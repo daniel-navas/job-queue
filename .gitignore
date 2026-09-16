@@ -1,0 +1,7 @@
+node_modules/
+.local/
+*.log
+profile/raw.md
+profile/cv/
+docs/ai-context.md
+docs/superpowers/

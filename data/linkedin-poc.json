@@ -1,0 +1,700 @@
+{
+  "capturedAt": "2026-09-12T08:57:40.982Z",
+  "source": "linkedin",
+  "searchUrl": "https://www.linkedin.com/jobs/search/?keywords=backend%20engineer&location=Colombia",
+  "network": {
+    "candidateResponses": [
+      {
+        "capturedAt": "2026-09-12T08:56:52.837Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(count:7)&queryId=voyagerJobsDashJobSearchSuggestionComponents.04e260716e8739f78bad924422f85f2f",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 12052,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/001.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.841Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(JOB_APPLICANT_INSIGHTS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 154131,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/002.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.841Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(INTERVIEW_PREP_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 152940,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/003.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.841Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(BANNER_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 152940,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/005.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.841Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(JSERP_SEEKER_NEXT_BEST_ACTION_CARDS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 153681,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/004.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.851Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(JOB_DESCRIPTION_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 237059,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/006.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.852Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323)&queryId=voyagerTalentbrandDashTargetedContents.4c8c7dc2f98499d0c03c3ac9ca3cd371",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 114512,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/007.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.853Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(count:20,start:0,jobSearchType:CLASSIC)&queryId=voyagerJobsDashJobSearchHistories.220d01e7d55ec8363130acffb73298ff",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 9527,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/008.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.853Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(COMPANY_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 156783,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/009.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.880Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(HIRING_TEAM_CARD,CONNECTIONS_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeConnectionsCard:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 163844,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/010.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.884Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(UPSELL_SECTION_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includePremiumUpsellSectionCard:true,jobDetailsContext:(isJobSearch:true))&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 157058,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/011.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.885Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(JOB_SEGMENT_ATTRIBUTES_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 152940,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/012.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.951Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323)&queryId=voyagerJobsDashJobPostings.8e5cd9bc41fc386f2e8ae995edea6721",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 76229,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/013.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.956Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(TOP_CARD,HOW_YOU_FIT_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true,jobDetailsContext:(isJobSearch:true))&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 188658,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/014.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.956Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(RECOMMENDED_ACTIONS_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 153946,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/015.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.963Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(JSERP_SEEKER_NEXT_BEST_ACTION_CARDS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 1085,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/018.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.963Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(SALARY_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 344,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/017.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.963Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(BENEFITS_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 344,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/019.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:52.963Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&queryId=voyagerMessagingDashAwayStatusV2.ee0ba3add6f8a58c35df3e08daa87b11",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 7338,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/016.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.345Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerJobsDashSearchFilterClustersResource?decorationId=com.linkedin.voyager.dash.deco.search.SearchFilterCluster-44&q=filters&query=(origin:JOB_SEARCH_PAGE_OTHER_ENTRY,keywords:backend%20engineer,locationUnion:(seoLocation:(location:Colombia)),spellCorrectionEnabled:true)",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 91491,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/020.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.345Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(HOW_YOU_MATCH_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 1441,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/021.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.347Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(JSERP_SEEKER_NEXT_BEST_ACTION_CARDS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 1085,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/023.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.347Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(companyUrn:urn%3Ali%3Afsd_company%3A18922914)&queryId=voyagerTalentbrandDashCandidateInterestMember.d831bf85b9873ef0228a2bab19781290",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 13214,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/022.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.347Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(MARKETPLACE_PROMO_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 344,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/025.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.347Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerIdentityDashNotificationCards?decorationId=com.linkedin.voyager.dash.deco.identity.notifications.CardsCollectionWithInjectionsNoPills-24&count=10&q=filterVanityName",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 114256,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/024.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.444Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(COMPANY_INSIGHTS_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 25568,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/027.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.444Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(TOP_CARD,HOW_YOU_FIT_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true,jobDetailsContext:(isJobSearch:true))&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 188658,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/026.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.444Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(JSERP_SEEKER_NEXT_BEST_ACTION_CARDS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 1085,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/028.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.451Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerJobsDashJobCards?decorationId=com.linkedin.voyager.dash.deco.jobs.search.JobSearchCardsCollection-220&count=25&q=jobSearch&query=(origin:JOB_SEARCH_PAGE_OTHER_ENTRY,keywords:backend%20engineer,locationUnion:(seoLocation:(location:Colombia)),spellCorrectionEnabled:true)&start=0",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 357406,
+        "jobIds": [
+          "4336895554",
+          "4460605977",
+          "4466309630",
+          "4457113259",
+          "4462228615",
+          "4456505323",
+          "4462229661",
+          "4411545149",
+          "4464225896",
+          "4449096335",
+          "4463865918",
+          "4448248723",
+          "4456274071",
+          "4449910054",
+          "4464320835",
+          "4466355053",
+          "4465368278",
+          "4466045510",
+          "4431864686",
+          "4459047469",
+          "4309397450",
+          "4464107192",
+          "4456168845",
+          "4458611805",
+          "4455894329"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/029.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.571Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(JSERP_SEEKER_NEXT_BEST_ACTION_CARDS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 1085,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/030.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.622Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(JSERP_SEEKER_NEXT_BEST_ACTION_CARDS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 1085,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/031.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.626Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(cardSectionTypes:List(TOP_CARD,HOW_YOU_FIT_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true,jobDetailsContext:(isJobSearch:true))&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 188658,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/032.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.626Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(companyUrn:urn%3Ali%3Afsd_company%3A18922914)&queryId=voyagerTalentbrandDashCandidateInterestMember.d831bf85b9873ef0228a2bab19781290",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 4294,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/033.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.736Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(jobFitLevelCardUrn:urn%3Ali%3Afsd_jobFitLevelCard%3A4456505323)&queryId=voyagerJobsDashJobFitLevelCards.7093ee476a688ed6848042e6823ce0db",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 37696,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/034.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.763Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(JSERP_SEEKER_NEXT_BEST_ACTION_CARDS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 1085,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/035.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.844Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(companyUrn:urn%3Ali%3Afsd_company%3A18922914)&queryId=voyagerTalentbrandDashCandidateInterestMember.d831bf85b9873ef0228a2bab19781290",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 4294,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/036.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.878Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(TOP_CARD,HOW_YOU_FIT_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true,jobDetailsContext:(isJobSearch:true))&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 36062,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/037.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:53.974Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(JSERP_SEEKER_NEXT_BEST_ACTION_CARDS),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true)&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 1085,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/038.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:54.302Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?variables=(cardSectionTypes:List(TOP_CARD,HOW_YOU_FIT_CARD),jobPostingUrn:urn%3Ali%3Afsd_jobPosting%3A4456505323,includeSecondaryActionsV2:true,jobDetailsContext:(isJobSearch:true))&queryId=voyagerJobsDashJobPostingDetailSections.bc2eee77d01abc6616b8c8855344dfd5",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 36062,
+        "jobIds": [
+          "4456505323"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/039.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:54.554Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerJobsDashJobCards?decorationId=com.linkedin.voyager.dash.deco.jobs.search.JobSearchCardsCollection-220&count=25&q=jobSearch&query=(origin:JOB_SEARCH_PAGE_OTHER_ENTRY,keywords:backend%20engineer,locationUnion:(seoLocation:(location:Colombia)),spellCorrectionEnabled:true)&start=25",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 246320,
+        "jobIds": [
+          "4464624460",
+          "4449688989",
+          "4439469372",
+          "4459316565",
+          "4457390516",
+          "4460632037",
+          "4421695829",
+          "4464909309",
+          "4464970320",
+          "4455895465",
+          "4456255691",
+          "4465814285",
+          "4465058577",
+          "4456013073",
+          "4427352897",
+          "4309376760",
+          "4460765223",
+          "4456717815",
+          "4464599633",
+          "4399689208",
+          "4461275133",
+          "4462040494",
+          "4430041147",
+          "4335557268",
+          "4458677690"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/040.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:56:54.731Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=(jobPostingDetailDescription_start:0,jobPostingDetailDescription_count:5,jobCardPrefetchQuery:(jobUseCase:JOB_DETAILS,prefetchJobPostingCardUrns:List(urn%3Ali%3Afsd_jobPostingCard%3A%284463865918%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284309397450%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284449910054%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284458611805%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284466355053%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284455894329%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284336895554%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284457113259%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284449096335%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284466045510%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284464107192%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284462229661%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284456168845%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284462228615%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284459047469%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284466309630%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284411545149%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284456274071%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284464320835%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284460605977%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284448248723%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284464225896%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284431864686%2CJOB_DETAILS%29,urn%3Ali%3Afsd_jobPostingCard%3A%284465368278%2CJOB_DETAILS%29),count:5),jobDetailsContext:(isJobSearch:true))&queryId=voyagerJobsDashJobCards.6fbc5612fb705c8bfe54134097e64aa7",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 2238342,
+        "jobIds": [
+          "4466355053",
+          "4411545149",
+          "4457113259",
+          "4456274071",
+          "4466309630",
+          "4309397450",
+          "4464107192",
+          "4336895554",
+          "4465368278",
+          "4456168845",
+          "4458611805",
+          "4448248723",
+          "4455894329",
+          "4459047469",
+          "4463865918",
+          "4464320835",
+          "4462228615",
+          "4449096335",
+          "4431864686",
+          "4462229661",
+          "4460605977",
+          "4449910054",
+          "4464225896",
+          "4466045510"
+        ],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/041.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:24.581Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=()&queryId=voyagerFeedDashGlobalNavs.a618d03c522276ae43e2ecc891d11cf2",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 72118,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/042.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:24.928Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&queryId=voyagerMessagingDashAwayStatusV2.ee0ba3add6f8a58c35df3e08daa87b11",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 7338,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/043.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:25.151Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerIdentityDashNotificationCards?decorationId=com.linkedin.voyager.dash.deco.identity.notifications.CardsCollectionWithInjectionsNoPills-24&count=10&q=filterVanityName",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 114260,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/044.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:28.362Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=()&queryId=voyagerFeedDashGlobalNavs.a618d03c522276ae43e2ecc891d11cf2",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 72104,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/045.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:28.608Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&queryId=voyagerMessagingDashAwayStatusV2.ee0ba3add6f8a58c35df3e08daa87b11",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 7338,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/046.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:29.119Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerIdentityDashNotificationCards?decorationId=com.linkedin.voyager.dash.deco.identity.notifications.CardsCollectionWithInjectionsNoPills-24&count=10&q=filterVanityName",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 114254,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/047.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:31.572Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=()&queryId=voyagerFeedDashGlobalNavs.a618d03c522276ae43e2ecc891d11cf2",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 72127,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/048.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:31.825Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&queryId=voyagerMessagingDashAwayStatusV2.ee0ba3add6f8a58c35df3e08daa87b11",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 7338,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/049.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:32.263Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerIdentityDashNotificationCards?decorationId=com.linkedin.voyager.dash.deco.identity.notifications.CardsCollectionWithInjectionsNoPills-24&count=10&q=filterVanityName",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 114258,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/050.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:35.171Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=()&queryId=voyagerFeedDashGlobalNavs.a618d03c522276ae43e2ecc891d11cf2",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 72126,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/051.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:35.493Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&queryId=voyagerMessagingDashAwayStatusV2.ee0ba3add6f8a58c35df3e08daa87b11",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 7338,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/052.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:35.768Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerIdentityDashNotificationCards?decorationId=com.linkedin.voyager.dash.deco.identity.notifications.CardsCollectionWithInjectionsNoPills-24&count=10&q=filterVanityName",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 114250,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/053.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:38.840Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&variables=()&queryId=voyagerFeedDashGlobalNavs.a618d03c522276ae43e2ecc891d11cf2",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 72104,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/054.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:39.112Z",
+        "url": "https://www.linkedin.com/voyager/api/graphql?includeWebMetadata=true&queryId=voyagerMessagingDashAwayStatusV2.ee0ba3add6f8a58c35df3e08daa87b11",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 7338,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/055.json"
+      },
+      {
+        "capturedAt": "2026-09-12T08:57:39.570Z",
+        "url": "https://www.linkedin.com/voyager/api/voyagerIdentityDashNotificationCards?decorationId=com.linkedin.voyager.dash.deco.identity.notifications.CardsCollectionWithInjectionsNoPills-24&count=10&q=filterVanityName",
+        "status": 200,
+        "contentType": "application/vnd.linkedin.normalized+json+2.1; charset=UTF-8",
+        "byteLength": 114258,
+        "jobIds": [],
+        "localCapture": ".local/linkedin-captures/2026-09-12T08-56-47-856Z/056.json"
+      }
+    ],
+    "jobIds": [
+      "4456505323",
+      "4336895554",
+      "4460605977",
+      "4466309630",
+      "4457113259",
+      "4462228615",
+      "4462229661",
+      "4411545149",
+      "4464225896",
+      "4449096335",
+      "4463865918",
+      "4448248723",
+      "4456274071",
+      "4449910054",
+      "4464320835",
+      "4466355053",
+      "4465368278",
+      "4466045510",
+      "4431864686",
+      "4459047469",
+      "4309397450",
+      "4464107192",
+      "4456168845",
+      "4458611805",
+      "4455894329",
+      "4464624460",
+      "4449688989",
+      "4439469372",
+      "4459316565",
+      "4457390516",
+      "4460632037",
+      "4421695829",
+      "4464909309",
+      "4464970320",
+      "4455895465",
+      "4456255691",
+      "4465814285",
+      "4465058577",
+      "4456013073",
+      "4427352897",
+      "4309376760",
+      "4460765223",
+      "4456717815",
+      "4464599633",
+      "4399689208",
+      "4461275133",
+      "4462040494",
+      "4430041147",
+      "4335557268",
+      "4458677690"
+    ]
+  },
+  "visibleJobs": [
+    {
+      "id": "4456505323",
+      "url": "https://www.linkedin.com/jobs/view/4456505323/",
+      "title": "Senior Backend Engineer, NodeJS | LATAM Senior Backend Engineer, NodeJS | LATAM with verification"
+    },
+    {
+      "id": "4463865918",
+      "url": "https://www.linkedin.com/jobs/view/4463865918/",
+      "title": "Back End Developer Back End Developer with verification"
+    },
+    {
+      "id": "4309397450",
+      "url": "https://www.linkedin.com/jobs/view/4309397450/",
+      "title": "Senior Backend Developer (Node.js / Nest.js) Senior Backend Developer (Node.js / Nest.js) with verification"
+    },
+    {
+      "id": "4449910054",
+      "url": "https://www.linkedin.com/jobs/view/4449910054/",
+      "title": "Backend Engineer Backend Engineer with verification"
+    },
+    {
+      "id": "4458611805",
+      "url": "https://www.linkedin.com/jobs/view/4458611805/",
+      "title": "Back End Developer Back End Developer with verification"
+    },
+    {
+      "id": "4466355053",
+      "url": "https://www.linkedin.com/jobs/view/4466355053/",
+      "title": "Backend Software Engineer (Remote)Backend Software Engineer (Remote)"
+    },
+    {
+      "id": "4455894329",
+      "url": "https://www.linkedin.com/jobs/view/4455894329/",
+      "title": "Software Engineer Software Engineer with verification"
+    }
+  ],
+  "completeCount": 25
+}

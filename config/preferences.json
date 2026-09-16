@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "unknownScore": 0,
+  "missingProjectScore": -1,
+  "roleFocus": {
+    "backend": 1,
+    "fullstack": 0,
+    "frontend": -1
+  },
+  "workplace": {
+    "remote": 1,
+    "hybrid": 0,
+    "onsite": -1
+  },
+  "relocation": {
+    "priorityCountries": ["ES", "DE"],
+    "countries": ["ES", "DE", "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "SE"],
+    "workplaceScore": 0,
+    "visaSupportRequired": true,
+    "relocationFundingRequired": false
+  },
+  "companyType": {
+    "product": 1,
+    "outsourcing": 0,
+    "recruiting-intermediary": 0,
+    "unknown": 0
+  },
+  "projectTags": {
+    "b2b": -1,
+    "hr-platform": -1,
+    "consumer": 1,
+    "mixed-audience": 1,
+    "consumer-credit": 1,
+    "crypto-trading": 1,
+    "growth-work": 1
+  },
+  "salaryMonthlyUsd": {
+    "preferredMin": 3000,
+    "preferredMax": 4000,
+    "acceptableMin": 2500,
+    "acceptableMax": 4500,
+    "preferredScore": 1,
+    "outsideScore": -1
+  }
+}

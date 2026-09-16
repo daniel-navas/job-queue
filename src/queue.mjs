@@ -1,0 +1,111 @@
+import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
+import path from 'node:path';
+import { discoveriesFor } from './searches.mjs';
+
+const text = value => (typeof value === 'string' ? value : value?.text)?.trim() || null;
+
+export function normalizeCaptures(payloads, metadata = []) {
+  // Legacy search-card metadata can hydrate a detail-only response. Never seed
+  // descriptions here: only descriptions received in this capture are imported.
+  const jobs = new Map(metadata.map(({ id, title, company, location, publishedAt, source, url }) => [id, { id, title, company, location, publishedAt, source, url }]));
+  for (const payload of payloads) {
+    for (const item of payload.included ?? []) {
+      const card = item.$type?.endsWith('.JobPostingCard');
+      if (!card && !item.$type?.endsWith('.JobPosting')) continue;
+      const id = item.entityUrn?.match(/jobPosting(?:Card)?:\(?(\d+)/)?.[1];
+      if (!id) continue;
+      const previous = jobs.get(id) ?? { id, source: 'linkedin', url: `https://www.linkedin.com/jobs/view/${id}/` };
+      const fields = {
+        title: text(item.jobPostingTitle) || text(item.title),
+        company: card ? text(item.primaryDescription) : null,
+        location: card ? text(item.secondaryDescription) : null,
+        description: text(item.description),
+        publishedAt: item.footerItems?.find(i => i.type === 'LISTED_DATE')?.timeAt,
+      };
+      for (const [key, value] of Object.entries(fields)) if (value) previous[key] = value;
+      jobs.set(id, previous);
+    }
+  }
+  return [...jobs.values()].filter(job => job.title && job.description);
+}
+
+export function mergeJobs(existing, incoming, capturedAt, searchUrl, search = null) {
+  const jobs = new Map(existing.map(job => [job.id, job]));
+  for (const job of incoming) {
+    const old = jobs.get(job.id);
+    const discoveries = structuredClone(discoveriesFor(old ?? {}));
+    if (search) {
+      const origin = discoveries.find(d => d.search.id === search.id && d.search.provider === search.provider && d.search.revision === search.revision);
+      if (origin) origin.lastSeen = capturedAt;
+      else discoveries.push({ search: structuredClone(search), firstSeen: capturedAt, lastSeen: capturedAt });
+    }
+    jobs.set(job.id, { ...old, ...job, firstSeen: old?.firstSeen ?? capturedAt,
+      lastSeen: capturedAt, searchUrl: old?.searchUrl ?? searchUrl, discoveries, status: old?.status ?? 'new',
+      reason: old?.reason ?? '', history: old?.history ?? [] });
+  }
+  return [...jobs.values()];
+}
+
+export class Queue {
+  constructor(root) { this.root = root; this.file = path.join(root, 'data/queue.json'); this.state = { jobs: [], importedAt: null }; this.pending = Promise.resolve(); }
+  async load() {
+    try { this.state = JSON.parse(await readFile(this.file, 'utf8')); }
+    catch (error) { if (error.code !== 'ENOENT') throw error; }
+  }
+  async save() {
+    await mkdir(path.dirname(this.file), { recursive: true });
+    await writeFile(`${this.file}.tmp`, JSON.stringify(this.state, null, 2) + '\n');
+    await rename(`${this.file}.tmp`, this.file);
+  }
+  mutate(fn) {
+    const operation = this.pending.then(async () => { const before = structuredClone(this.state); try { const result = await fn(); await this.save(); return result; } catch (error) { this.state = before; throw error; } });
+    this.pending = operation.catch(() => {});
+    return operation;
+  }
+  async importCapture(manifest = path.join(this.root, 'data/linkedin-poc.json'), expectedRunId = null) {
+    const capture = JSON.parse(await readFile(manifest, 'utf8'));
+    if (expectedRunId && capture.runId !== expectedRunId) throw new Error('Capture run does not match the current search');
+    const payloads = await Promise.all(capture.network.candidateResponses.map(async response => {
+      const file = path.resolve(this.root, response.localCapture);
+      if (!file.startsWith(path.join(this.root, '.local/linkedin-captures/'))) throw new Error('Invalid capture path');
+      return JSON.parse(await readFile(file, 'utf8'));
+    }));
+    return this.mutate(() => {
+      if (capture.runId && this.state.searchRuns?.some(run => run.id === capture.runId)) return { captured: 0, added: 0 };
+      let incoming = normalizeCaptures(payloads, this.state.jobs);
+      if (capture.search) {
+        // Discovery is established on the search page, never from detail-page
+        // recommendations or a feed response containing an incidental job ID.
+        const discovered = new Set(capture.searchJobIds ?? []);
+        const fresh = new Map(incoming.filter(job => discovered.has(job.id)).map(job => [job.id, job]));
+        for (const old of this.state.jobs) if (discovered.has(old.id) && old.description?.trim() && !fresh.has(old.id)) fresh.set(old.id, { id: old.id });
+        incoming = [...fresh.values()];
+      }
+      const added = incoming.filter(job => !this.state.jobs.some(old => old.id === job.id && old.description?.trim())).length;
+      this.state.jobs = mergeJobs(this.state.jobs, incoming, capture.capturedAt, capture.searchUrl, capture.search);
+      if (capture.runId && capture.search) {
+        (this.state.searchRuns ??= []).push({ id: capture.runId, search: capture.search, capturedAt: capture.capturedAt,
+          status: capture.status ?? 'complete', observed: new Set(capture.searchJobIds ?? []).size,
+          captured: incoming.length, added, jobIds: incoming.map(job => job.id), effectiveUrl: capture.effectiveUrl ?? null });
+      }
+      this.state.importedAt = capture.capturedAt;
+      this.state.searchUrl = capture.searchUrl;
+      return { captured: incoming.length, added };
+    });
+  }
+  recordFailedSearch(id, search, message) {
+    return this.mutate(() => {
+      if (!this.state.searchRuns?.some(run => run.id === id)) (this.state.searchRuns ??= []).push({ id, search, status: 'failed', capturedAt: new Date().toISOString(), observed: 0, captured: 0, added: 0, jobIds: [], message });
+    });
+  }
+  review(id, status, reason) {
+    if (!['new', 'interesting', 'dismissed'].includes(status) || typeof reason !== 'string' || reason.length > 2000) throw new Error('Invalid review');
+    if (status === 'dismissed' && !reason.trim()) throw new Error('Please add a reason for dismissing this job.');
+    return this.mutate(() => {
+      const job = this.state.jobs.find(job => job.id === id);
+      if (!job) throw new Error('Job not found');
+      job.status = status; job.reason = reason.trim();
+      job.history.push({ status, reason: job.reason, at: new Date().toISOString() });
+    });
+  }
+}

@@ -1,0 +1,891 @@
+{
+  "version": 1,
+  "technology": {
+    "nodejs": {
+      "label": "Node.js",
+      "aliases": [
+        "node",
+        "node.js"
+      ]
+    },
+    "typescript": {
+      "label": "TypeScript",
+      "aliases": [
+        "ts"
+      ]
+    },
+    "javascript": {
+      "label": "JavaScript",
+      "aliases": [
+        "js"
+      ]
+    },
+    "python": {
+      "label": "Python"
+    },
+    "go": {
+      "label": "Go",
+      "aliases": [
+        "golang"
+      ]
+    },
+    "java": {
+      "label": "Java"
+    },
+    "rust": {
+      "label": "Rust"
+    },
+    "c++": {
+      "label": "C++",
+      "aliases": [
+        "cpp"
+      ]
+    },
+    "csharp": {
+      "label": "C#",
+      "aliases": [
+        "c#"
+      ]
+    },
+    "ruby": {
+      "label": "Ruby"
+    },
+    "php": {
+      "label": "PHP"
+    },
+    "kotlin": {
+      "label": "Kotlin"
+    },
+    "scala": {
+      "label": "Scala"
+    },
+    "sql": {
+      "label": "SQL"
+    },
+    "react": {
+      "label": "React",
+      "aliases": [
+        "react.js",
+        "reactjs"
+      ]
+    },
+    "react-native": {
+      "label": "React Native"
+    },
+    "angular": {
+      "label": "Angular"
+    },
+    "angularjs": {
+      "label": "AngularJS"
+    },
+    "vue": {
+      "label": "Vue",
+      "aliases": [
+        "vue.js",
+        "vuejs"
+      ]
+    },
+    "nextjs": {
+      "label": "Next.js",
+      "aliases": [
+        "next.js"
+      ]
+    },
+    "nuxt": {
+      "label": "Nuxt",
+      "aliases": [
+        "nuxt.js"
+      ]
+    },
+    "tailwind": {
+      "label": "Tailwind CSS",
+      "aliases": [
+        "tailwind-css"
+      ]
+    },
+    "nestjs": {
+      "label": "NestJS",
+      "aliases": [
+        "nest",
+        "nest.js"
+      ]
+    },
+    "express": {
+      "label": "Express"
+    },
+    "fastify": {
+      "label": "Fastify"
+    },
+    "spring-boot": {
+      "label": "Spring Boot"
+    },
+    "dotnet": {
+      "label": ".NET",
+      "aliases": [
+        ".net"
+      ]
+    },
+    "ruby-on-rails": {
+      "label": "Ruby on Rails",
+      "aliases": [
+        "rails"
+      ]
+    },
+    "django": {
+      "label": "Django"
+    },
+    "fastapi": {
+      "label": "FastAPI"
+    },
+    "django-rest-framework": {
+      "label": "Django REST Framework"
+    },
+    "typeorm": {
+      "label": "TypeORM"
+    },
+    "prisma": {
+      "label": "Prisma"
+    },
+    "sequelize": {
+      "label": "Sequelize"
+    },
+    "drizzle": {
+      "label": "Drizzle"
+    },
+    "postgresql": {
+      "label": "PostgreSQL",
+      "aliases": [
+        "postgres"
+      ]
+    },
+    "mysql": {
+      "label": "MySQL"
+    },
+    "mariadb": {
+      "label": "MariaDB"
+    },
+    "sql-server": {
+      "label": "SQL Server"
+    },
+    "mongodb": {
+      "label": "MongoDB"
+    },
+    "cassandra": {
+      "label": "Cassandra"
+    },
+    "redis": {
+      "label": "Redis"
+    },
+    "elasticsearch": {
+      "label": "Elasticsearch"
+    },
+    "dynamodb": {
+      "label": "DynamoDB"
+    },
+    "bigquery": {
+      "label": "BigQuery"
+    },
+    "aws": {
+      "label": "AWS",
+      "aliases": [
+        "amazon-web-services"
+      ]
+    },
+    "gcp": {
+      "label": "GCP",
+      "aliases": [
+        "google-cloud",
+        "google-cloud-platform"
+      ]
+    },
+    "azure": {
+      "label": "Azure"
+    },
+    "docker": {
+      "label": "Docker"
+    },
+    "docker-compose": {
+      "label": "Docker Compose"
+    },
+    "kubernetes": {
+      "label": "Kubernetes",
+      "aliases": [
+        "k8s"
+      ]
+    },
+    "gke": {
+      "label": "GKE"
+    },
+    "terraform": {
+      "label": "Terraform"
+    },
+    "ansible": {
+      "label": "Ansible"
+    },
+    "aws-cdk": {
+      "label": "AWS CDK"
+    },
+    "aws-lambda": {
+      "label": "AWS Lambda",
+      "aliases": [
+        "lambda"
+      ]
+    },
+    "aws-s3": {
+      "label": "Amazon S3",
+      "aliases": [
+        "s3"
+      ]
+    },
+    "aws-sqs": {
+      "label": "Amazon SQS",
+      "aliases": [
+        "sqs"
+      ]
+    },
+    "aws-sns": {
+      "label": "Amazon SNS",
+      "aliases": [
+        "sns"
+      ]
+    },
+    "aws-ecs": {
+      "label": "Amazon ECS",
+      "aliases": [
+        "ecs"
+      ]
+    },
+    "aws-iam": {
+      "label": "AWS IAM",
+      "aliases": [
+        "iam"
+      ]
+    },
+    "aws-bedrock": {
+      "label": "AWS Bedrock"
+    },
+    "aws-codebuild": {
+      "label": "AWS CodeBuild"
+    },
+    "api-gateway": {
+      "label": "API Gateway"
+    },
+    "cloud-run": {
+      "label": "Cloud Run"
+    },
+    "pub-sub": {
+      "label": "Pub/Sub"
+    },
+    "vercel": {
+      "label": "Vercel"
+    },
+    "linux": {
+      "label": "Linux"
+    },
+    "nginx": {
+      "label": "NGINX"
+    },
+    "git": {
+      "label": "Git",
+      "differentiating": false
+    },
+    "gitlab": {
+      "label": "GitLab"
+    },
+    "github-actions": {
+      "label": "GitHub Actions"
+    },
+    "gitlab-ci": {
+      "label": "GitLab CI"
+    },
+    "azure-devops": {
+      "label": "Azure DevOps",
+      "aliases": [
+        "vsts"
+      ]
+    },
+    "argocd": {
+      "label": "ArgoCD"
+    },
+    "bitbucket": {
+      "label": "Bitbucket"
+    },
+    "kafka": {
+      "label": "Kafka"
+    },
+    "rabbitmq": {
+      "label": "RabbitMQ"
+    },
+    "temporal": {
+      "label": "Temporal"
+    },
+    "sidekiq": {
+      "label": "Sidekiq"
+    },
+    "celery": {
+      "label": "Celery"
+    },
+    "airflow": {
+      "label": "Airflow"
+    },
+    "graphql": {
+      "label": "GraphQL"
+    },
+    "openapi": {
+      "label": "OpenAPI",
+      "aliases": [
+        "swagger"
+      ]
+    },
+    "jwt": {
+      "label": "JWT"
+    },
+    "oauth2": {
+      "label": "OAuth 2.0",
+      "aliases": [
+        "oauth",
+        "oauth-2.0"
+      ]
+    },
+    "jest": {
+      "label": "Jest"
+    },
+    "mocha": {
+      "label": "Mocha"
+    },
+    "pytest": {
+      "label": "pytest"
+    },
+    "prometheus": {
+      "label": "Prometheus"
+    },
+    "grafana": {
+      "label": "Grafana"
+    },
+    "sonarqube": {
+      "label": "SonarQube"
+    },
+    "power-bi": {
+      "label": "Power BI"
+    },
+    "pytorch": {
+      "label": "PyTorch"
+    },
+    "scikit-learn": {
+      "label": "scikit-learn"
+    },
+    "huggingface": {
+      "label": "Hugging Face"
+    },
+    "langchain": {
+      "label": "LangChain"
+    },
+    "llamaindex": {
+      "label": "LlamaIndex"
+    },
+    "semantic-kernel": {
+      "label": "Semantic Kernel"
+    },
+    "mcp": {
+      "label": "MCP"
+    },
+    "claude": {
+      "label": "Claude"
+    },
+    "claude-code": {
+      "label": "Claude Code"
+    },
+    "cursor": {
+      "label": "Cursor"
+    },
+    "codex": {
+      "label": "Codex"
+    },
+    "github-copilot": {
+      "label": "GitHub Copilot"
+    },
+    "gemini": {
+      "label": "Gemini"
+    },
+    "chatgpt": {
+      "label": "ChatGPT"
+    },
+    "relational-db": {
+      "label": "Relational databases",
+      "definition": "A general relational-database requirement, not a specific vendor.",
+      "members": [
+        "postgresql",
+        "mysql",
+        "mariadb",
+        "sql-server"
+      ]
+    },
+    "orm": {
+      "label": "ORM",
+      "definition": "A general ORM requirement permitting equivalent tools.",
+      "members": [
+        "typeorm",
+        "prisma",
+        "sequelize",
+        "drizzle"
+      ]
+    },
+    "compiled-language": {
+      "label": "Compiled languages",
+      "definition": "General compiled statically typed languages, only when equivalents are allowed.",
+      "members": [
+        "go",
+        "java",
+        "rust",
+        "c++",
+        "csharp",
+        "kotlin",
+        "scala"
+      ]
+    },
+    "modern-frontend": {
+      "label": "Modern frontend",
+      "definition": "General modern frontend frameworks, not specific React proficiency.",
+      "members": [
+        "react",
+        "angular",
+        "vue"
+      ]
+    },
+    "nosql": {
+      "label": "NoSQL",
+      "definition": "General non-relational database experience.",
+      "members": [
+        "mongodb",
+        "cassandra",
+        "dynamodb"
+      ]
+    },
+    "llm-tools": {
+      "label": "LLM tools",
+      "definition": "General usage of LLM tools, not proficiency with a specific named product.",
+      "aliases": [
+        "equivalent-llm-tools"
+      ],
+      "capability": "ai-assisted"
+    }
+  },
+  "capability": {
+    "backend": {
+      "label": "Backend development",
+      "definition": "Building backend services; not a proxy for every engineering skill."
+    },
+    "financial": {
+      "label": "Financial domain",
+      "definition": "Experience in finance, banking, payments or reconciliation; not proof of each specialty."
+    },
+    "ai-assisted": {
+      "label": "AI-assisted development",
+      "definition": "Using AI/LLM coding tools, including a named tool OR equivalents; not building AI models."
+    },
+    "degree": {
+      "label": "Relevant technical degree",
+      "definition": "A software/computing/engineering degree. Exact graduate degrees remain unmapped."
+    },
+    "full-stack": {
+      "label": "Full-stack development",
+      "definition": "Experience across frontend and backend."
+    },
+    "automated-testing": {
+      "label": "Automated testing",
+      "definition": "General automated testing. Do not substitute for a required specific subtype."
+    },
+    "unit-testing": {
+      "label": "Unit testing",
+      "definition": "Explicit unit-test experience."
+    },
+    "integration-testing": {
+      "label": "Integration testing",
+      "definition": "Explicit integration-test experience."
+    },
+    "e2e-testing": {
+      "label": "End-to-end testing",
+      "definition": "Explicit end-to-end tests."
+    },
+    "contract-testing": {
+      "label": "Contract testing",
+      "definition": "Explicit API/consumer contract tests."
+    },
+    "rest-api": {
+      "label": "REST APIs",
+      "definition": "RESTful API design or implementation."
+    },
+    "microservices": {
+      "label": "Microservices",
+      "definition": "Microservice architecture or implementation."
+    },
+    "engineering-process": {
+      "label": "Engineering delivery",
+      "definition": "General SDLC/release experience; not evidence for a specific vendor or specialty.",
+      "differentiating": false
+    },
+    "distributed": {
+      "label": "Distributed systems",
+      "definition": "Distributed services and their failure/consistency characteristics."
+    },
+    "english": {
+      "label": "English for daily work",
+      "definition": "Daily work/communication in English; not a standardized CEFR score."
+    },
+    "english-b2": {
+      "label": "English B2",
+      "definition": "Explicit B2 proficiency; daily English alone does not establish certification/level."
+    },
+    "english-c1": {
+      "label": "English C1",
+      "definition": "Explicit C1 or higher proficiency; do not infer it."
+    },
+    "data-structures": {
+      "label": "Data structures",
+      "definition": "Explicit data-structure knowledge."
+    },
+    "algorithms": {
+      "label": "Algorithms",
+      "definition": "Explicit algorithm knowledge."
+    },
+    "system-design": {
+      "label": "System design",
+      "definition": "Architecture/design knowledge; do not infer from tenure."
+    },
+    "data-modeling": {
+      "label": "Data modeling",
+      "definition": "Schemas, relational modeling and migrations."
+    },
+    "query-optimization": {
+      "label": "Query optimization",
+      "definition": "Database query/index performance."
+    },
+    "data-integrity": {
+      "label": "Transactions & integrity",
+      "definition": "Transactions, consistency and integrity; financial domain alone does not establish it."
+    },
+    "api-integration": {
+      "label": "API integrations",
+      "definition": "Integrating external APIs, webhooks or systems."
+    },
+    "authentication": {
+      "label": "Authentication & authorization",
+      "definition": "Identity, access control and authentication flows."
+    },
+    "caching": {
+      "label": "Caching",
+      "definition": "Application or service caching strategies."
+    },
+    "ci-cd": {
+      "label": "CI/CD",
+      "definition": "Build and delivery pipelines; not any particular pipeline tool."
+    },
+    "devops": {
+      "label": "DevOps",
+      "definition": "Development/operations and deployment practices."
+    },
+    "containerization": {
+      "label": "Containerization",
+      "definition": "General container experience; not orchestration."
+    },
+    "container-orchestration": {
+      "label": "Container orchestration",
+      "definition": "Operating container schedulers; Docker alone does not establish it."
+    },
+    "event-driven": {
+      "label": "Event-driven architecture",
+      "definition": "Asynchronous events and event-driven services."
+    },
+    "message-queues": {
+      "label": "Message queues",
+      "definition": "Message brokers/queues; no vendor implied."
+    },
+    "observability": {
+      "label": "Observability",
+      "definition": "Logs, metrics, tracing and monitoring."
+    },
+    "incident-response": {
+      "label": "Production troubleshooting",
+      "definition": "Diagnosing and resolving production incidents."
+    },
+    "production-operations": {
+      "label": "Production operations",
+      "definition": "Operating and owning live production services."
+    },
+    "performance-optimization": {
+      "label": "Performance optimization",
+      "definition": "Explicit system performance/scalability tuning."
+    },
+    "secure-coding": {
+      "label": "Secure coding",
+      "definition": "Application security and secure coding practices."
+    },
+    "iac": {
+      "label": "Infrastructure as code",
+      "definition": "Declarative/programmatic infrastructure provisioning."
+    },
+    "serverless": {
+      "label": "Serverless",
+      "definition": "Serverless architecture/deployment."
+    },
+    "cloud-native": {
+      "label": "Cloud-native systems",
+      "definition": "Building/operating cloud-native applications; not every cloud vendor."
+    },
+    "data-engineering": {
+      "label": "Data engineering",
+      "definition": "Data processing/pipeline engineering; not all backend work."
+    },
+    "etl": {
+      "label": "ETL/ELT pipelines",
+      "definition": "Extracting, transforming and loading data."
+    },
+    "data-warehousing": {
+      "label": "Data warehousing",
+      "definition": "Analytical warehouse modeling and operation."
+    },
+    "data-visualization": {
+      "label": "Data visualization",
+      "definition": "Dashboards, reports and visual analytics."
+    },
+    "ai-integration": {
+      "label": "AI integration",
+      "definition": "Building products integrating model APIs/outputs; not merely using coding assistants."
+    },
+    "ai-agents": {
+      "label": "AI-agent systems",
+      "definition": "Building/orchestrating agents in applications."
+    },
+    "rag": {
+      "label": "RAG",
+      "definition": "Retrieval-augmented generation."
+    },
+    "vector-search": {
+      "label": "Vector search",
+      "definition": "Vector indexes, embeddings and retrieval."
+    },
+    "ml-serving": {
+      "label": "ML model serving",
+      "definition": "Production model deployment/inference."
+    },
+    "ai-evaluation": {
+      "label": "AI evaluation",
+      "definition": "Benchmarks and evaluation environments for AI systems."
+    },
+    "web3": {
+      "label": "Web3",
+      "definition": "Blockchain/decentralized application experience."
+    },
+    "electronic-trading": {
+      "label": "Electronic trading",
+      "definition": "Trading infrastructure/domain experience."
+    },
+    "product-experimentation": {
+      "label": "Product experimentation",
+      "aliases": [
+        "ab-testing",
+        "a/b-testing"
+      ],
+      "definition": "Controlled product experiments, including A/B, split, multivariate and feature experiments, plus experimentation frameworks."
+    },
+    "analytics-instrumentation": {
+      "label": "Analytics instrumentation",
+      "definition": "Planning, implementing and validating product events, properties and telemetry."
+    },
+    "product-analytics": {
+      "label": "Product analytics",
+      "definition": "Funnels, conversion, retention, cohorts and behavioral analysis."
+    },
+    "growth-engineering": {
+      "label": "Growth engineering",
+      "definition": "Activation/onboarding/conversion engineering."
+    },
+    "technical-leadership": {
+      "label": "Technical leadership",
+      "definition": "Leading technical projects; not inferred from senior title alone."
+    },
+    "mentoring": {
+      "label": "Mentoring",
+      "definition": "Explicit engineering mentoring."
+    },
+    "team-problem-solving": {
+      "label": "Team problem solving",
+      "definition": "Concrete experience solving technical problems in a team.",
+      "aliases": [
+        "team-technical-problem-solving"
+      ],
+      "differentiating": false
+    },
+    "agile": {
+      "label": "Agile development",
+      "definition": "Scrum/Kanban or similar delivery experience.",
+      "differentiating": false
+    },
+    "pair-programming": {
+      "label": "Pair programming",
+      "definition": "Explicit pair-programming experience.",
+      "differentiating": false
+    },
+    "high-growth": {
+      "label": "High-growth teams",
+      "definition": "Experience in high-growth organizations; not a personality trait."
+    },
+    "early-stage": {
+      "label": "Early-stage startups",
+      "definition": "Explicit early-stage/startup engineering experience."
+    },
+    "saas-experience": {
+      "label": "SaaS experience",
+      "definition": "Experience operating a SaaS product; not a product audience classification."
+    },
+    "pci-dss": {
+      "label": "PCI-DSS",
+      "definition": "Explicit payment-card compliance experience."
+    },
+    "accessibility": {
+      "label": "Web accessibility",
+      "definition": "Explicit WCAG/accessibility engineering."
+    },
+    "azure-developer-certification": {
+      "label": "Azure Developer certification",
+      "definition": "Microsoft Azure Developer Associate certification."
+    },
+    "aws-certification": {
+      "label": "AWS certification",
+      "definition": "Explicit AWS certification; use source label for any required specialization."
+    },
+    "code-review": {
+      "label": "Code review",
+      "definition": "Routine review participation expected of experienced engineers.",
+      "differentiating": false
+    },
+    "collaboration": {
+      "label": "Collaboration",
+      "definition": "Generic teamwork or cross-functional collaboration.",
+      "differentiating": false
+    },
+    "generic-problem-solving": {
+      "label": "Problem solving",
+      "definition": "Generic problem solving without a measurable specialty.",
+      "differentiating": false
+    },
+    "generic-debugging": {
+      "label": "Generic debugging",
+      "definition": "Routine software debugging without a specialized system, incident, or diagnostic scope.",
+      "differentiating": false
+    },
+    "generic-communication": {
+      "label": "Communication",
+      "definition": "Generic communication without a stated language level or specialized audience.",
+      "differentiating": false
+    },
+    "clean-code": {
+      "label": "Clean code",
+      "definition": "Routine readable, maintainable code expectations.",
+      "differentiating": false
+    },
+    "fast-paced": {
+      "label": "Fast-paced work",
+      "definition": "Generic ability to work in a fast-paced environment.",
+      "differentiating": false
+    },
+    "adaptability": {
+      "label": "Adaptability",
+      "definition": "Generic adaptability or eagerness to learn.",
+      "differentiating": false
+    },
+    "ownership": {
+      "label": "Ownership",
+      "definition": "Generic responsibility or ownership expectations.",
+      "differentiating": false
+    }
+  },
+  "experience": {
+    "professional": {
+      "label": "Software engineering",
+      "definition": "Total professional software-engineering duration; never specialty or technology tenure."
+    }
+  },
+  "project": {
+    "b2b": {
+      "label": "B2B",
+      "definition": "The assigned software primarily serves business/professional workflows (e.g. corporate treasury or advisor operations). Merchants accepting consumer payments, company clients, and the recruiter's business model alone do NOT qualify."
+    },
+    "consumer": {
+      "label": "Consumer product",
+      "definition": "The assigned software directly serves personal activities such as shopping, borrowing or learning. Supporting merchants/institutions does not by itself turn that consumer journey into B2B."
+    },
+    "mixed-audience": {
+      "label": "Mixed audience",
+      "definition": "Both independent business and consumer use cases are explicit and the assigned product area is unclear. Neutral unless a separate preference is defined."
+    },
+    "internal-tools": {
+      "label": "Internal tools",
+      "definition": "Software used by the employer's own teams. Not automatically an externally sold B2B product."
+    },
+    "hr-platform": {
+      "label": "HR platform",
+      "definition": "Software for HR/payroll/workforce management. Incidental HR staff, recruiting firms or the user's employer are not enough."
+    },
+    "fintech": {
+      "label": "Fintech",
+      "definition": "Software for financial services."
+    },
+    "payments": {
+      "label": "Payments",
+      "definition": "Software moves or processes money."
+    },
+    "stablecoins": {
+      "label": "Stablecoins",
+      "definition": "Software transacts in stablecoins."
+    },
+    "consumer-credit": {
+      "label": "Consumer credit",
+      "definition": "Personal lending or buy-now-pay-later software."
+    },
+    "crypto-trading": {
+      "label": "Crypto trading",
+      "definition": "Trading/investing in digital assets."
+    },
+    "growth-work": {
+      "label": "Growth-focused work",
+      "definition": "The assigned work explicitly focuses on activation, onboarding, lifecycle, engagement, funnels or conversion growth."
+    },
+    "developer-tools": {
+      "label": "Developer tools",
+      "definition": "Software used to develop, release, secure or operate software."
+    },
+    "software-supply-chain": {
+      "label": "Software supply-chain security",
+      "definition": "Dependency/repository/SBOM protection; not logistics."
+    },
+    "marketing-tools": {
+      "label": "Marketing tools",
+      "definition": "Campaign, marketing analytics or marketing workflow software."
+    },
+    "education": {
+      "label": "Education",
+      "definition": "Learning or school/education software."
+    },
+    "energy-utilities": {
+      "label": "Energy utilities",
+      "definition": "Software supporting power utilities or grid operations."
+    },
+    "property-valuation": {
+      "label": "Property valuation",
+      "definition": "Software for property valuation/assessment."
+    },
+    "ai-platform": {
+      "label": "AI platform",
+      "definition": "Software for operating/deploying AI applications or models."
+    },
+    "ai-evaluation": {
+      "label": "AI evaluation",
+      "definition": "Software environments that evaluate AI model behavior."
+    },
+    "data-integration": {
+      "label": "Data integration",
+      "definition": "Software synchronizes/integrates data across systems."
+    }
+  }
+}

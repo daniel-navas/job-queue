@@ -1,0 +1,4 @@
+interface:
+  display_name: "Review LinkedIn searches"
+  short_description: "Refine JobQueue searches using profile and results"
+  default_prompt: "Use $review-linkedin-search-strategy to review my LinkedIn searches against my current profile, preferences, and results."

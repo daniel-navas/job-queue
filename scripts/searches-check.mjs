@@ -1,0 +1,114 @@
+// Exercises the real server and browser against temporary data, never LinkedIn.
+import { chromium } from 'playwright-core';
+import assert from 'node:assert/strict';
+import { mkdtemp, cp, mkdir, writeFile, rm, readFile } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
+import net from 'node:net';
+import os from 'node:os';
+import path from 'node:path';
+import { normalizeSearch } from '../src/searches.mjs';
+import { fingerprint, summaryVersion } from '../src/summarize.mjs';
+import { emptyCard, requirement, matchingProfile, evaluationConfig } from '../test-support/fixtures.mjs';
+import { readJobDescription } from '../src/linkedin/description.mjs';
+
+const root = await mkdtemp(path.join(os.tmpdir(), 'jq-search-browser-'));
+let child, browser;
+try {
+  for (const dir of ['config', 'profile', 'public', 'src', 'docs']) await cp(dir, path.join(root, dir), { recursive: true });
+  await mkdir(path.join(root, 'data'));
+  // Fixed scoring inputs keep UI expectations independent of owner calibration.
+  const { preferences, scoring } = evaluationConfig();
+  await writeFile(path.join(root, 'profile/matching.json'), JSON.stringify(matchingProfile()));
+  await writeFile(path.join(root, 'config/preferences.json'), JSON.stringify(preferences));
+  await writeFile(path.join(root, 'config/scoring.json'), JSON.stringify(scoring));
+  const search = normalizeSearch({ id: 'backend', provider: 'linkedin', name: 'Backend · Colombia', query: 'backend engineer', location: 'Colombia', workplace: 'any', datePosted: 'month', enabled: true });
+  await writeFile(path.join(root, 'config/searches.json'), JSON.stringify({ searches: [search] }));
+  const source = { id: '100', title: 'Backend Engineer', company: 'Example', location: 'Colombia', description: 'Backend. Remote in Colombia. 3-7 years.', status: 'new', history: [], discoveries: [{ search, firstSeen: '2026-09-14', lastSeen: '2026-09-14' }] };
+  const card = emptyCard({ id: source.id, roleFocus: { value: 'backend', evidence: 'Backend.' }, workplaceMode: { value: 'remote', evidence: 'Remote in Colombia.' }, requirements: [
+    requirement('professional', { kind: 'experience', minMonths: 36, maxMonths: 84, evidence: '3-7 years.' }),
+  ] });
+  const jobs = [ { ...source, summary: { fields: card, version: summaryVersion, inputHash: fingerprint(source) } }, { ...source, id: '101', title: 'Pending offer' }, { ...source, id: '102', title: 'Legacy offer', discoveries: undefined, searchUrl: 'https://www.linkedin.com/jobs/search/?keywords=old&location=Colombia' } ];
+  await writeFile(path.join(root, 'data/queue.json'), JSON.stringify({ jobs }));
+  const queueBefore = await readFile(path.join(root, 'data/queue.json'), 'utf8');
+  const socket = net.createServer(); socket.listen(0, '127.0.0.1'); await once(socket, 'listening'); const port = socket.address().port; await new Promise(resolve => socket.close(resolve));
+  child = spawn(process.execPath, ['src/server.mjs'], { env: { ...process.env, JOBQUEUE_ROOT: root, PORT: String(port) }, stdio: ['ignore', 'pipe', 'pipe'] });
+  await Promise.race([once(child.stdout, 'data'), once(child, 'exit').then(() => { throw new Error('Test server exited'); })]);
+  const base = `http://127.0.0.1:${port}`;
+  const get = async () => (await fetch(`${base}/api/searches`)).json();
+  const post = async body => fetch(`${base}/api/searches`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const initial = await get();
+  assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 2);
+  const invalid = await post({ version: initial.version, search: { ...search, provider: 'other' } }); assert.equal(invalid.status, 400);
+  browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
+  const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
+  // A local fixture reproduces the current LinkedIn HTML-only detail layout.
+  const detail = await browser.newPage();
+  await detail.route('https://www.linkedin.com/jobs/view/123/', route => route.fulfill({ contentType: 'text/html', body: '<section><div><h2>About the job</h2></div><div><span data-testid="expandable-text-box"><p>Build and maintain backend services using Python. This is the complete source description for a concrete engineering role.</p><p>Work with a distributed team.</p><button>… more</button></span></div></section><section><h2>Similar jobs</h2><span data-testid="expandable-text-box">Never capture this recommendation.</span></section>' }));
+  await detail.goto('https://www.linkedin.com/jobs/view/123/');
+  const description = await readJobDescription(detail, '123');
+  assert.match(description, /Work with a distributed team/);
+  assert.doesNotMatch(description, /Never capture|more/);
+  assert.equal(await readJobDescription(detail, '999'), null);
+  await detail.close();
+  const errors = []; page.on('pageerror', error => errors.push(error.message));
+  await page.goto(base); await page.locator('.job').first().waitFor();
+  await page.getByText('3–7 years · Software engineering', { exact: true }).waitFor();
+  assert.deepEqual(await page.locator('.coverage').allInnerTexts(), ['1/1']);
+  await page.locator('.search-origin summary').click(); await page.getByText('First found 2026-09-14 · Last seen 2026-09-14').waitFor();
+  await page.getByRole('button', { name: 'Searches', exact: true }).click();
+  await page.locator('.search-row').waitFor();
+  const criteriaText = await page.locator('.search-copy').first().innerText();
+  assert.equal(await page.locator('.search-copy strong').first().innerText(), 'backend engineer');
+  assert.doesNotMatch(criteriaText, /Query:|Backend · Colombia/);
+  assert.doesNotMatch(await page.locator('#searches-list-view').innerText(), /Checked searches|detail visits/);
+  assert.match(criteriaText, /Location: Colombia/);
+  assert.match(criteriaText, /Date posted: Past month/);
+  assert.doesNotMatch(criteriaText, /Work mode:|Any work mode|No other filters/);
+  assert.equal(await page.locator('.search-metrics small').first().innerText(), '1 processed · avg 2');
+  await page.locator('[data-offers="backend"]').click();
+  assert.equal(await page.locator('.job').count(), 2);
+  await page.getByRole('button', { name: 'Clear search filter' }).click();
+  assert.equal(await page.locator('.job').count(), 3);
+  await page.getByRole('button', { name: 'Searches', exact: true }).click();
+  const checkbox = page.getByRole('checkbox', { name: 'Enable backend engineer' });
+  await checkbox.uncheck();
+  await page.waitForFunction(() => document.querySelector('#scan').disabled);
+  assert.equal((await get()).searches[0].enabled, false);
+  assert.equal((await fetch(`${base}/api/scan`, { method: 'POST' })).status, 400);
+  await page.getByRole('button', { name: 'Edit backend engineer', exact: true }).click();
+  assert.equal(await page.locator('#search-name').count(), 0);
+  await page.locator('#search-query').fill('Python backend');
+  await page.getByRole('button', { name: 'Save search', exact: true }).click();
+  await page.getByText('0 processed · avg —', { exact: true }).waitFor();
+  assert.equal((await get()).stats[0].historicalCaptured, 2);
+  await page.getByRole('button', { name: 'Add search', exact: true }).click();
+  await page.locator('#search-query').fill('Backend with visa sponsorship'); await page.locator('#search-location').fill('Spain');
+  await page.locator('#search-workplace').selectOption('remote');
+  await page.locator('#search-date').selectOption('any');
+  await page.getByRole('button', { name: 'Save search', exact: true }).click();
+  await page.locator('.search-row').nth(1).waitFor();
+  const remoteCriteria = await page.locator('.search-copy').nth(1).innerText();
+  assert.match(remoteCriteria, /Work mode: Remote/);
+  assert.doesNotMatch(remoteCriteria, /Date posted:|Any date/);
+  assert.equal((await get()).searches.length, 2);
+  // Stale editor must not overwrite a change made through the same API.
+  await page.getByRole('button', { name: 'Edit Python backend', exact: true }).click();
+  const current = await get();
+  assert.equal((await post({ version: current.version, search: { ...current.searches[0], query: 'External query' } })).status, 200);
+  await page.locator('#search-query').fill('Stale query'); await page.getByRole('button', { name: 'Save search', exact: true }).click();
+  await page.getByRole('alert').filter({ hasText: 'Searches changed' }).waitFor();
+  assert.equal((await get()).searches[0].query, 'External query');
+  await page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  await page.getByText('External query', { exact: true }).waitFor();
+  await mkdir('.local', { recursive: true });
+  await page.screenshot({ path: '.local/searches-desktop.png' });
+  await page.keyboard.press('Escape'); assert.equal(await page.locator('#searches-dialog').isVisible(), false);
+  assert.deepEqual(errors, []);
+  assert.equal(await readFile(path.join(root, 'data/queue.json'), 'utf8'), queueBefore);
+  console.log('Search UI/API checks passed: add/edit/toggle, stale edit, metrics, provenance, filtering, keyboard, no runtime errors or offer mutations.');
+} finally {
+  if (browser) await browser.close();
+  if (child && child.exitCode === null) { child.kill(); await once(child, 'exit'); }
+  await rm(root, { recursive: true, force: true });
+}

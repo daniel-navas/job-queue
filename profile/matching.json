@@ -1,0 +1,332 @@
+{
+  "schemaVersion": 1,
+  "source": "Sanitized professional profile",
+  "technologyInterests": [
+    "go"
+  ],
+  "candidate": {
+    "english": {
+      "dailyWork": true,
+      "interviews": true
+    }
+  },
+  "technologies": {
+    "docker": {
+      "label": "Docker",
+      "practicalMonths": 12,
+      "autonomy": "basic",
+      "lastUsedYear": 2023,
+      "professionalUse": true
+    },
+    "kubernetes": {
+      "label": "Kubernetes",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "react": {
+      "label": "React",
+      "practicalMonths": 36,
+      "autonomy": "independent",
+      "lastUsedYear": 2022,
+      "professionalUse": true
+    },
+    "react-native": {
+      "label": "React Native",
+      "practicalMonths": 6,
+      "autonomy": "basic",
+      "lastUsedYear": 2025,
+      "professionalUse": true
+    },
+    "angularjs": {
+      "label": "AngularJS",
+      "practicalMonths": 6,
+      "autonomy": "basic",
+      "lastUsedYear": 2020,
+      "professionalUse": true
+    },
+    "elasticsearch": {
+      "label": "Elasticsearch",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "gitlab": {
+      "label": "GitLab",
+      "practicalMonths": 24,
+      "autonomy": "independent",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "mysql": {
+      "label": "MySQL",
+      "practicalMonths": 24,
+      "autonomy": "basic",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "nodejs": {
+      "label": "Node.js",
+      "practicalMonths": 72,
+      "autonomy": "advanced",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "typescript": {
+      "label": "TypeScript",
+      "practicalMonths": 60,
+      "autonomy": "advanced",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "sql": {
+      "label": "SQL",
+      "practicalMonths": 36,
+      "autonomy": "basic",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "nosql": {
+      "label": "NoSQL",
+      "practicalMonths": 12,
+      "autonomy": "basic",
+      "lastUsedYear": 2022,
+      "professionalUse": true
+    },
+    "python": {
+      "label": "Python",
+      "practicalMonths": 12,
+      "autonomy": "independent",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "postgresql": {
+      "label": "PostgreSQL",
+      "practicalMonths": 36,
+      "autonomy": "basic",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "typeorm": {
+      "label": "TypeORM",
+      "practicalMonths": 12,
+      "autonomy": "independent",
+      "lastUsedYear": 2023,
+      "professionalUse": true
+    },
+    "nestjs": {
+      "label": "NestJS",
+      "practicalMonths": 36,
+      "autonomy": "independent",
+      "lastUsedYear": 2023,
+      "professionalUse": true
+    },
+    "aws": {
+      "label": "AWS",
+      "practicalMonths": 48,
+      "autonomy": "independent",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "java": {
+      "label": "Java",
+      "practicalMonths": 6,
+      "autonomy": "basic",
+      "lastUsedYear": 2019,
+      "professionalUse": true
+    },
+    "go": {
+      "label": "Go",
+      "practicalMonths": null,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "llm-tools": {
+      "label": "LLM tools",
+      "practicalMonths": 12,
+      "autonomy": "independent",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    },
+    "gcp": {
+      "label": "GCP",
+      "practicalMonths": 12,
+      "autonomy": "independent",
+      "lastUsedYear": 2026,
+      "professionalUse": true
+    }
+  },
+  "employmentPeriods": [
+    [
+      "2017-02",
+      "2017-07"
+    ],
+    [
+      "2017-10",
+      "2018-02"
+    ],
+    [
+      "2018-02",
+      "2019-05"
+    ],
+    [
+      "2019-06",
+      "2020-01"
+    ],
+    [
+      "2020-02",
+      "2020-09"
+    ],
+    [
+      "2020-11",
+      "2022-03"
+    ],
+    [
+      "2022-03",
+      "2023-07"
+    ],
+    [
+      "2024-06",
+      "2025-01"
+    ],
+    [
+      "2025-11",
+      "2026-03"
+    ]
+  ],
+  "capabilities": {
+    "backend": {
+      "confirmed": true,
+      "evidence": "Professional backend systems experience."
+    },
+    "financial": {
+      "confirmed": true,
+      "evidence": "Professional financial, reconciliation and payment-flow experience."
+    },
+    "ai-assisted": {
+      "confirmed": true,
+      "evidence": "Professional AI-assisted and agentic development experience; duration and tool-specific depth are unknown."
+    },
+    "degree": {
+      "confirmed": true,
+      "evidence": "Bachelor of Engineering in Computer Software Engineering."
+    },
+    "full-stack": {
+      "confirmed": true,
+      "practicalMonths": 36,
+      "autonomy": "independent",
+      "lastUsedYear": 2026,
+      "evidence": "Owner confirmed approximately 36 practical months and current full-stack project work."
+    },
+    "automated-testing": {
+      "confirmed": true,
+      "evidence": "Professional end-to-end testing experience."
+    },
+    "rest-api": {
+      "confirmed": true,
+      "evidence": "Professional REST API and API design experience."
+    },
+    "microservices": {
+      "confirmed": true,
+      "evidence": "Professional microservice operation experience."
+    },
+    "ci-cd": {
+      "confirmed": true,
+      "evidence": "Owner confirmed independent GitLab CI/CD work through 2026."
+    },
+    "containerization": {
+      "confirmed": true,
+      "evidence": "Owner confirmed 12 practical months with Docker and professional containerization work."
+    },
+    "performance-optimization": {
+      "confirmed": true,
+      "evidence": "Professional performance-improvement experience during a frontend migration."
+    },
+    "secure-coding": {
+      "confirmed": true,
+      "knowledgeLevel": "basic",
+      "evidence": "Built a secure proxy for sensitive data; this establishes basic secure-coding knowledge, not advanced security ownership."
+    },
+    "data-structures": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed intermediate conceptual knowledge: can select and use common data structures for normal engineering problems."
+    },
+    "algorithms": {
+      "confirmed": true,
+      "knowledgeLevel": "basic",
+      "evidence": "Owner confirmed basic conceptual algorithm knowledge; algorithms are rarely a direct part of current day-to-day work."
+    },
+    "system-design": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed intermediate system-design knowledge and considers normal design work manageable, despite limited repeated ownership."
+    },
+    "product-experimentation": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed hands-on A/B testing and experimentation strategy."
+    },
+    "analytics-instrumentation": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed analytics instrumentation implementation."
+    },
+    "product-analytics": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed funnel and experimentation data analysis."
+    },
+    "growth-engineering": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed growth work covering funnels, experiments, analytics and growth strategies."
+    },
+    "devops": {
+      "confirmed": true,
+      "knowledgeLevel": "basic",
+      "evidence": "Owner confirmed basic DevOps conceptual knowledge."
+    },
+    "unit-testing": {
+      "confirmed": true,
+      "practicalMonths": 24,
+      "autonomy": "independent",
+      "lastUsedYear": 2026,
+      "evidence": "Owner confirmed approximately 24 practical months, independent current autonomy, and use in 2026; AI assistance is part of the current workflow."
+    },
+    "integration-testing": {
+      "confirmed": true,
+      "practicalMonths": 6,
+      "autonomy": "basic",
+      "lastUsedYear": 2026,
+      "evidence": "Owner confirmed approximately 6 practical months, basic current autonomy, and light use in recent roles through 2026."
+    },
+    "distributed": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed hands-on work with distributed systems and microservices."
+    },
+    "event-driven": {
+      "confirmed": true,
+      "knowledgeLevel": "basic",
+      "evidence": "Owner confirmed hands-on exposure to asynchronous workflows."
+    },
+    "data-integrity": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed intermediate transaction, consistency and integrity experience."
+    },
+    "production-operations": {
+      "confirmed": true,
+      "knowledgeLevel": "intermediate",
+      "evidence": "Owner confirmed intermediate production-service operation and incident experience."
+    },
+    "english": {
+      "confirmed": true,
+      "evidence": "Owner confirmed daily work and interviews in English; no standardized proficiency level inferred."
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "job-queue",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal job-search automation experiments.",
+  "scripts": {
+    "start": "node src/server.mjs",
+    "poc:linkedin": "node src/linkedin/poc.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "playwright-core": "1.63.0"
+  }
+}

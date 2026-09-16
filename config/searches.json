@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 2,
+  "searches": [
+    { "id": "backend-colombia", "provider": "linkedin", "name": "Backend · Colombia", "query": "backend engineer", "location": "Colombia", "workplace": "any", "datePosted": "month", "enabled": true },
+    { "id": "node-colombia", "provider": "linkedin", "name": "Node / TypeScript · Remote", "query": "backend engineer Node.js TypeScript", "location": "Colombia", "workplace": "remote", "datePosted": "month", "enabled": true },
+    { "id": "python-colombia", "provider": "linkedin", "name": "Python · Remote", "query": "Python backend engineer", "location": "Colombia", "workplace": "remote", "datePosted": "month", "enabled": true },
+    { "id": "backend-spain", "provider": "linkedin", "name": "Backend · Spain · Visa support", "query": "backend engineer with visa sponsorship or work permit support", "location": "Spain", "workplace": "any", "datePosted": "month", "enabled": true },
+    { "id": "backend-germany", "provider": "linkedin", "name": "Backend · Germany · Visa support", "query": "backend engineer with visa sponsorship or work permit support", "location": "Germany", "workplace": "any", "datePosted": "month", "enabled": true }
+  ]
+}
