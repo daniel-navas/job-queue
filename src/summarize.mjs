@@ -54,6 +54,7 @@ export function validateCards(result, jobs) {
     if (audiences.length > 1) throw new Error('Choose one supported project audience, not conflicting audience tags');
     if (new Set(card.projectTags.map(t => t.key)).size !== card.projectTags.length) throw new Error('Duplicate project tag');
     for (const item of [...card.requirements, ...card.preferred, ...card.stack]) {
+      if (item.kind === 'technology' && item.knowledgeLevel !== null) throw new Error('Technology criteria cannot assign conceptual knowledge levels');
       if (item.maxMonths !== null && (item.minMonths === null || item.maxMonths < item.minMonths)) throw new Error('Invalid experience range');
       if (item.lastUsedYear !== null && item.maxYearsSinceUse !== null) throw new Error('Choose an absolute or relative last-use threshold, not both');
       if (new Set(item.alternatives).size !== item.alternatives.length) throw new Error('Duplicate requirement alternative');

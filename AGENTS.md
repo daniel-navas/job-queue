@@ -29,6 +29,9 @@ architecture, or dependency until the product need justifies it.
   the computer, where results are saved, and whether a change is implemented
   or only proposed. Timings must identify what was measured; do not present
   whole-workflow latency as one endpoint's latency.
+- The owner is learning Codex and AI engineering. When relevant, explain one
+  useful engineering pattern briefly, with its standard name and concrete role
+  here. Do not assume prior AI expertise or replace delivery with a lecture.
 - Make the smallest coherent change that satisfies the current requirement.
 - Prefer existing project patterns once they exist.
 - Do not add features, abstractions, dependencies, or infrastructure for

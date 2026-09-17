@@ -16,7 +16,7 @@ export function initSearches(api, refresh, filterOffers) {
   const dialog = document.createElement('dialog');
   dialog.id = 'searches-dialog'; dialog.setAttribute('aria-labelledby', 'searches-title');
   dialog.innerHTML = `<div class="searches-head"><h2 id="searches-title">Searches</h2><button type="button" id="searches-close" aria-label="Close searches">✕</button></div>
-    <div id="searches-list-view"><div class="searches-provider"><strong>LinkedIn</strong><button id="search-add" type="button">Add search</button></div><div id="searches-list"></div></div>
+    <div id="searches-list-view"><div class="searches-provider"><strong>LinkedIn</strong><div class="actions"><button id="linkedin-connect" type="button" title="Open Chrome to sign in or renew the LinkedIn connection">Connect LinkedIn</button><button id="search-add" type="button">Add search</button></div></div><div id="searches-list"></div></div>
     <form id="search-editor" hidden><h3 id="search-editor-title">Edit search</h3>
       <label for="search-query">Query</label><textarea id="search-query" required maxlength="500" rows="2"></textarea>
       <label for="search-location">Location</label><input id="search-location" required maxlength="150">
@@ -27,6 +27,7 @@ export function initSearches(api, refresh, filterOffers) {
   document.body.append(dialog);
   const $ = selector => dialog.querySelector(selector);
   let state, editing, editVersion, busy = false;
+  let connectionTimer;
   const message = error => { $('#searches-error').textContent = error?.message || ''; };
   function render() {
     $('#searches-list').innerHTML = state.searches.map(search => {
@@ -37,7 +38,15 @@ export function initSearches(api, refresh, filterOffers) {
         <button class="search-edit" data-edit="${escape(search.id)}" aria-label="Edit ${escape(search.query)}">Edit</button></div>`;
     }).join('') || '<p class="muted">Add your first LinkedIn search.</p>';
   }
-  async function load() { state = await api('/api/searches'); render(); }
+  async function loadConnection() {
+    clearTimeout(connectionTimer);
+    const connection = await api('/api/linkedin/connection');
+    $('#linkedin-connect').disabled = connection.running;
+    $('#linkedin-connect').textContent = connection.running ? 'Connecting…' : connection.connected ? 'Reconnect LinkedIn' : 'Connect LinkedIn';
+    if (connection.error) message(new Error(connection.error));
+    if (connection.running && dialog.open) connectionTimer = setTimeout(() => loadConnection().catch(message), 2000);
+  }
+  async function load() { state = await api('/api/searches'); render(); await loadConnection(); }
   function showEditor(search) {
     editing = search; editVersion = state.version;
     $('#searches-list-view').hidden = true; $('#search-editor').hidden = false;
@@ -52,6 +61,12 @@ export function initSearches(api, refresh, filterOffers) {
     try { await load(); } catch (error) { message(error); }
   };
   $('#searches-close').onclick = () => dialog.close();
+  dialog.addEventListener('close', () => clearTimeout(connectionTimer));
+  $('#linkedin-connect').onclick = async () => {
+    $('#linkedin-connect').disabled = true; message();
+    try { await api('/api/linkedin/connect', {}); await loadConnection(); await refresh(); }
+    catch (error) { message(error); $('#linkedin-connect').disabled = false; }
+  };
   $('#search-add').onclick = () => { if (state && !busy) showEditor(null); };
   $('#search-cancel').onclick = async () => { showList(); try { await load(); } catch (error) { message(error); } };
   $('#searches-list').onclick = event => {

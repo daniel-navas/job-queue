@@ -83,24 +83,25 @@ have their own search adapter and review skill.
 
 ## Collection and provenance
 
-Find opportunities reuses one authenticated browser for all enabled searches,
-visited sequentially, with at most five missing detail attempts per search.
-Searches wait for results instead of a fixed sleep. Missing descriptions use
-HTTP requests learned from that browser session when available; ordinary
-unavailable/incomplete responses fall back to the job page. Previously captured complete jobs are linked
-to additional searches without another detail visit. The one-minute batch
+Find opportunities calls saved LinkedIn HTTP endpoints without launching Chrome.
+Searches are sequential, with at most two result pages and five missing detail
+attempts per search. Connect/Reconnect in Searches explicitly opens Chrome to
+sign in and learn current request templates. Missing/stale connections require
+reconnection; searches never silently fall back to a browser. Previously
+captured complete jobs are linked to additional searches without another
+detail request. The one-minute batch
 cooldown remains. Any failed search stops the rest; successful captures remain.
 Run-specific manifests prevent accidentally importing an earlier search after
 a launch failure. Security challenges, authentication failures and HTTP 429
 stop the batch without browser fallback for a blocked HTTP request.
 
-Search-page cards/visible result links establish membership. Detail-page
+Search-response cards establish membership. Detail-page
 recommendations and feed IDs do not establish discovery by that search.
 Unrecognized empty result layouts and all-attempted-detail capture failures
 stop the batch. An explicit LinkedIn no-results message permits a successful
 empty run. No run claims exhaustive LinkedIn coverage. Only full descriptions
-enter the queue. HTML-only details use the description scoped to About the job;
-recommendation sections are excluded and the matching page ID is required.
+enter the queue. The legacy browser diagnostic remains separate from managed
+searches; ordinary HTTP detail failures do not trigger browser extraction.
 
 Each offer stores discoveries with a provider, stable search ID, criteria
 fingerprint, exact name/query/location/filters/URL and first/last observed dates.

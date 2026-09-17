@@ -5,7 +5,7 @@ const evidence = { type: 'string', minLength: 1, maxLength: 500 };
 const nullable = value => ({ anyOf: [{ type: 'null' }, value] });
 const object = properties => ({ type: 'object', additionalProperties: false, required: Object.keys(properties), properties });
 const fact = values => nullable(object({ value: values ? { ...string, enum: values } : string, evidence }));
-const array = items => ({ type: 'array', maxItems: 30, items });
+const array = (items, maxItems = 30) => ({ type: 'array', maxItems, items });
 export const capabilityKeys = Object.keys(catalog.capability);
 export const projectKeys = Object.keys(catalog.project);
 export const requirementSchema = { anyOf: ['technology', 'capability', 'experience', 'unknown'].map(kind => object({
@@ -30,7 +30,7 @@ export const properties = {
   visaSupport: fact(['supported', 'not-supported', 'unknown']),
   relocationFunding: fact(['available', 'not-available', 'unknown']),
   software: fact(), work: fact(),
-  requirements: array(requirementSchema), preferred: array(requirementSchema), stack: array(requirementSchema),
+  requirements: array(requirementSchema, 100), preferred: array(requirementSchema, 100), stack: array(requirementSchema, 100),
   projectTags: array(object({ key: { type: 'string', enum: projectKeys }, evidence })),
 };
 export const schema = object({ cards: array(object(properties)) });

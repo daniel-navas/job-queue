@@ -57,8 +57,8 @@ professional-use status. Preference values live in
 - The collector hydrates full details and does not import partial review cards.
 - The two-offer pilot code has been removed. Every current extraction uses the
   same typed matcher; previously reviewed jobs remain useful validation cases.
-- A simple Node process and local JSON storage are sufficient for this personal
-  workload. Preserve the useful UI/persistence, not a wholesale rewrite or
+- A simple Node process and local SQLite storage serve this personal workload
+  (storage evolution: decision 0006). Preserve the useful UI, not a wholesale rewrite or
   speculative services. Future providers feed the same source contract; future
   application actions remain outside extraction and scoring.
 - Process extracts at most two offers concurrently per click and saves each

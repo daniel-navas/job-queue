@@ -50,14 +50,14 @@ test('one collector serves sequential searches, imports partial progress, and cl
   assert.equal(events.filter(event => event.startsWith('import:')).length, 2);
 });
 
-test('browser startup failure records the first attempted search as failed', async () => {
+test('missing HTTP connection records the first attempted search as failed', async () => {
   const { runManagedSearchBatch } = await import('../src/scan.mjs');
   const failures = [];
   const queue = { async recordFailedSearch(id, search, message) { failures.push({ id, search, message }); } };
   await assert.rejects(runManagedSearchBatch('/unused', queue, [
     { id: 'first', enabled: true }, { id: 'second', enabled: true },
-  ], () => {}, async () => { throw new Error('Chrome unavailable'); }), /Chrome unavailable/);
+  ], () => {}, async () => { throw new Error('Connect LinkedIn explicitly'); }), /Connect LinkedIn explicitly/);
   assert.equal(failures.length, 1);
   assert.equal(failures[0].search.id, 'first');
-  assert.match(failures[0].message, /Chrome unavailable/);
+  assert.match(failures[0].message, /Connection unavailable.*Connect LinkedIn explicitly/);
 });

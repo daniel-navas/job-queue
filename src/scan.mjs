@@ -27,7 +27,7 @@ export async function collectSearch(root, queue, search, collector) {
     throw new Error(`${search.query}: capture unavailable; search stopped.`);
   }
   if (failure) {
-    const error = new Error(`${search.query}: ${failure.message} Captures retained; check Chrome before retrying.`);
+    const error = new Error(`${search.query}: ${failure.message} Captures retained; check the LinkedIn connection before retrying.`);
     error.added = result.added;
     throw error;
   }
@@ -40,7 +40,7 @@ export async function runManagedSearchBatch(root, queue, searches, progress = ()
   let collector;
   try { collector = await openCollector(root, progress); }
   catch (error) {
-    await queue.recordFailedSearch(randomUUID(), selected[0], `Browser startup failed: ${error.message}`);
+    await queue.recordFailedSearch(randomUUID(), selected[0], `Connection unavailable: ${error.message}`);
     throw error;
   }
   try { return await runSearchBatch(selected, search => collectSearch(root, queue, search, collector), progress); }

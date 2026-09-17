@@ -7,10 +7,12 @@ extraction → deterministic matching and ranking → manual review/application.
 
 Run `npm install`, then `npm start`. Open http://127.0.0.1:4317 in Chrome.
 
-- **Find opportunities** searches LinkedIn using the saved local Chrome login.
-  One browser session serves all enabled searches. Missing descriptions use
-  observed HTTP requests when available, with browser fallback, sequentially
-  and at most five per search. Only complete jobs enter the UI.
+- **Searches → Connect LinkedIn** opens Chrome for sign-in and learns LinkedIn's
+  current request templates. Use Reconnect when the saved connection expires.
+- **Find opportunities** calls LinkedIn endpoints directly with that saved
+  connection. It does not launch Chrome or fall back to a browser. Searches and
+  missing descriptions are fetched sequentially, at most five details/search.
+  Only complete jobs enter the UI.
 - **Process** handles at most two pending jobs, selected pending job first.
   Each gets an independent AI call; both run concurrently and save individually.
   Progress shows 0/2, 1/2, 2/2. It does not search.
@@ -24,7 +26,7 @@ read-only run without this conversation, project files, or candidate profile.
 It requires subscription authentication and removes API-key environment values.
 No automatic retries. Each job has a three-minute timeout. Per-job invocations
 provide durable progress but repeat CLI prompt overhead. Usage reported by the
-CLI is recorded in data/queue.json under lastSummaryRun.
+CLI is recorded in the local SQLite queue under lastSummaryRun.
 The AI writes compact JSON; local code restores the full fact schema and checks
 source quotes. Full descriptions and catalog rules are retained. Parallelism
 does not add calls or duplicate more input than the same individual calls run
@@ -57,12 +59,27 @@ catalog and range display; they do not require an extra AI call.
 
 `npm run poc:linkedin -- --url "https://www.linkedin.com/jobs/search/" --detail-limit 2`
 runs the legacy browser-only diagnostic without importing. The app uses the
-shared-session hybrid collector in src/linkedin/collector.mjs instead.
+HTTP-first collector in src/linkedin/collector.mjs instead.
 Raw responses live in unique run folders
 under .local/linkedin-captures; the latest manifest is data/linkedin-poc.json.
 The collector stops on security challenges/rate limiting. Failed runs retain
 completed captures and show a visible error. It does not guarantee exhaustive
-search coverage. Review state lives in data/queue.json with atomic writes.
+search coverage. Live offers, descriptions, classifications, reviews and search
+history live in data/jobqueue.sqlite, excluded from Git. On first startup the
+app imports data/queue.json once, preserves it, and saves a private copy under
+data/backups. Later edits to that legacy JSON do not modify the live queue.
+Use `node scripts/backup-queue.mjs` for a database snapshot. Restore instructions
+and component explanations are in docs/storage-and-discovery-options.md.
+
+Saved LinkedIn authentication is private to this OS account in
+.local/linkedin-connection.json (permissions 0600), not encrypted. Never share
+that file or the Chrome profile. Neither is sent to the classifier.
+
+`node scripts/classifier-eval.mjs` runs a synthetic semantic evaluation through
+Codex; it does not import results. `--sources FILE` additionally uses the two
+reviewed real-source cases; sending those descriptions requires owner approval.
+`--audit REPORT` checks an existing report offline. Reports stay in .local.
+Passing these targeted evals is not a guarantee of perfect AI interpretation.
 
 Original CVs remain in profile/cv. The pre-refactor queue backup is
 .local/queue-before-structured-v3.json. There is no deployment or scheduler.

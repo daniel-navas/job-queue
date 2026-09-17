@@ -36,7 +36,8 @@ The extraction/matching boundary is recorded in decision 0002.
   Add controls only for current owner needs, not hypothetical future features.
 - Capture fewer complete jobs when necessary. Do not present incomplete cards
   as review-ready or claim that a search exhausted all LinkedIn results.
-- LinkedIn uses an authenticated local browser. The owner accepts unofficial
+- LinkedIn searches use authenticated HTTP; Chrome opens only for explicit
+  connection/session renewal and request-template discovery. The owner accepts unofficial
   integration/account-restriction risk. Stay sequential and bounded; stop on
   rate limiting, CAPTCHA or checkpoints, without bypassing them.
 - At most two AI jobs per Process click; no automatic retries or background

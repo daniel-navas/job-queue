@@ -196,8 +196,45 @@ browser smoke check pass. The server was restarted with the new implementation.
 
 ## Further optimization: judgment, not an implementation backlog
 
+### 2026-09-17 delivery follow-up
+
+HTTP-only production collector verified live after one explicit Chrome
+connection. Colombia and Germany, one result page and at most two missing
+details each: **3.106s total**, **zero browser launches** during collection.
+The two search calls took **1,025ms / 846ms**; four detail calls took
+**337 / 272 / 321 / 256ms**. Each search observed 25 IDs. Saved query, location
+and filters were replayed; no offers or reviews were imported. This is a bounded
+diagnostic, not a full-batch or exhaustive-coverage benchmark. Report:
+.local/http-finder-verification/report.json. Production allows at most two
+pages and five missing descriptions per search.
+
+Classifier corrections retain the model/default settings, full descriptions,
+catalog, compact transport and two independent calls. Source-derived evals
+reproduced five known semantic failures in the earlier two-offer outputs.
+Generic prompt corrections address conflicting geography, required general
+concepts versus preferred vendors, required lists, explicit proficiency, and
+AND/OR semantics in all groups. Technology knowledge-level misuse is rejected.
+Review also discovered a schema cap of 30 criteria that dropped the tail of a
+long list; criteria now allow 100. Cached cards are not silently reprocessed.
+
+Final reviewed run: **19/19 targeted semantic checks** across two real offers
+and one synthetic case. Real offers took **52.904s / 31.819s concurrently**;
+the later synthetic call took **13.929s**. This is a correctness correction,
+**not a demonstrated classifier speedup**. The final two real calls reported
+41,990 input and 3,928 output tokens, including 25,600 cached input tokens.
+Report: .local/classifier-eval-reviewed.json; no automatic queue import.
+A subsequent prose-only grammar correction does not change extraction rules.
+The evals cover known failure modes, not every possible omission. A source quote
+is an excerpt, not proof of every clause in a synthesized display sentence;
+review against the full source remains necessary for ambiguous facts.
+
+SQLite migration and restoration matched the entire original state (158 records,
+including reviews/history/metadata). It improves write safety, not model latency.
+91 automated tests and both desktop checks passed. Browser connection testing
+caught and fixed an unbound launcher and an unbounded unrelated-response wait.
+
 - **Keep:** cached facts for unchanged sources, deterministic local scoring,
-  compact output, two independent concurrent calls, browser/session reuse and
+  compact output, two independent concurrent calls, HTTP session reuse and
   readiness instead of sleeps. These remove repeated work without intentionally
   removing source information. Concurrency does not increase the number of
   per-offer calls; actual tokens/cache usage can still vary.

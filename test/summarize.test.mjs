@@ -1,8 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fingerprint, pendingJobs, currentSummary, processingStatus, summaryVersion, validateCards, discardUnsupportedFacts, Summarizer } from '../src/summarize.mjs';
-import { emptyCard } from '../test-support/fixtures.mjs';
+import { emptyCard, requirement } from '../test-support/fixtures.mjs';
 import { Queue } from '../src/queue.mjs';
+import { mkdtemp, rm } from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
+import { DatabaseSync } from 'node:sqlite';
 const job = { id: '1', title: 'Engineer', description: 'Requires Java. Remote in Colombia.', status: 'new' };
 const card = () => emptyCard({ workplace: { value: 'Remote', evidence: 'Remote in Colombia.' } });
 test('only new or changed descriptions need processing', () => {
@@ -86,18 +90,33 @@ test('both offers start together and a failed offer does not release the batch b
 });
 
 test('ready count includes only durably saved offers after a write failure', async () => {
-  const queue = new Queue(process.cwd());
+  const root = await mkdtemp(path.join(os.tmpdir(), 'jq-summary-save-'));
+  try {
+  const queue = new Queue(root);
   queue.state.jobs = [{ ...job }, { ...job, id: '2' }];
-  let writes = 0, persisted;
-  queue.save = async () => {
-    if (++writes === 1) throw new Error('Disk full');
-    persisted = structuredClone(queue.state);
-  };
+  await queue.save();
+  const db = new DatabaseSync(path.join(root, 'data/jobqueue.sqlite'));
+  db.exec("CREATE TRIGGER fail_first_summary BEFORE UPDATE ON jobs WHEN NEW.id = '1' AND json_extract(NEW.record, '$.summary') IS NOT NULL BEGIN SELECT RAISE(ABORT, 'Disk full'); END");
+  db.close();
   const worker = new Summarizer(queue, process.cwd(), async ([input]) => ({ cards: [{ ...card(), id: input.id }], usage: null }));
   worker.start(); await worker.completion;
+  const restored = new Queue(root); await restored.load(); const persisted = restored.state;
   assert.equal(persisted.jobs.filter(item => item.summary).length, 1);
   assert.equal(worker.state.processed, 1);
   assert.equal(persisted.lastSummaryRun.processed, 1);
   assert.equal(worker.state.error, true);
   assert.match(worker.state.message, /^1 ready/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test('long qualification lists are not truncated to thirty criteria', () => {
+  const requirements = Array.from({ length: 40 }, (_, index) => requirement('unmapped', { kind: 'unknown', label: `Qualification ${index}`, evidence: `Qualification ${index}.` }));
+  const source = { ...job, description: requirements.map(item => item.evidence).join(' ') };
+  assert.equal(validateCards({ cards: [emptyCard({ requirements })] }, [source])[0].requirements.length, 40);
+});
+
+test('technology criteria cannot assign conceptual knowledge levels', () => {
+  const source = { ...job, description: 'Knowledge of Java.' };
+  const bad = emptyCard({ requirements: [requirement('java', { evidence: source.description, knowledgeLevel: 'basic' })] });
+  assert.throws(() => validateCards({ cards: [bad] }, [source]), /knowledge/i);
 });

@@ -1,6 +1,8 @@
-import { readFile, mkdir, writeFile, rename } from 'node:fs/promises';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { discoveriesFor } from './searches.mjs';
+import { beginWrite, commitWrite, openStorage, storageState, storeState } from './queue-storage.mjs';
+export { backupQueue, readStoredJobs } from './queue-storage.mjs';
 
 const text = value => (typeof value === 'string' ? value : value?.text)?.trim() || null;
 
@@ -49,16 +51,37 @@ export function mergeJobs(existing, incoming, capturedAt, searchUrl, search = nu
 export class Queue {
   constructor(root) { this.root = root; this.file = path.join(root, 'data/queue.json'); this.state = { jobs: [], importedAt: null }; this.pending = Promise.resolve(); }
   async load() {
-    try { this.state = JSON.parse(await readFile(this.file, 'utf8')); }
-    catch (error) { if (error.code !== 'ENOENT') throw error; }
+    const db = await openStorage(this.root, this.state);
+    try { this.state = storageState(db); } finally { db.close(); }
   }
   async save() {
-    await mkdir(path.dirname(this.file), { recursive: true });
-    await writeFile(`${this.file}.tmp`, JSON.stringify(this.state, null, 2) + '\n');
-    await rename(`${this.file}.tmp`, this.file);
+    const db = await openStorage(this.root, this.state);
+    try {
+      await beginWrite(db);
+      try { storeState(db, this.state); await commitWrite(db); }
+      catch (error) { db.exec('ROLLBACK'); throw error; }
+    } finally { db.close(); }
   }
   mutate(fn) {
-    const operation = this.pending.then(async () => { const before = structuredClone(this.state); try { const result = await fn(); await this.save(); return result; } catch (error) { this.state = before; throw error; } });
+    const operation = this.pending.then(async () => {
+      const db = await openStorage(this.root, this.state);
+      try {
+        await beginWrite(db);
+        const before = storageState(db);
+        this.state = structuredClone(before);
+        try {
+          const result = fn();
+          const resolved = result && typeof result.then === 'function' ? await result : result;
+          storeState(db, this.state);
+          await commitWrite(db);
+          return resolved;
+        } catch (error) {
+          db.exec('ROLLBACK');
+          this.state = before;
+          throw error;
+        }
+      } finally { db.close(); }
+    });
     this.pending = operation.catch(() => {});
     return operation;
   }

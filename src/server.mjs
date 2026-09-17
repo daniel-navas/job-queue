@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { SearchStore, searchAnalytics, discoveriesFor } from './searches.mjs';
 import { runManagedSearchBatch } from './scan.mjs';
+import { connectLinkedIn, connectionStatus } from './linkedin/collector.mjs';
 import { Queue } from './queue.mjs';
 import { Summarizer, pendingJobs, currentSummary, processingStatus } from './summarize.mjs';
 import { evaluateJob } from './evaluate.mjs';
@@ -16,11 +17,26 @@ const summarizer = new Summarizer(queue, root);
 const searches = new SearchStore(root);
 const port = Number(process.env.PORT ?? 4317);
 let scan = { running: false, message: 'Ready', finishedAt: null };
+let connection = { running: false };
 const server = http.createServer(async (req, res) => {
   const json = (status, data) => { res.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' }); res.end(JSON.stringify(data)); };
   try {
     if (![`127.0.0.1:${port}`, `localhost:${port}`].includes(req.headers.host)) return json(403, { error: 'Local access only' });
     if (req.method === 'POST' && req.headers.origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`].includes(req.headers.origin)) return json(403, { error: 'Invalid origin' });
+    if (req.method === 'GET' && req.url === '/api/linkedin/connection') return json(200, { ...await connectionStatus(root), ...connection });
+    if (req.method === 'POST' && req.url === '/api/linkedin/connect') {
+      if (connection.running || scan.running) return json(409, { error: 'LinkedIn is busy; wait for the current operation' });
+      connection = { running: true, message: 'Connecting in Chrome…' };
+      let selected;
+      try {
+        selected = (await searches.read()).searches;
+        if (!selected.some(search => search.enabled)) throw new Error('Enable a search first');
+      } catch (error) { connection = { running: false, error: error.message }; throw error; }
+      connectLinkedIn(root, selected, message => { connection.message = message; })
+        .then(() => { connection = { running: false }; })
+        .catch(error => { connection = { running: false, error: error.message }; });
+      return json(202, connection);
+    }
     if (req.method === 'POST' && req.url === '/api/searches') {
       let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }
       const { search, version } = JSON.parse(body);
@@ -36,7 +52,7 @@ const server = http.createServer(async (req, res) => {
       const jobs = currentJobs.map((job, index) => ({ ...evaluateJob(job, profile, preferencesConfig, scoringConfig, withCOP(salaries[index], exchange)), discoveries: discoveriesFor(job) }));
       const searchState = { ...config, stats: searchAnalytics(config.searches, jobs, queue.state.searchRuns) };
       if (req.url === '/api/searches') return json(200, searchState);
-      return json(200, { jobs, searches: searchState, preferences: preferencesConfig, scan, ai: { ...summarizer.state, pending: pendingJobs(queue.state.jobs).length } });
+      return json(200, { jobs, searches: searchState, preferences: preferencesConfig, scan, connection, ai: { ...summarizer.state, pending: pendingJobs(queue.state.jobs).length } });
     }
     if (req.method === 'POST' && req.url === '/api/summarize') {
       let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }
@@ -49,11 +65,10 @@ const server = http.createServer(async (req, res) => {
       await queue.review(id, status, reason); return json(200, { ok: true });
     }
     if (req.method === 'POST' && req.url === '/api/scan') {
-      if (scan.running) return json(409, { error: 'A search is already running' });
+      if (scan.running || connection.running) return json(409, { error: 'LinkedIn is busy; wait for the current operation' });
       if (scan.finishedAt && Date.now() - Date.parse(scan.finishedAt) < 60000) return json(429, { error: 'Please wait a minute before searching again' });
-      // Reserve the batch before awaiting disk so concurrent clicks cannot launch
-      // two persistent browsers against the same authenticated profile.
-      scan = { running: true, message: 'Opening LinkedIn. Complete sign-in in Chrome if requested.', finishedAt: null };
+      // Reserve before awaiting disk so concurrent clicks cannot start two batches.
+      scan = { running: true, message: 'Searching LinkedIn…', finishedAt: null };
       let selected;
       try {
         selected = (await searches.read()).searches;

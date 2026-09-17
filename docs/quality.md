@@ -40,6 +40,12 @@ Do not create brittle tests merely to increase test count. Some visual,
 exploratory, or judgment-heavy behavior may require a documented scenario and
 human inspection instead.
 
+Run `node scripts/classifier-eval.mjs` for the synthetic live semantic eval
+(uses subscription tokens), or `--audit REPORT` for offline output review.
+Real-source runs additionally require explicit owner approval. Freeze reviewed
+expectations before changing prompts; extend them when source review catches
+an omission. Passing targeted checks is not a universal quality guarantee.
+
 Behavioral tests use synthetic inputs from `test-support/fixtures.mjs`, not the
 owner's editable profile or preference values. Check real configuration for
 valid structure and catalog references, not exact experience durations, prose

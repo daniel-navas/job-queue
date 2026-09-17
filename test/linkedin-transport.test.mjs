@@ -21,7 +21,7 @@ test('HTTP detail uses an observed request template and retains only needed in-m
   assert.equal(calls[0].options.maxRedirects, 0);
 });
 
-test('ordinary missing or incomplete detail allows browser fallback', async () => {
+test('ordinary missing or incomplete HTTP detail returns no capture', async () => {
   const template = observedDetailTemplate(observedUrl, {});
   for (const response of [
     { status: 404, type: 'application/json', body: '{}' },

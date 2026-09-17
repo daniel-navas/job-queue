@@ -11,6 +11,7 @@ import { normalizeSearch } from '../src/searches.mjs';
 import { fingerprint, summaryVersion } from '../src/summarize.mjs';
 import { emptyCard, requirement, matchingProfile, evaluationConfig } from '../test-support/fixtures.mjs';
 import { readJobDescription } from '../src/linkedin/description.mjs';
+import { readStoredJobs } from '../src/queue.mjs';
 
 const root = await mkdtemp(path.join(os.tmpdir(), 'jq-search-browser-'));
 let child, browser;
@@ -37,6 +38,9 @@ try {
   const base = `http://127.0.0.1:${port}`;
   const get = async () => (await fetch(`${base}/api/searches`)).json();
   const post = async body => fetch(`${base}/api/searches`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const connection = await (await fetch(`${base}/api/linkedin/connection`)).json();
+  assert.equal(connection.running, false); assert.equal(connection.connected, false);
+  assert.equal((await fetch(`${base}/api/linkedin/connect`, { method: 'POST', headers: { Origin: 'https://untrusted.example' } })).status, 403);
   const initial = await get();
   assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 2);
   const invalid = await post({ version: initial.version, search: { ...search, provider: 'other' } }); assert.equal(invalid.status, 400);
@@ -58,6 +62,7 @@ try {
   await page.locator('.search-origin summary').click(); await page.getByText('First found 2026-09-14 · Last seen 2026-09-14').waitFor();
   await page.getByRole('button', { name: 'Searches', exact: true }).click();
   await page.locator('.search-row').waitFor();
+  assert.equal(await page.getByRole('button', { name: 'Connect LinkedIn' }).count(), 1);
   const criteriaText = await page.locator('.search-copy').first().innerText();
   assert.equal(await page.locator('.search-copy strong').first().innerText(), 'backend engineer');
   assert.doesNotMatch(criteriaText, /Query:|Backend · Colombia/);
@@ -107,6 +112,7 @@ try {
   await page.keyboard.press('Escape'); assert.equal(await page.locator('#searches-dialog').isVisible(), false);
   assert.deepEqual(errors, []);
   assert.equal(await readFile(path.join(root, 'data/queue.json'), 'utf8'), queueBefore);
+  assert.deepEqual(await readStoredJobs(root), JSON.parse(queueBefore).jobs);
   // Simulate scan state only at the API boundary; never launch LinkedIn.
   const headerHeight = (await page.locator('header').boundingBox()).height;
   let scan = { running: true, message: 'Searching 2/5', query: 'Python backend' };

@@ -23,8 +23,8 @@ which ones deserve further action.
 1. Use enabled LinkedIn searches from the Searches dialog and collect
    preferences gradually through reviews and dismissal reasons. See
    docs/linkedin-searches.md for current strategy and provenance semantics.
-2. JobQueue runs those LinkedIn searches through the local authenticated
-   browser session.
+2. JobQueue runs those LinkedIn searches through saved authenticated HTTP
+   requests. Chrome is only for explicit connection/renewal.
 3. It hydrates each discovered job detail and persists only complete vacancies
    with a full description into the review queue.
 4. It merges duplicates and remembers vacancies seen in previous runs.
@@ -38,7 +38,7 @@ which ones deserve further action.
 ### Source and collection
 
 - LinkedIn is the only vacancy provider.
-- Reuse a local authenticated browser profile.
+- Reuse a private authenticated HTTP session; connect explicitly through Chrome.
 - Support a small configurable set of saved searches.
 - Run searches sequentially and conservatively.
 - Stop on throttling, CAPTCHA, checkpoint, or security challenge.

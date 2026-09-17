@@ -40,6 +40,9 @@ performed, supported by explicit job geography (for example Spain -> ES,
 Germany -> DE, Colombia -> CO). Do not use employer headquarters or infer the
 country from a city name alone. Multiple possible countries or unspecified
 remote geography remain null; preserve the actual wording in workplace.
+Compare the location metadata WITH the description: if they name conflicting
+role countries, keep workCountry null and preserve the conflict in workplace.
+Do not choose metadata over an explicitly contradictory role location.
 visaSupport: supported only when the employer explicitly offers sponsorship
 or help obtaining a work visa/permit for this role. not-supported for explicit
 refusal or a requirement to already hold work authorization without support.
@@ -53,6 +56,13 @@ not prove either funding or visa support. These are three independent facts.
 requirements: explicitly required qualifications. preferred: explicit bonuses.
 stack: contextual technologies only, excluding those in requirements/preferred.
 Never promote a company stack list to mandatory qualifications.
+Conversely, a technology list INSIDE the candidate requirements section is
+required unless explicitly optional; do not demote it to stack merely because
+it is a list. Respect section headings even when scraped text loses newlines.
+Separate a required general capability from a preferred vendor in the same
+sentence: "cloud architecture, preferably Azure" requires cloud architecture
+and prefers Azure. Keep the general requirement even if its catalog key is
+unknown. A preferred example must not replace the required parent concept.
 Only extract concrete qualifications that could be checked from a profile.
 Exclude employer values, personality adjectives, high IQ/EQ, high standards,
 bias for action, trust, innovation and other unmeasurable hiring rhetoric.
@@ -67,13 +77,18 @@ they are deliberately outside the scoring denominator. A specialized version
 remains valid when the catalog has a differentiating key (for example English
 C1, technical leadership, incident response, or a named CI/CD platform).
 Each independently checkable criterion is one item. A OR B is ONE item with
-alternatives [A,B]; A AND B is TWO items. Preserve other/nontechnical criteria
-with kind unknown so coverage never silently excludes unmatched requirements.
+alternatives [A,B]; A AND B is TWO items.
+This AND/OR rule applies equally to requirements, preferred AND stack;
+"y"/"e"/"and" are conjunctions, never alternative-choice markers.
+Preserve other/nontechnical criteria with kind unknown so coverage never
+silently excludes unmatched requirements.
 Do not split illustrative examples into separate criteria: "automated testing
 (unit, integration, end-to-end)" is one testing criterion. Never map a narrow
 specialism to a broader capability merely to make it match: specific Claude
 experience is not generic ai-assisted; specific unit-testing experience is not
 established by generic automated-testing. Use an unknown key if needed.
+Generic troubleshooting does not establish incident response. Do not add a
+broader adjacent capability just because a related word appears in the source.
 
 Each criterion has a label, kind, alternatives (catalog keys), minMonths, maxMonths,
 autonomy, knowledgeLevel, lastUsedYear, maxYearsSinceUse, evidence. Null thresholds unless EXPLICIT:
@@ -87,11 +102,16 @@ autonomy, knowledgeLevel, lastUsedYear, maxYearsSinceUse, evidence. Null thresho
   independent for working proficiency, and advanced for explicit advanced or
   expert execution. Do not infer technology expertise from a senior title or
   set autonomy from conceptual knowledge wording alone.
+  Bare "experience with", "knowledge of", "production systems", or years of
+  experience do NOT state a proficiency level: leave autonomy null. Working
+  proficiency must actually be stated, not inferred from having used a tool.
 - knowledgeLevel: only for conceptual capability requirements rather than
   hands-on technology autonomy. Map basic/familiarity/unqualified understanding
   to basic; intermediate/working/solid knowledge to intermediate; and
   strong/deep/advanced/expert knowledge to advanced. Otherwise null. Examples
   include data structures, algorithms, system design and security concepts.
+  For kind technology, knowledgeLevel is always null, including database
+  families. "Knowledge of PostgreSQL" alone sets neither threshold.
 - lastUsedYear: only an explicit absolute year cutoff.
 - maxYearsSinceUse: a relative recency cutoff. Use the explicit number for
   "within the last N years". Map current/currently to 1 and recent/recently to
@@ -111,3 +131,9 @@ Do not drop an unmapped criterion; it stays visible and can inform a later
 human-reviewed catalog addition. Never add candidate facts or preference scores.
 
 No recommendation, candidate information, or per-company exceptions.
+
+Before returning, silently check every concrete qualification against the
+output: required vs preferred, independent AND vs alternative OR, omitted
+general concepts, and thresholds unsupported by explicit level wording.
+Check conflicting geography and visa/funding independently. Do not output
+this checklist or reasoning; return only the requested JSON.

@@ -16,7 +16,7 @@ function render() {
   $('#count').textContent = `${jobs.length} opportunities${discoveryFilter ? ` · ${discoveryFilter.query}` : ''}`;
   $('#clear-discovery').hidden = !discoveryFilter;
   const enabled = data.searches?.searches?.filter(s => s.enabled) ?? [];
-  $('#scan').disabled = data.scan?.running || !enabled.length;
+  $('#scan').disabled = data.scan?.running || data.connection?.running || !enabled.length;
   $('#summarize').disabled = data.ai?.running || !data.ai?.pending;
   const pendingCount = data.ai?.pending ?? 0;
   const nextBatch = Math.min(2, pendingCount);
@@ -53,7 +53,7 @@ $('#summarize').onclick = async () => { try { $('#error').textContent = ''; awai
 initSearches(api, refresh, search => { discoveryFilter = search; active = 'all'; $('#search').value = ''; render(); });
 $('#clear-discovery').onclick = () => { discoveryFilter = null; render(); };
 refresh().catch(error);
-setInterval(() => { if (data.scan?.running || data.ai?.running) refresh().catch(error); }, 3000);
+setInterval(() => { if (data.scan?.running || data.ai?.running || data.connection?.running) refresh().catch(error); }, 3000);
 
 function summaryHTML(job) {
   if (!job.summary) return provenanceHTML(job) + `<p class="muted">${job.description ? 'Summary pending. Use Process pending to prepare decision cards.' : 'Description not captured yet.'}</p>`;

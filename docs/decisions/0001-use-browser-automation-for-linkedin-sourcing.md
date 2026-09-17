@@ -2,7 +2,8 @@
 
 ## Status
 
-Accepted
+Superseded by [0006](0006-http-discovery-and-sqlite-queue.md). Retained as the
+historical browser-led design, not current runtime behavior.
 
 ## Context
 

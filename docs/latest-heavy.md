@@ -1,50 +1,45 @@
 # Latest Heavy Delivery
 
-Delivery: **H-2026-09-17-hybrid**
-Status: Implementation verified; live classifier review found semantic defects.
+Delivery: **H-2026-09-17-http-sqlite**
+Status: Implemented and verified; AI remains fallible, not universally certified.
 
 ## Outcome
 
-- Find opportunities reuses one authenticated browser for all enabled searches.
-  Search membership remains browser-led; missing details use an observed HTTP
-  template with browser fallback for ordinary incomplete/unavailable responses.
-  Readiness replaces fixed sleeps. Security/authentication/rate limits stop.
-- Process keeps individual AI calls, two concurrently per click, with independent
-  saves. Compact output restores the unchanged version-6 facts before validation.
-  Full sources/catalog, source-hash caching and subscription-only auth remain.
-- Prior UI refinements remain: query titles, active filters, no Searches footer,
-  search progress in the button. No mobile redesign or new controls.
+- Find opportunities calls LinkedIn HTTP endpoints without Chrome. Searches →
+  Connect/Reconnect opens Chrome explicitly for login and request discovery.
+  Connection saved privately (0600, plaintext) in .local/linkedin-connection.json.
+- Queue migrated to data/jobqueue.sqlite: all 158 records and metadata preserved.
+  Legacy JSON remains untouched and is no longer live. Private JSON and SQLite
+  backups are in data/backups; `node scripts/backup-queue.mjs` creates snapshots.
+- Classifier corrections cover geography conflicts, required/optional criteria,
+  unsupported proficiency and AND/OR. The old 30-criterion cap truncated long
+  lists; it is now 100. No model downgrade or full-source truncation.
 
 ## Files for Light
 
-- Processing: src/extraction-wire.mjs, src/summarize.mjs and corresponding tests.
-- Discovery: src/linkedin/{collector,transport,extract}.mjs, src/scan.mjs,
-  src/server.mjs and corresponding tests.
-- UI: public/{app,searches}.js, public/index.html, public/style.css.
-- Rationale/evidence: decisions 0001/0002, docs/performance-spike.md.
-- Current product rules: docs/preferences.md, docs/linkedin-searches.md.
+src/linkedin/{collector,connection,transport}.mjs; src/queue{,-storage}.mjs;
+src/server.mjs; public/{app,searches}.js; docs/summary-prompt.md;
+src/{facts,summarize}.mjs; scripts/classifier-eval.mjs;
+test-support/classifier-cases.mjs. Decision 0006 explains storage/transport.
 
 ## Preserve
 
-Maximum two AI offers per click; wait for both even on failure. No retries,
-whole-backlog automation, model downgrade or API fallback. Preserve reviews,
-individual durable saves and full sources. LinkedIn remains sequential with
-at most five missing-detail attempts/search. Never bypass a security stop.
-Legacy poc:linkedin is still the separate browser-only diagnostic.
+Two independent AI calls maximum/click, no retries/backlog automation/API
+billing fallback. Full source and deterministic matching. LinkedIn sequential,
+two pages/five details maximum/search; security failures stop, never browser
+fallback. Preserve reviews, IDs/order, provenance and the minimal desktop UI.
 
 ## Verification and limits
 
-70 tests and both desktop browser checks pass; screenshots inspected. Live
-Colombia/Germany collection preserved filters and used one session. After fixing
-REST.li URL escaping, a Germany run took 5.794s including startup; two HTTP
-details took 295/256ms. These bounded diagnostics did not import offers.
+91 automated tests; both desktop checks passed. Full migration and isolated
+SQLite backup restoration had exact state parity. Live HTTP test: two searches
+plus four details, 3.106s total, zero browser launches, no queue import. Search
+requests 846–1,025ms; details 256–337ms. Not an exhaustive benchmark.
 
-The authorized two-offer classifier check completed in 38.063s concurrently.
-Schema/quotes pass, but source review found omitted cloud qualification,
-unsupported proficiency and conflicting-country handling. Results remain local
-test artifacts, not queue summaries. See docs/performance-spike.md for details.
-Classifier quality remains open; do not claim semantic parity or a speedup.
-The owner wants ordinary searches without Chrome; current production still
-opens it. HTTP-first session reuse and SQLite storage are proposals, not shipped.
+Classifier: 19 targeted semantic checks passed. Real pair took 52.904s in
+parallel; no speedup claim. Outputs remain diagnostic, not imported; 124 pending
+offers unchanged. Cached older cards are not automatically reclassified.
+Private APIs and session expiry may require explicit reconnect. See
+docs/performance-spike.md and docs/storage-and-discovery-options.md.
 
-Use **Retoques del heavy:** for follow-up adjustments; read this file fresh.
+Use **Retoques del heavy:**; read this file fresh.

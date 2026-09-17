@@ -5,3 +5,5 @@ profile/raw.md
 profile/cv/
 docs/ai-context.md
 docs/superpowers/
+data/jobqueue.sqlite*
+data/backups/
