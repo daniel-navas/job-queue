@@ -87,3 +87,23 @@ relevant decision records; after work, update the narrow authoritative source
 and replace stale handoff facts. Never rely on the other conversation's chat
 history. Avoid simultaneous overlapping edits; inspect current files again
 before modifying shared profile, scoring, schema, or context files.
+
+### Heavy-to-Light handoff
+
+The owner's shorthand **"Retoques del heavy:"** means: read `docs/latest-heavy.md`
+from disk, then apply the requested adjustment to that delivery. It does not
+mean the latest chat message or an older delivery remembered in conversation.
+
+At the end of each substantial Heavy delivery, update authoritative docs and
+replace `docs/latest-heavy.md` with one short handoff (aim for 300 words):
+delivery ID/date, outcome, relevant files, invariants, verification evidence,
+known limitations, and pending work. Do not append a diary or copy transcripts.
+Mark incomplete deliveries honestly. Link to it from `docs/ai-context.md`.
+Light reads it fresh even in an existing conversation, confirms the delivery ID
+briefly, and reads only files relevant to the requested tweak. Light may update
+the handoff's follow-up notes without changing its delivery identity. Only the
+next substantial Heavy delivery replaces that identity.
+
+Both conversations must use the same checkout. If the file or referenced code
+is missing/stale, report that instead of guessing. Work sequentially on shared
+files; changing the model does not replace this disk-based handoff protocol.

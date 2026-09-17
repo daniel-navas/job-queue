@@ -61,6 +61,12 @@ fixtures, scenario generators, seed values, saved states, or shareable links.
 Keep evaluation mechanics deterministic where possible, and keep human or AI
 judgment explicit when it cannot be automated reliably.
 
+For AI performance experiments, freeze the source sample and record the prompt,
+schema, model/settings and usage alongside timings. Compare equal samples;
+exclude interrupted runs from speed claims. Check meaning and omissions against
+the source, not just valid JSON or another model's answer. Import experimental
+results only after review, preserving existing decisions and source hashes.
+
 ## Reporting
 
 Final work summaries should distinguish:

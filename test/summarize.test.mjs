@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { fingerprint, pendingJobs, currentSummary, processingStatus, summaryVersion, validateCards, discardUnsupportedFacts, Summarizer } from '../src/summarize.mjs';
 import { emptyCard } from '../test-support/fixtures.mjs';
+import { Queue } from '../src/queue.mjs';
 const job = { id: '1', title: 'Engineer', description: 'Requires Java. Remote in Colombia.', status: 'new' };
 const card = () => emptyCard({ workplace: { value: 'Remote', evidence: 'Remote in Colombia.' } });
 test('only new or changed descriptions need processing', () => {
@@ -53,4 +54,50 @@ test('one start processes at most two pending offers', async () => {
   assert.equal(worker.state.remaining,4);
   assert.equal(worker.state.usage.input_tokens,2);
   assert.equal(queue.state.jobs.filter(item=>item.summary?.version===summaryVersion).length,2);
+});
+
+test('both offers start together and a failed offer does not release the batch before its sibling saves', { timeout: 2000 }, async () => {
+  const queue = { state: { jobs: [{ ...job }, { ...job, id: '2' }] }, mutate: async fn => fn() };
+  const gates = new Map();
+  let bothStarted;
+  const started = new Promise(resolve => { bothStarted = resolve; });
+  const worker = new Summarizer(queue, process.cwd(), batch => new Promise((resolve, reject) => {
+    gates.set(batch[0].id, { resolve, reject });
+    if (gates.size === 2) bothStarted();
+  }));
+  worker.start();
+  await started;
+  gates.get('1').reject(new Error('Extraction failed'));
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(worker.state.running, true);
+  assert.throws(() => worker.start(), /already running/);
+  queue.state.jobs[1].status = 'interesting';
+  gates.get('2').resolve({ cards: [{ ...card(), id: '2' }], usage: { input_tokens: 7 } });
+  await worker.completion;
+  assert.equal(worker.state.error, true);
+  assert.equal(worker.state.processed, 1);
+  assert.equal(worker.state.completed, 2);
+  assert.equal(worker.state.remaining, 1);
+  assert.equal(queue.state.jobs[1].status, 'interesting');
+  assert.ok(queue.state.jobs[1].summary);
+  assert.equal(queue.state.jobs[0].summary, undefined);
+  assert.equal(queue.state.lastSummaryRun.timings.length, 2);
+  assert.ok(queue.state.lastSummaryRun.durationMs >= 0);
+});
+
+test('ready count includes only durably saved offers after a write failure', async () => {
+  const queue = new Queue(process.cwd());
+  queue.state.jobs = [{ ...job }, { ...job, id: '2' }];
+  let writes = 0, persisted;
+  queue.save = async () => {
+    if (++writes === 1) throw new Error('Disk full');
+    persisted = structuredClone(queue.state);
+  };
+  const worker = new Summarizer(queue, process.cwd(), async ([input]) => ({ cards: [{ ...card(), id: input.id }], usage: null }));
+  worker.start(); await worker.completion;
+  assert.equal(persisted.jobs.filter(item => item.summary).length, 1);
+  assert.equal(worker.state.processed, 1);
+  assert.equal(persisted.lastSummaryRun.processed, 1);
+  assert.equal(worker.state.error, true);
+  assert.match(worker.state.message, /^1 ready/);
 });

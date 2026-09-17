@@ -83,12 +83,16 @@ have their own search adapter and review skill.
 
 ## Collection and provenance
 
-Find opportunities visits every enabled search sequentially, at most five
-missing detail pages per search. Previously captured complete jobs are linked
+Find opportunities reuses one authenticated browser for all enabled searches,
+visited sequentially, with at most five missing detail attempts per search.
+Searches wait for results instead of a fixed sleep. Missing descriptions use
+HTTP requests learned from that browser session when available; ordinary
+unavailable/incomplete responses fall back to the job page. Previously captured complete jobs are linked
 to additional searches without another detail visit. The one-minute batch
 cooldown remains. Any failed search stops the rest; successful captures remain.
 Run-specific manifests prevent accidentally importing an earlier search after
-a launch failure. Security challenges and HTTP 429 stop navigation.
+a launch failure. Security challenges, authentication failures and HTTP 429
+stop the batch without browser fallback for a blocked HTTP request.
 
 Search-page cards/visible result links establish membership. Detail-page
 recommendations and feed IDs do not establish discovery by that search.

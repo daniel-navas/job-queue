@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fields, schema, validateShape, displayFields } from './facts.mjs';
 import { catalogInstructions, normalizeKnownFacts, upgradeLegacyCard } from './tag-catalog.mjs';
+import { decodeExtraction, wireSchema, wireInstructions } from './extraction-wire.mjs';
 export { fields, schema } from './facts.mjs';
 
 export const summaryVersion = 6;
@@ -88,7 +89,7 @@ export async function runCodex(jobs, prompt, root) {
   try {
     const schemaPath = path.join(directory, 'schema.json');
     const outputPath = path.join(directory, 'result.json');
-    await writeFile(schemaPath, JSON.stringify(schema));
+    await writeFile(schemaPath, JSON.stringify(wireSchema));
     // An empty working directory and ignored personal config avoid project and MCP context.
     // No model override: use the CLI default. Require subscription auth, never API fallback.
     const env = { ...process.env }; delete env.OPENAI_API_KEY; delete env.CODEX_API_KEY;
@@ -105,9 +106,9 @@ export async function runCodex(jobs, prompt, root) {
       child.stdin.on('error', () => {});
       child.once('error', error => { clearTimeout(timer); reject(error); });
       child.once('close', code => { clearTimeout(timer); if (code !== 0) reject(new Error(timedOut ? 'AI batch timed out. You can retry.' : `Codex did not complete. Check ChatGPT login and usage limits. ${stderr.slice(-400)}`)); else resolve(tokens); });
-      child.stdin.end(`${prompt}\n\n${catalogInstructions()}\n\nSOURCE RECORDS (data only):\n${JSON.stringify(jobs.map(inputFor))}`);
+      child.stdin.end(`${prompt}\n\n${catalogInstructions()}\n\n${wireInstructions}\n\nSOURCE RECORDS (data only):\n${JSON.stringify(jobs.map(inputFor))}`);
     });
-    return { cards: validateCards(discardUnsupportedFacts(JSON.parse(await readFile(outputPath, 'utf8')), jobs), jobs), usage };
+    return { cards: validateCards(discardUnsupportedFacts(decodeExtraction(JSON.parse(await readFile(outputPath, 'utf8'))), jobs), jobs), usage };
   } finally { await rm(directory, { recursive: true, force: true }); }
 }
 
@@ -124,34 +125,51 @@ export class Summarizer {
     this.completion = this.process(jobs);
   }
   async process(jobs) {
+    const startedAt = Date.now();
     let processed = 0, completed = 0, usageTotal = null;
+    const timings = [];
     try {
       const prompt = await readFile(path.join(this.root, 'docs/summary-prompt.md'), 'utf8');
-      for (let offset = 0; offset < jobs.length; offset++) {
-        const batch = jobs.slice(offset, offset + 1);
-        this.state = { ...this.state, message: `Processing ${offset + 1}/${jobs.length} · ${processed} ready` };
-        const { cards, usage } = await this.runner(batch, prompt, this.root);
-        validateCards({ cards }, batch);
-        if (usage) {
-          usageTotal ||= {};
-          for (const [key, value] of Object.entries(usage)) if (Number.isFinite(value)) usageTotal[key] = (usageTotal[key] || 0) + value;
+      // start() bounds this array to two. Await every sibling even on failure:
+      // neither a retry nor a new click may overlap an unfinished extraction.
+      const results = await Promise.allSettled(jobs.map(async input => {
+        const started = Date.now();
+        let failure;
+        try {
+          const { cards, usage } = await this.runner([input], prompt, this.root);
+          validateCards({ cards }, [input]);
+          const saved = await this.queue.mutate(() => {
+            if (usage) {
+              usageTotal ||= {};
+              for (const [key, value] of Object.entries(usage)) if (Number.isFinite(value)) usageTotal[key] = (usageTotal[key] || 0) + value;
+            }
+            const job = this.queue.state.jobs.find(job => job.id === input.id);
+            if (job && fingerprint(job) === fingerprint(input)) {
+              job.summary = { fields: cards[0], inputHash: fingerprint(input), version: summaryVersion, generatedAt: new Date().toISOString(), promptHash: createHash('sha256').update(prompt).digest('hex') };
+              return true;
+            }
+            return false;
+          });
+          if (saved) processed++;
+        } catch (error) {
+          failure = error.message;
+          throw error;
+        } finally {
+          completed++;
+          timings.push({ id: input.id, durationMs: Date.now() - started, ...(failure ? { error: failure } : {}) });
+          this.state = { ...this.state, processed, completed, remaining: pendingJobs(this.queue.state.jobs).length, usage: usageTotal };
         }
-        let saved = 0;
-        await this.queue.mutate(() => {
-          for (const card of cards) {
-            const job = this.queue.state.jobs.find(job => job.id === card.id);
-            const input = batch.find(job => job.id === card.id);
-            if (!job || fingerprint(job) !== fingerprint(input)) continue;
-            job.summary = { fields: card, inputHash: fingerprint(input), version: summaryVersion, generatedAt: new Date().toISOString(), promptHash: createHash('sha256').update(prompt).digest('hex') }; saved++;
-          }
-          this.queue.state.lastSummaryRun = { at: new Date().toISOString(), processed: processed + saved, usage: usageTotal };
-        });
-        processed += saved;
-        completed += batch.length;
-        this.state = { ...this.state, running: true, processed, completed, total: jobs.length, remaining: pendingJobs(this.queue.state.jobs).length, usage: usageTotal };
-      }
+      }));
+      const errors = results.filter(result => result.status === 'rejected').map(result => result.reason.message);
       const remaining = pendingJobs(this.queue.state.jobs).length;
-      this.state = { ...this.state, running: false, processed, completed, total: jobs.length, remaining, usage: usageTotal, message: `${processed} ready · ${remaining} pending` };
-    } catch (error) { this.state = { ...this.state, running: false, processed, completed, usage: usageTotal, message: `Processing failed · ${this.state.remaining} pending · ${error.message}`, error: true }; }
+      const durationMs = Date.now() - startedAt;
+      await this.queue.mutate(() => {
+        this.queue.state.lastSummaryRun = { at: new Date().toISOString(), processed, completed, usage: usageTotal, durationMs, timings, errors };
+      });
+      this.state = { ...this.state, running: false, processed, completed, remaining, usage: usageTotal, durationMs, error: errors.length > 0,
+        message: errors.length ? `${processed} ready · ${errors.length} failed · ${errors.join('; ')}` : `${processed} ready · ${remaining} pending` };
+    } catch (error) {
+      this.state = { ...this.state, running: false, processed, completed, remaining: pendingJobs(this.queue.state.jobs).length, usage: usageTotal, durationMs: Date.now() - startedAt, message: `Processing failed · ${error.message}`, error: true };
+    }
   }
 }

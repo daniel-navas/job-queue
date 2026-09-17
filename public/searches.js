@@ -16,7 +16,7 @@ export function initSearches(api, refresh, filterOffers) {
   const dialog = document.createElement('dialog');
   dialog.id = 'searches-dialog'; dialog.setAttribute('aria-labelledby', 'searches-title');
   dialog.innerHTML = `<div class="searches-head"><h2 id="searches-title">Searches</h2><button type="button" id="searches-close" aria-label="Close searches">✕</button></div>
-    <div id="searches-list-view"><div class="searches-provider"><strong>LinkedIn</strong><button id="search-add" type="button">Add search</button></div><div id="searches-list"></div><p class="searches-note">Counts and averages use unique captured offers with the current criteria. Pending offers are excluded from averages.</p></div>
+    <div id="searches-list-view"><div class="searches-provider"><strong>LinkedIn</strong><button id="search-add" type="button">Add search</button></div><div id="searches-list"></div></div>
     <form id="search-editor" hidden><h3 id="search-editor-title">Edit search</h3>
       <label for="search-query">Query</label><textarea id="search-query" required maxlength="500" rows="2"></textarea>
       <label for="search-location">Location</label><input id="search-location" required maxlength="150">

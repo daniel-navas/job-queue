@@ -16,3 +16,4 @@ header{height:46px}header button{padding:7px 10px}.toolbar{margin-top:5px;paddin
 /* Desktop layout only; small-device browsers scale the 1024px viewport. */
 body{min-width:1024px}
 .search-copy strong{overflow-wrap:anywhere}
+header{gap:18px}header>strong,header>.actions{flex:none}header #run-status{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;margin:0}#scan .spinner{border-color:#215c4944;border-top-color:#215c49}

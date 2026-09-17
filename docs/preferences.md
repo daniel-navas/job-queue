@@ -125,6 +125,10 @@ Keep top controls compact, scores next to field labels, and source toggles besid
 Chrome directly; do not open the page in Codex after changes.
 Searches opens one minimal provider-labeled dialog for adding, editing and
 enabling LinkedIn searches and viewing current-criteria counts and mean ratings.
+Do not add instructional footer copy to Searches. Search progress belongs in
+the Find opportunities button as a search counter, not raw collector logs.
+Use the existing header space for completion or sign-in/error messages without
+adding a status row. Tooltips may show the current query, never the old name.
 Keep search provenance in a compact detail disclosure, not on list cards.
 Keep work-mode detail on the same line as its normalized value and keep the
 offer-detail header dense. Company stack should contain only useful technology

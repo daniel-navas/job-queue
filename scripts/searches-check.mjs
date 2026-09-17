@@ -62,6 +62,7 @@ try {
   assert.equal(await page.locator('.search-copy strong').first().innerText(), 'backend engineer');
   assert.doesNotMatch(criteriaText, /Query:|Backend · Colombia/);
   assert.doesNotMatch(await page.locator('#searches-list-view').innerText(), /Checked searches|detail visits/);
+  assert.equal(await page.locator('#searches-list-view .searches-note').count(), 0);
   assert.match(criteriaText, /Location: Colombia/);
   assert.match(criteriaText, /Date posted: Past month/);
   assert.doesNotMatch(criteriaText, /Work mode:|Any work mode|No other filters/);
@@ -106,6 +107,24 @@ try {
   await page.keyboard.press('Escape'); assert.equal(await page.locator('#searches-dialog').isVisible(), false);
   assert.deepEqual(errors, []);
   assert.equal(await readFile(path.join(root, 'data/queue.json'), 'utf8'), queueBefore);
+  // Simulate scan state only at the API boundary; never launch LinkedIn.
+  const headerHeight = (await page.locator('header').boundingBox()).height;
+  let scan = { running: true, message: 'Searching 2/5', query: 'Python backend' };
+  await page.route('**/api/jobs', async route => {
+    const response = await route.fetch();
+    await route.fulfill({ response, json: { ...await response.json(), scan } });
+  });
+  await page.reload();
+  await page.getByRole('button', { name: 'Searching 2/5', exact: true }).waitFor();
+  assert.equal(await page.locator('#scan').isDisabled(), true);
+  assert.equal(await page.locator('#scan').getAttribute('title'), 'Python backend');
+  assert.equal(await page.locator('#run-status').innerText(), '');
+  assert.equal((await page.locator('header').boundingBox()).height, headerHeight);
+  scan = { running: false, added: 3, finishedAt: '2026-09-16', message: '3 complete opportunities added · 5 searches' };
+  await page.reload();
+  await page.getByRole('status').filter({ hasText: '3 offers added' }).waitFor();
+  assert.equal(await page.locator('header #run-status').count(), 1);
+  assert.equal((await page.locator('header').boundingBox()).height, headerHeight);
   console.log('Search UI/API checks passed: add/edit/toggle, stale edit, metrics, provenance, filtering, keyboard, no runtime errors or offer mutations.');
 } finally {
   if (browser) await browser.close();

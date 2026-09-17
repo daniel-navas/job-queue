@@ -47,3 +47,40 @@ export function isLikelyJobResponse({ url, contentType }) {
       normalizedUrl.includes("jobposting"))
   );
 }
+
+export function securityResponseReason({ url, status, contentType = '', body = '' }) {
+  if (!/^https:\/\/www\.linkedin\.com\/(?:voyager\/api\/|jobs\/)/.test(url)) return null;
+  if ([401, 403, 429].includes(status)) return `LinkedIn HTTP ${status}; stopped.`;
+  if (status !== 200 || !contentType.toLowerCase().includes('json')) return null;
+  let payload;
+  try { payload = JSON.parse(body); } catch { return null; }
+  if (Array.isArray(payload.included)) return null;
+  return /unauthori[sz]ed|authentication|required.*login|sign.?in|captcha|checkpoint|security challenge/i.test(`${payload.serviceErrorCode ?? ''} ${payload.message ?? ''}`)
+    ? 'LinkedIn security/sign-in response; stopped.' : null;
+}
+
+export function pageGateReason({ url, title = '' }) {
+  if (/\/checkpoint\/|\/challenge\/|captcha/i.test(url) || /security verification|captcha/i.test(title)) {
+    return 'LinkedIn security challenge; stopped.';
+  }
+  if (/\/login(?:\/|\?|$)/i.test(url) || /^(?:sign in|log in|iniciar sesi[oó]n)\b/i.test(title)) {
+    return 'LinkedIn sign-in is required; stopped.';
+  }
+  return null;
+}
+
+export async function waitForSearchReadiness({ inspect, ensureAllowed, drain, timeoutMs = 15_000, intervalMs = 200 }) {
+  const deadline = Date.now() + timeoutMs;
+  let result;
+  do {
+    await drain();
+    await ensureAllowed();
+    result = await inspect();
+    if (result.observed > 0 || result.explicitEmpty) return result;
+    if (Date.now() >= deadline) break;
+    await new Promise(resolve => setTimeout(resolve, intervalMs));
+  } while (true);
+  // DOM-only results are a bounded degraded path when the card response was
+  // absent; capture health still rejects an unrecognized empty layout.
+  return result;
+}

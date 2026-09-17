@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { SearchStore, searchAnalytics, discoveriesFor } from './searches.mjs';
-import { runSearchBatch, collectSearch } from './scan.mjs';
+import { runManagedSearchBatch } from './scan.mjs';
 import { Queue } from './queue.mjs';
 import { Summarizer, pendingJobs, currentSummary, processingStatus } from './summarize.mjs';
 import { evaluateJob } from './evaluate.mjs';
@@ -59,8 +59,8 @@ const server = http.createServer(async (req, res) => {
         selected = (await searches.read()).searches;
         if (!selected.some(search => search.enabled)) throw new Error('Enable a search first');
       } catch (error) { scan = { running: false, message: error.message, error: true, finishedAt: null }; throw error; }
-      const progress = message => { scan.message = message; };
-      runSearchBatch(selected, search => collectSearch(root, queue, search, progress), progress)
+      const progress = (message, query) => { scan.message = message; scan.query = query; };
+      runManagedSearchBatch(root, queue, selected, progress)
         .then(result => { scan = { ...result, running: false, finishedAt: new Date().toISOString() }; })
         .catch(error => { scan = { running: false, error: true, message: error.message, finishedAt: new Date().toISOString() }; });
       return json(202, scan);

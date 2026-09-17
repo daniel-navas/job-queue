@@ -23,9 +23,16 @@ account continuity.
 ## Decision
 
 Use a local persistent browser session to run LinkedIn job searches and capture
-their results. Begin with browser-controlled network interception so the
-browser handles authentication. Directly replaying private requests may be
-considered later if necessary.
+their results. Reuse one browser context across an enabled-search batch, with
+readiness checks instead of unconditional sleeps. Searches remain browser-led:
+the September 2026 HTTP spike did not establish exact search-result parity.
+
+Missing details may replay a request template observed in that same browser
+session. Keep authentication headers in memory and let the browser context
+manage cookies; never hard-code GraphQL hashes or persist replay credentials.
+Ordinary missing, malformed or incomplete responses permit browser fallback.
+Authentication failures, security challenges and throttling stop the batch,
+without switching transport to bypass the block. See docs/performance-spike.md.
 
 The owner explicitly accepts the possibility that the integration will break
 or that LinkedIn will restrict the account. Execution will be sequential and

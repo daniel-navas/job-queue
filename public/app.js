@@ -20,12 +20,14 @@ function render() {
   $('#summarize').disabled = data.ai?.running || !data.ai?.pending;
   const pendingCount = data.ai?.pending ?? 0;
   const nextBatch = Math.min(2, pendingCount);
-  $('#summarize').innerHTML = data.ai?.running ? `<span class="spinner" aria-hidden="true"></span>${data.ai.completed}/${data.ai.total} ready` : `Process ${nextBatch} · ${pendingCount} pending`;
+  $('#summarize').innerHTML = data.ai?.running ? `<span class="spinner" aria-hidden="true"></span>${data.ai.processed}/${data.ai.total} ready` : `Process ${nextBatch} · ${pendingCount} pending`;
   $('#summarize').title = `Summarize the next ${nextBatch} of ${pendingCount} eligible offers using Codex`;
-  $('#ai-status').textContent = data.ai?.message || '';
+  $('#ai-status').textContent = data.ai?.error ? data.ai.message : '';
   $('#ai-status').classList.toggle('failure', !!data.ai?.error);
-  $('#run-status').textContent = data.scan?.running || data.scan?.finishedAt ? data.scan.message : '';
-  $('#scan').title = enabled.length ? `${enabled.length} LinkedIn searches · up to ${enabled.length * 5} detail visits` : 'Enable a search in Searches';
+  $('#scan').innerHTML = data.scan?.running ? `<span class="spinner" aria-hidden="true"></span>${escape(/^Searching \d+\/\d+$/.test(data.scan.message) ? data.scan.message : 'Searching…')}` : 'Find opportunities';
+  $('#run-status').textContent = data.scan?.running ? (data.scan.message === 'Sign in to LinkedIn' ? data.scan.message : '') : data.scan?.finishedAt ? (data.scan.error ? data.scan.message : `${data.scan.added ?? 0} offers added`) : '';
+  $('#run-status').title = $('#run-status').textContent;
+  $('#scan').title = enabled.length ? (data.scan?.running && data.scan.query ? data.scan.query : `${enabled.length} LinkedIn searches`) : 'Enable a search in Searches';
   $('#run-status').classList.toggle('failure', !!data.scan?.error);
   $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span>${processingBadge(job.processingStatus)}</span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Weighted priority score')}</span><span class="list-footer"><span class="muted">${escape(job.location || 'Location not provided')}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more opportunities.</p></div>';
   const job = data.jobs.find(j => j.id === selected);
