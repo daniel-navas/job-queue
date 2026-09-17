@@ -50,6 +50,9 @@ The extraction/matching boundary is recorded in decision 0002.
   owner can calibrate the level consistently.
 - Source quotations prove provenance, not perfect AI interpretation. Extraction
   errors must be fixed generically, not with hidden per-offer score exceptions.
+- Keep the verified GitHub remote (`origin/main`) synchronized after coherent
+  local changes. Inspect the diff before committing and do not publish
+  unrelated changes from another workstream without reviewing them.
 
 ## Success criteria
 
