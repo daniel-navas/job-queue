@@ -24,6 +24,11 @@ architecture, or dependency until the product need justifies it.
 
 - Inspect the repository before proposing or changing implementation.
 - Lead with the intended outcome and keep communication concise.
+- Explain behavior using plain component roles in the owner's language:
+  finder, classifier, and queue. State whether a browser opens, what data leaves
+  the computer, where results are saved, and whether a change is implemented
+  or only proposed. Timings must identify what was measured; do not present
+  whole-workflow latency as one endpoint's latency.
 - Make the smallest coherent change that satisfies the current requirement.
 - Prefer existing project patterns once they exist.
 - Do not add features, abstractions, dependencies, or infrastructure for

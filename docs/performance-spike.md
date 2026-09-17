@@ -147,11 +147,25 @@ source retention, schema delivery, auth constraints and result decoding.
 Independent review found no blocking AI-code issues; the obsolete schema export
 and its test were removed. No summaries require migration or reprocessing.
 
-A further two-offer live AI check (4456274071 and 4456384983) was blocked by the
-permission reviewer before execution, pending explicit consent to send those
-descriptions to Codex. It was not bypassed or silently retried. Therefore this
-delivery does not claim a new live-AI latency measurement or broader semantic
-parity. Prior compact extraction evidence remains exploratory, not a guarantee.
+The owner explicitly authorized the initially blocked two-offer check, which
+then completed on 2026-09-17. The classifier used the production runCodex path:
+Stefanini 4456274071 took 38.060s; N26 4456384983 took 24.868s; concurrent wall
+time was 38.063s. Combined usage: 41,266 input tokens, 2,880 output tokens,
+844 reasoning output tokens; no cached input was reported. This different sample
+does not demonstrate a speedup or isolate a bottleneck.
+
+Both cards passed structural/source-quote validation, but manual source review
+found semantic defects: N26 omitted the required modern-cloud-architecture
+criterion and inferred independent Spring Boot autonomy without explicit
+proficiency wording. Stefanini selected CO despite conflicting Colombia/Chile
+role geography. These are evidence against claiming extraction quality is
+fully solved; the earlier six targeted checks for these two offers alone would
+not catch them. The cause is not isolated to the compact representation.
+The results were saved in .local/performance-spike-20260916/
+production-compact-holdout.json, not imported into the queue. Both descriptions
+already exist in the queue; no offers, reviews or summaries were overwritten.
+Generic classifier-quality corrections need a separate focused change, not
+manual per-offer scoring exceptions or an automatic retry.
 
 The app now uses one persistent browser per scan, browser-led searches,
 readiness conditions, and observed HTTP detail requests with ordinary browser

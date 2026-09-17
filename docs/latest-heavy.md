@@ -1,7 +1,7 @@
 # Latest Heavy Delivery
 
 Delivery: **H-2026-09-17-hybrid**
-Status: Implemented and verified; additional live AI evaluation awaits consent.
+Status: Implementation verified; live classifier review found semantic defects.
 
 ## Outcome
 
@@ -39,9 +39,12 @@ Colombia/Germany collection preserved filters and used one session. After fixing
 REST.li URL escaping, a Germany run took 5.794s including startup; two HTTP
 details took 295/256ms. These bounded diagnostics did not import offers.
 
-Five previous live compact outputs decode identically with production code.
-The new two-offer live AI check was blocked pending exact consent; no new
-latency or semantic-parity claim. See the performance report for sample limits,
-permission status and optimization ideas. Server restarted with this code.
+The authorized two-offer classifier check completed in 38.063s concurrently.
+Schema/quotes pass, but source review found omitted cloud qualification,
+unsupported proficiency and conflicting-country handling. Results remain local
+test artifacts, not queue summaries. See docs/performance-spike.md for details.
+Classifier quality remains open; do not claim semantic parity or a speedup.
+The owner wants ordinary searches without Chrome; current production still
+opens it. HTTP-first session reuse and SQLite storage are proposals, not shipped.
 
 Use **Retoques del heavy:** for follow-up adjustments; read this file fresh.
