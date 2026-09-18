@@ -96,6 +96,12 @@ and replace stale handoff facts. Never rely on the other conversation's chat
 history. Avoid simultaneous overlapping edits; inspect current files again
 before modifying shared profile, scoring, schema, or context files.
 
+At a clean delivery boundary, explicitly tell the owner whether the current
+chat remains appropriate for follow-up tweaks or whether the next distinct
+objective should start in a new chat. Do not recommend a new chat merely
+because the conversation is long; recommend it when the objective or primary
+model should change, or when the working context has become materially noisy.
+
 ### Heavy-to-Light handoff
 
 The owner's shorthand **"Retoques del heavy:"** means: read `docs/latest-heavy.md`
