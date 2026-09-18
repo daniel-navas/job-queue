@@ -252,6 +252,47 @@ caught and fixed an unbound launcher and an unbounded unrelated-response wait.
   More concurrent calls may reduce backlog time but increase burst/rate-limit
   pressure; the owner-approved cap remains two.
 
+## Model and reasoning comparison (2026-09-18)
+
+The owner requested a model/effort decision. Three explicit Codex CLI settings
+were run through the production extraction prompt, full descriptions, catalog,
+compact schema, ChatGPT subscription authentication and strict validation. Each
+setting processed the same two frozen, previously source-reviewed real offers
+and one synthetic case: one offer per call, at most two concurrent, no retries.
+Nothing was imported into the queue. Local report:
+`.local/model-benchmark-20260918.json`; disposable runner:
+`.local/model-benchmark.mjs`. Prompt, schema, catalog and source hashes are in
+the report. The initial sandbox-denied attempt reached no model; one later Sol
+medium response was discarded because of a report-reader error, then the full
+comparison was rerun. Neither interrupted attempt contributes timing or quality
+claims.
+
+| Model / effort | Source checks after review | Three-call wall time | Output tokens | Cached input tokens |
+| --- | ---: | ---: | ---: | ---: |
+| Sol / medium | 22/22 | 83.562s | 5,195 | 25,600 |
+| Sol / low | 21/22 | 92.649s | 5,426 | 0 |
+| Terra / medium | 20/22 | 84.041s | 5,277 | 12,032 |
+
+All three initially passed 19 checks. Manual comparison with the full Stefanini
+source added three source-derived checks: keep explicitly listed Kubernetes as
+required alongside GKE; do not turn generic API design into a REST-specific
+requirement; do not turn Cursor, Claude and Gemini, given as examples of AI
+development tools, into three independent mandatory requirements. Sol low
+omitted Kubernetes. Terra made both over-specific interpretations. Sol medium
+passed all 22 checks. These additional checks were written after seeing the
+outputs, so the comparison is exploratory rather than a blinded accuracy study.
+The source-review checks cover known cases and do not prove complete extraction
+on every offer. Wall times describe all three calls per setting, including the
+two real calls run concurrently; they are not individual model latency figures.
+Cache usage varied, and the observed times do not establish a speed ranking or
+subscription-dollar savings.
+
+Decision: pin production classification to `gpt-5.6-sol` with `medium`
+reasoning. This preserves the strongest observed source fidelity in the tested
+sample and prevents the CLI default from changing the classifier silently.
+Keep the 19 original checks plus the three new source-derived checks as an
+evaluation gate. Revisit the setting only with a larger, source-reviewed sample.
+
 ## References
 
 - [Codex configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference):

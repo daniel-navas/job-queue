@@ -92,10 +92,10 @@ export async function runCodex(jobs, prompt, root) {
     const outputPath = path.join(directory, 'result.json');
     await writeFile(schemaPath, JSON.stringify(wireSchema));
     // An empty working directory and ignored personal config avoid project and MCP context.
-    // No model override: use the CLI default. Require subscription auth, never API fallback.
+    // Pin the source-reviewed classifier configuration. Require subscription auth, never API fallback.
     const env = { ...process.env }; delete env.OPENAI_API_KEY; delete env.CODEX_API_KEY;
     const usage = await new Promise((resolve, reject) => {
-      const child = spawn(process.env.CODEX_BIN || 'codex', ['exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method="chatgpt"', '--output-schema', schemaPath, '--output-last-message', outputPath, '--json', '-'], { cwd: directory, env, stdio: ['pipe', 'pipe', 'pipe'] });
+      const child = spawn(process.env.CODEX_BIN || 'codex', ['exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method="chatgpt"', '-m', 'gpt-5.6-sol', '-c', 'model_reasoning_effort="medium"', '--output-schema', schemaPath, '--output-last-message', outputPath, '--json', '-'], { cwd: directory, env, stdio: ['pipe', 'pipe', 'pipe'] });
       let buffer = '', stderr = '', tokens = null, timedOut = false;
       const timer = setTimeout(() => { timedOut = true; child.kill('SIGTERM'); }, 180000);
       child.stdout.on('data', chunk => {
