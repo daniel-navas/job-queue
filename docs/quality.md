@@ -72,6 +72,10 @@ schema, model/settings and usage alongside timings. Compare equal samples;
 exclude interrupted runs from speed claims. Check meaning and omissions against
 the source, not just valid JSON or another model's answer. Import experimental
 results only after review, preserving existing decisions and source hashes.
+Before live model trials, bound the number of calls and check current subscription
+usage. Stop trials once the evidence supports a decision or the planned usage
+budget is reached. A model's lower token or credit rate alone does not establish
+that it can process the backlog within the account's time-window limits.
 
 ## Reporting
 

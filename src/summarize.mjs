@@ -41,6 +41,33 @@ export const currentSummary = job => {
 };
 export const processingStatus = job => !job.description?.trim() ? 'no-description' : currentSummary(job) ? 'processed' : 'pending';
 const compact = value => value.replace(/\s+/g, ' ').trim();
+export function normalizeUnknownMobility(result) {
+  for (const card of result?.cards || []) {
+    for (const key of ['visaSupport', 'relocationFunding']) {
+      if (card[key]?.value === 'unknown') card[key] = null;
+    }
+  }
+  return result;
+}
+export function normalizeEvidenceQuotes(result, jobs) {
+  for (const card of result?.cards || []) {
+    const job = jobs.find(job => job.id === card.id);
+    if (!job) continue;
+    const sources = Object.values(inputFor(job)).map(compact);
+    for (const key of fields) {
+      for (const value of Array.isArray(card[key]) ? card[key] : [card[key]]) {
+        if (!value || typeof value.evidence !== 'string' || sources.some(source => source.includes(compact(value.evidence)))) continue;
+        for (const [left, right] of [['"', '"'], ['“', '”'], ["'", "'"], ['‘', '’']]) {
+          if (!value.evidence.startsWith(left) || !value.evidence.endsWith(right)) continue;
+          const inner = value.evidence.slice(left.length, -right.length);
+          if (sources.some(source => source.includes(compact(inner)))) value.evidence = inner;
+          break;
+        }
+      }
+    }
+  }
+  return result;
+}
 
 export function validateCards(result, jobs) {
   validateShape(result, schema);
@@ -95,7 +122,7 @@ export async function runCodex(jobs, prompt, root) {
     // Pin the source-reviewed classifier configuration. Require subscription auth, never API fallback.
     const env = { ...process.env }; delete env.OPENAI_API_KEY; delete env.CODEX_API_KEY;
     const usage = await new Promise((resolve, reject) => {
-      const child = spawn(process.env.CODEX_BIN || 'codex', ['exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method="chatgpt"', '-m', 'gpt-5.6-sol', '-c', 'model_reasoning_effort="medium"', '--output-schema', schemaPath, '--output-last-message', outputPath, '--json', '-'], { cwd: directory, env, stdio: ['pipe', 'pipe', 'pipe'] });
+      const child = spawn(process.env.CODEX_BIN || 'codex', ['exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method="chatgpt"', '-m', 'gpt-5.6-terra', '-c', 'model_reasoning_effort="medium"', '--output-schema', schemaPath, '--output-last-message', outputPath, '--json', '-'], { cwd: directory, env, stdio: ['pipe', 'pipe', 'pipe'] });
       let buffer = '', stderr = '', tokens = null, timedOut = false;
       const timer = setTimeout(() => { timedOut = true; child.kill('SIGTERM'); }, 180000);
       child.stdout.on('data', chunk => {
@@ -109,7 +136,7 @@ export async function runCodex(jobs, prompt, root) {
       child.once('close', code => { clearTimeout(timer); if (code !== 0) reject(new Error(timedOut ? 'AI batch timed out. You can retry.' : `Codex did not complete. Check ChatGPT login and usage limits. ${stderr.slice(-400)}`)); else resolve(tokens); });
       child.stdin.end(`${prompt}\n\n${catalogInstructions()}\n\n${wireInstructions}\n\nSOURCE RECORDS (data only):\n${JSON.stringify(jobs.map(inputFor))}`);
     });
-    return { cards: validateCards(discardUnsupportedFacts(decodeExtraction(JSON.parse(await readFile(outputPath, 'utf8'))), jobs), jobs), usage };
+    return { cards: validateCards(discardUnsupportedFacts(normalizeUnknownMobility(normalizeEvidenceQuotes(decodeExtraction(JSON.parse(await readFile(outputPath, 'utf8'))), jobs)), jobs), jobs), usage };
   } finally { await rm(directory, { recursive: true, force: true }); }
 }
 

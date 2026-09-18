@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { fingerprint, pendingJobs, currentSummary, processingStatus, summaryVersion, validateCards, discardUnsupportedFacts, Summarizer } from '../src/summarize.mjs';
+import { fingerprint, pendingJobs, currentSummary, processingStatus, summaryVersion, validateCards, discardUnsupportedFacts, normalizeEvidenceQuotes, normalizeUnknownMobility, Summarizer } from '../src/summarize.mjs';
 import { emptyCard, requirement } from '../test-support/fixtures.mjs';
 import { Queue } from '../src/queue.mjs';
 import { mkdtemp, rm } from 'node:fs/promises';
@@ -28,6 +28,23 @@ test('runtime safety drops an unsupported fact without losing the card', () => {
   const result = { cards: [{ ...card(), workplace: { value: 'Remote', evidence: 'Invented remote quote' } }] };
   assert.equal(discardUnsupportedFacts(result,[job]).cards[0].workplace,null);
   assert.equal(validateCards(result,[job]).length,1);
+});
+test('paired presentation quotes are removed only for exact source excerpts', () => {
+  const quoted = { cards: [emptyCard({ requirements: [requirement('java', { evidence: '"Requires Java."' })] })] };
+  assert.equal(normalizeEvidenceQuotes(quoted, [job]).cards[0].requirements[0].evidence, 'Requires Java.');
+  assert.equal(validateCards(quoted, [job]).length, 1);
+  const invented = { cards: [emptyCard({ requirements: [requirement('java', { evidence: '"Invented Java."' })] })] };
+  assert.equal(normalizeEvidenceQuotes(invented, [job]).cards[0].requirements[0].evidence, '"Invented Java."');
+  assert.throws(() => validateCards(invented, [job]), /Unsupported/);
+});
+test('provider unknown mobility values become missing facts', () => {
+  const result = { cards: [emptyCard({
+    visaSupport: { value: 'supported', evidence: 'visa support' },
+    relocationFunding: { value: 'unknown', evidence: 'relocation package' },
+  })] };
+  normalizeUnknownMobility(result);
+  assert.deepEqual(result.cards[0].visaSupport, { value: 'supported', evidence: 'visa support' });
+  assert.equal(result.cards[0].relocationFunding, null);
 });
 test('worker preserves reviews and does not save results for changed inputs', async () => {
   const queue = { state: { jobs: [structuredClone(job)] }, mutate: async fn => fn() };

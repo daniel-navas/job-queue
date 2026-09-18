@@ -59,7 +59,7 @@ import { readFile, writeFile } from 'node:fs/promises';
 const args = process.argv.slice(2);
 assert(args.includes('forced_login_method="chatgpt"'));
 assert(args.includes('--ignore-user-config'));
-assert.equal(args[args.indexOf('-m') + 1], 'gpt-5.6-sol');
+assert.equal(args[args.indexOf('-m') + 1], 'gpt-5.6-terra');
 assert(args.includes('model_reasoning_effort="medium"'));
 assert.equal(process.env.OPENAI_API_KEY, undefined);
 assert.equal(process.env.CODEX_API_KEY, undefined);

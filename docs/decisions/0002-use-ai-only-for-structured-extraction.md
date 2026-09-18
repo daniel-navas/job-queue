@@ -68,7 +68,9 @@ professional-use status. Preference values live in
 - The provider schema shares repeated definitions and uses a compact wire
   representation: short property names and only non-null thresholds. Local code
   restores version-6 facts and validates types, IDs and source evidence before
-  saving. No migration, source truncation, catalog pruning or model downgrade.
+  saving. No migration, source truncation or catalog pruning. Model/effort changes
+  require source-reviewed quality and subscription-usage evidence; the current
+  cost-first setting is recorded in docs/performance-spike.md.
   Five-offer experiments favored individual extraction over large batches;
   valid JSON alone did not prevent batching-related semantic omissions. See
   docs/performance-spike.md for evidence and limits.

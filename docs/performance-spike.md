@@ -293,6 +293,58 @@ sample and prevents the CLI default from changing the classifier silently.
 Keep the 19 original checks plus the three new source-derived checks as an
 evaluation gate. Revisit the setting only with a larger, source-reviewed sample.
 
+### Cost-first follow-up (2026-09-18; supersedes Sol decision)
+
+The owner clarified that subscription consumption matters more than speed when
+processing hundreds of offers. The Sol choice above did not evaluate this
+constraint and is superseded. No queue records were processed or imported in
+this follow-up. Chrome did not open. Each live trial used the same frozen source
+descriptions and wrote only local reports under `.local/model-benchmark-*.json`.
+The reviewed checks were expanded to 27 after source inspection, before the
+final prompt trials. Their small, partly post hoc sample is a quality gate for
+known failures, not a general accuracy estimate.
+
+Luna low failed strict source-quote validation on both real offers initially.
+After a prompt revision, it still invented an unsupported Power BI requirement
+on the long offer, missed cloud architecture on N26, and mishandled visa/funding.
+Luna medium produced valid cards on a later three-case run but passed only
+23/26 then-current checks; the long offer omitted API design, technical debt
+and cloud operations. A further one-off attempt invented Power BI again and
+was invalid. Lower model rates do not compensate for these omissions and
+failed calls. Luna was not adopted.
+
+The prompt now explicitly requires bare contiguous evidence, clause-by-clause
+coverage of concrete requirements, proper treatment of parenthetical examples,
+and exclusion of unmeasurable attitudes. The decoder removes paired decorative
+quotation marks only when the inner excerpt is present verbatim in the source;
+unsupported text still fails validation. Explicit provider `unknown` values for
+visa support or relocation funding become null, consistent with the extraction
+contract. These are generic rules, not per-offer score exceptions.
+
+Terra medium passed 25/27 checks in a three-case trial before the final attitude
+instruction and mobility normalization. With those changes, both real offers
+passed all 22 source-derived checks in the last two-call run; the synthetic case
+had passed 5/5 with the preceding prompt version. The last two Terra calls used
+41,488 reported input tokens and 4,521 output tokens, taking 73.051s total
+with concurrent calls. Sol's earlier real pair used 42,004 input and 4,643
+output tokens, so the model choice did not materially shrink the token count.
+Cache hits differed across runs, and these timings do not establish a speed
+ranking. The exact final prompt was not rerun on the synthetic case; the final
+one-line attitude change was unrelated to that case.
+
+Decision: pin `gpt-5.6-terra` with `medium` reasoning. Official ChatGPT pricing
+lists Terra at 50/5/300 credits per million uncached input/cached input/output
+tokens versus Sol at 100/10/500, and estimates more local messages per five-hour
+window for Terra, but Plus included usage is variable and weekly limits may
+apply. These rates are not a measured debit or a promise that hundreds of
+offers fit one window. Process remains an owner-triggered maximum of two offers
+per click, with no automatic retry or API-billing fallback. Reassess with a
+larger independently reviewed sample before treating quality as settled. Terra
+low was not tested in this follow-up; Terra medium is the least intensive
+configuration that passed the reviewed cases among the settings actually run.
+
+Source: [ChatGPT/Codex pricing and usage](https://learn.chatgpt.com/docs/pricing).
+
 ## References
 
 - [Codex configuration reference](https://learn.chatgpt.com/docs/config-file/config-reference):
