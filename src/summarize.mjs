@@ -32,7 +32,7 @@ const upgradeV4Card = card => {
     });
   return result;
 };
-export const pendingJobs = jobs => jobs.filter(job => job.description?.trim() && job.status !== 'dismissed' && !usable(job));
+export const pendingJobs = jobs => jobs.filter(job => job.description?.trim() && job.status !== 'dismissed' && job.availability?.status !== 'closed' && !usable(job));
 export const currentSummary = job => {
   if (!usable(job)) return null;
   const facts = job.summary.version === 3 ? upgradeV4Card(upgradeLegacyCard(job.summary.fields)) : job.summary.version === 4 ? upgradeV4Card(job.summary.fields) : job.summary.fields;

@@ -17,7 +17,9 @@ marketing, accounts, multi-user infrastructure, or additional providers.
    local code. Profile, preference and weight changes require no AI calls.
 4. Show compact decision cards, source quotes, weighted contributions, and a
    priority-ordered review queue. Unknown remains visible and is not invented.
-5. Preserve reviews, reasons, source records, stable IDs and original CVs.
+5. Preserve reviews, reasons, availability history, source records, stable IDs
+   and original CVs. Manually closed offers leave active review tabs but remain
+   recoverable in All opportunities.
 6. Manage LinkedIn searches locally with per-offer historical criteria and
    measured capture results. Definitions and provenance identify their provider;
    review skills are provider-specific. Only LinkedIn is currently implemented.

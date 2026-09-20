@@ -149,6 +149,12 @@ means current structured extraction plus deterministic matching/scoring,
 `Pending` means the complete description still needs current extraction.
 Incomplete legacy records are hidden from the review UI. Only `Processed`
 offers show a numeric score; stale extractions must not appear current.
+Availability is separate from owner review. `Mark as closed` removes an offer
+from the active status tabs and pending AI processing without changing its
+score, facts, `New`/`Interesting`/`Dismissed` decision, or reason. Closed offers
+remain in All opportunities with a `Closed` label and a reversible `Reopen`
+action. Manual checks store their timestamp and source; absence from bounded
+LinkedIn search results is not proof that an offer closed.
 
 ## Requirement tags
 

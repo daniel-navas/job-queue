@@ -69,6 +69,24 @@ test('review persists across restart and requires dismissal reason', async () =>
   } finally { await rm(root, { recursive: true }); }
 });
 
+test('manual availability changes persist independently from review state', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'jobqueue-availability-'));
+  try {
+    const queue = new Queue(root); queue.state.jobs = [{ id: '123', status: 'interesting', history: [] }];
+    await queue.setAvailability('123', 'closed');
+    const restored = new Queue(root); await restored.load();
+    assert.equal(restored.state.jobs[0].status, 'interesting');
+    assert.equal(restored.state.jobs[0].availability.status, 'closed');
+    assert.equal(restored.state.jobs[0].availability.source, 'manual');
+    assert.ok(!Number.isNaN(Date.parse(restored.state.jobs[0].availability.checkedAt)));
+    assert.equal(restored.state.jobs[0].availabilityHistory.length, 1);
+    await restored.setAvailability('123', 'open');
+    assert.equal(restored.state.jobs[0].availability.status, 'open');
+    assert.equal(restored.state.jobs[0].availabilityHistory.length, 2);
+    assert.throws(() => restored.setAvailability('123', 'unknown'), /Invalid availability/);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
 test('run imports attribute only observed results, preserve rediscoveries, and are idempotent', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'jq-import-run-'));
   try {

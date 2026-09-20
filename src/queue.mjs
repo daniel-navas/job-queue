@@ -131,4 +131,14 @@ export class Queue {
       job.history.push({ status, reason: job.reason, at: new Date().toISOString() });
     });
   }
+  setAvailability(id, status) {
+    if (!['open', 'closed'].includes(status)) throw new Error('Invalid availability');
+    return this.mutate(() => {
+      const job = this.state.jobs.find(job => job.id === id);
+      if (!job) throw new Error('Job not found');
+      const availability = { status, checkedAt: new Date().toISOString(), source: 'manual' };
+      job.availability = availability;
+      (job.availabilityHistory ??= []).push(availability);
+    });
+  }
 }

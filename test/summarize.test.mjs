@@ -12,6 +12,7 @@ const card = () => emptyCard({ workplace: { value: 'Remote', evidence: 'Remote i
 test('only new or changed descriptions need processing', () => {
   const done = { ...job, summary: { inputHash: fingerprint(job), version: summaryVersion, fields: card() } };
   assert.equal(pendingJobs([done, { ...job, status: 'dismissed' }, { ...job, description: '' }]).length, 0);
+  assert.equal(pendingJobs([{ ...job, availability: { status: 'closed' } }]).length, 0);
   assert.equal(pendingJobs([{ ...done, summary: { inputHash: fingerprint(job) } }]).length, 1);
   assert.equal(pendingJobs([{ ...done, description: 'Changed' }]).length, 1);
   assert.deepEqual(currentSummary(done).facts, done.summary.fields);

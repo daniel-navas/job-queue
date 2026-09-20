@@ -64,6 +64,11 @@ const server = http.createServer(async (req, res) => {
       const { id, status, reason = '' } = JSON.parse(body);
       await queue.review(id, status, reason); return json(200, { ok: true });
     }
+    if (req.method === 'POST' && req.url === '/api/availability') {
+      let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }
+      const { id, status } = JSON.parse(body);
+      await queue.setAvailability(id, status); return json(200, { ok: true });
+    }
     if (req.method === 'POST' && req.url === '/api/scan') {
       if (scan.running || connection.running) return json(409, { error: 'LinkedIn is busy; wait for the current operation' });
       if (scan.finishedAt && Date.now() - Date.parse(scan.finishedAt) < 60000) return json(429, { error: 'Please wait a minute before searching again' });

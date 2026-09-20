@@ -59,6 +59,14 @@ try {
   await page.goto(base); await page.locator('.job').first().waitFor();
   await page.getByText('3–7 years · Software engineering', { exact: true }).waitFor();
   assert.deepEqual(await page.locator('.coverage').allInnerTexts(), ['1/1']);
+  await page.getByRole('button', { name: 'Mark as closed', exact: true }).click();
+  await page.getByRole('button', { name: 'All opportunities', exact: false }).click();
+  await page.getByText('Closed', { exact: true }).waitFor();
+  await page.locator('.job-closed .job-open').click();
+  assert.equal(await page.getByRole('button', { name: 'Reopen', exact: true }).count(), 1);
+  await page.getByRole('button', { name: 'Reopen', exact: true }).click();
+  await page.getByRole('button', { name: 'New', exact: false }).click();
+  assert.equal(await page.locator('.job').count(), 3);
   await page.locator('.search-origin summary').click(); await page.getByText('First found 2026-09-14 · Last seen 2026-09-14').waitFor();
   await page.getByRole('button', { name: 'Searches', exact: true }).click();
   await page.locator('.search-row').waitFor();
@@ -112,7 +120,13 @@ try {
   await page.keyboard.press('Escape'); assert.equal(await page.locator('#searches-dialog').isVisible(), false);
   assert.deepEqual(errors, []);
   assert.equal(await readFile(path.join(root, 'data/queue.json'), 'utf8'), queueBefore);
-  assert.deepEqual(await readStoredJobs(root), JSON.parse(queueBefore).jobs);
+  const storedJobs = await readStoredJobs(root);
+  assert.equal(storedJobs[0].availability.status, 'open');
+  assert.deepEqual(storedJobs[0].availabilityHistory.map(entry => entry.status), ['closed', 'open']);
+  const jobsWithoutAvailability = structuredClone(storedJobs);
+  delete jobsWithoutAvailability[0].availability;
+  delete jobsWithoutAvailability[0].availabilityHistory;
+  assert.deepEqual(jobsWithoutAvailability, JSON.parse(queueBefore).jobs);
   // Simulate scan state only at the API boundary; never launch LinkedIn.
   const headerHeight = (await page.locator('header').boundingBox()).height;
   let scan = { running: true, message: 'Searching 2/5', query: 'Python backend' };
@@ -131,7 +145,7 @@ try {
   await page.getByRole('status').filter({ hasText: '3 offers added' }).waitFor();
   assert.equal(await page.locator('header #run-status').count(), 1);
   assert.equal((await page.locator('header').boundingBox()).height, headerHeight);
-  console.log('Search UI/API checks passed: add/edit/toggle, stale edit, metrics, provenance, filtering, keyboard, no runtime errors or offer mutations.');
+  console.log('Search UI/API checks passed: availability, add/edit/toggle, stale edit, metrics, provenance, filtering, keyboard, and no runtime errors.');
 } finally {
   if (browser) await browser.close();
   if (child && child.exitCode === null) { child.kill(); await once(child, 'exit'); }
