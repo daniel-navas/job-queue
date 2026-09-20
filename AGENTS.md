@@ -80,21 +80,16 @@ provisional preference or one-off observation into a permanent rule.
 - Update durable documentation in the same change that makes it outdated.
 - Remove superseded current-state notes instead of accumulating a diary.
 
-## Cross-Conversation Workstreams
+## Cross-Conversation Work
 
-The owner may alternate between two conversations that share this repository:
-
-- Light: profile/preferences calibration, offer-tag review, scoring tuning,
-  documentation, and small process or matcher corrections.
-- Heavy: new systems, architecture, substantial features, migrations, or broad
-  UI/implementation work.
-
-Treat repository documentation as the handoff between both conversations.
-Before substantive work, read `docs/project.md`, `docs/ai-context.md`, and any
-relevant decision records; after work, update the narrow authoritative source
-and replace stale handoff facts. Never rely on the other conversation's chat
-history. Avoid simultaneous overlapping edits; inspect current files again
-before modifying shared profile, scoring, schema, or context files.
+The owner may use separate chats for different models or tightly scoped
+deliveries. There are no named workstream types and no model-to-task mapping.
+Treat repository documentation as the handoff between chats. Before substantive
+work, read `docs/project.md`, `docs/ai-context.md`, and any relevant decision
+records; after work, update the narrow authoritative source and replace stale
+handoff facts. Never rely on another chat's history. Avoid simultaneous
+overlapping edits; inspect current files again before modifying shared profile,
+scoring, schema, or context files.
 
 At a clean delivery boundary, explicitly tell the owner whether the current
 chat remains appropriate for follow-up tweaks or whether the next distinct
@@ -102,21 +97,14 @@ objective should start in a new chat. Do not recommend a new chat merely
 because the conversation is long; recommend it when the objective or primary
 model should change, or when the working context has become materially noisy.
 
-### Heavy-to-Light handoff
+### Requested handoffs
 
-The owner's shorthand **"Retoques del heavy:"** means: read `docs/latest-heavy.md`
-from disk, then apply the requested adjustment to that delivery. It does not
-mean the latest chat message or an older delivery remembered in conversation.
-
-At the end of each substantial Heavy delivery, update authoritative docs and
-replace `docs/latest-heavy.md` with one short handoff (aim for 300 words):
-delivery ID/date, outcome, relevant files, invariants, verification evidence,
-known limitations, and pending work. Do not append a diary or copy transcripts.
-Mark incomplete deliveries honestly. Link to it from `docs/ai-context.md`.
-Light reads it fresh even in an existing conversation, confirms the delivery ID
-briefly, and reads only files relevant to the requested tweak. Light may update
-the handoff's follow-up notes without changing its delivery identity. Only the
-next substantial Heavy delivery replaces that identity.
+Create a handoff only when the owner requests one. Update the authoritative
+docs first, then write a concise, descriptively named handoff if it helps the
+next chat: outcome, relevant files, invariants, verification evidence, known
+limitations, and pending work. Do not keep a special "latest" handoff file or
+append a diary. Link an active handoff from `docs/ai-context.md` only while it
+is the current next step.
 
 Both conversations must use the same checkout. If the file or referenced code
 is missing/stale, report that instead of guessing. Work sequentially on shared

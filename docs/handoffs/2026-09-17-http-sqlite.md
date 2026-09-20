@@ -1,6 +1,5 @@
-# Latest Heavy Delivery
+# 2026-09-17 HTTP and SQLite delivery handoff
 
-Delivery: **H-2026-09-17-http-sqlite**
 Status: Implemented and verified; AI remains fallible, not universally certified.
 
 ## Outcome
@@ -15,7 +14,7 @@ Status: Implemented and verified; AI remains fallible, not universally certified
   unsupported proficiency and AND/OR. The old 30-criterion cap truncated long
   lists; it is now 100. No model downgrade or full-source truncation.
 
-## Files for Light
+## Relevant files
 
 src/linkedin/{collector,connection,transport}.mjs; src/queue{,-storage}.mjs;
 src/server.mjs; public/{app,searches}.js; docs/summary-prompt.md;
@@ -41,16 +40,3 @@ parallel; no speedup claim. Outputs remain diagnostic, not imported; 124 pending
 offers unchanged. Cached older cards are not automatically reclassified.
 Private APIs and session expiry may require explicit reconnect. See
 docs/performance-spike.md and docs/storage-and-discovery-options.md.
-
-Use **Retoques del heavy:**; read this file fresh.
-
-## Follow-up: AI provider plan (2026-09-20)
-
-No implementation has changed the classifier after this delivery. The owner
-does not authorize any additional AI billing: the only resources to consider
-are existing ChatGPT Plus and Google AI Pro subscriptions. Terra medium remains
-production. Before any Gemini work, read `docs/ai-provider-plan.md`: it defines
-the bounded, no-import evaluation of Google AI Pro through Antigravity CLI,
-prohibits Gemini API/Cloud billing and automatic provider fallback, and records
-the local-model alternative as untested. `docs/ai-context.md` links the same
-plan for general cross-chat handoff.

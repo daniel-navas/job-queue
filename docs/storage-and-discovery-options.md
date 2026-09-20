@@ -1,8 +1,8 @@
 # Discovery and storage assessment
 
 Status: owner-approved and implemented, 2026-09-17. See decision 0006 and
-docs/latest-heavy.md for current verification. The assessment below records
-why the change was chosen; it is not a list of outstanding approvals.
+docs/performance-spike.md for current verification. The assessment below
+records why the change was chosen; it is not a list of outstanding approvals.
 
 ## Plain component roles
 
@@ -34,7 +34,7 @@ and fixed latency are not promised.
 The measured 5.794s was startup + search + two details + cleanup, not one request.
 The detail requests took 295ms and 256ms. Browser-independent request contexts
 can reuse authenticated storage: [Playwright API testing](https://playwright.dev/docs/api-testing).
-See the latest handoff for the bounded live check.
+See `docs/performance-spike.md` for the bounded live check.
 
 ## Queue: SQLite storage
 
