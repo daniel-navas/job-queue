@@ -42,9 +42,11 @@ The extraction/matching boundary is recorded in decision 0002.
   rate limiting, CAPTCHA or checkpoints, without bypassing them.
 - At most two AI jobs per Process click; no automatic retries or background
   processing of the whole queue. No API-billing fallback.
-- Treat ChatGPT subscription usage as the primary resource constraint for AI
-  processing. Prefer lower model/effort intensity when it meets source-reviewed
-  extraction quality; test settings on a bounded sample before changing them.
+- Treat the owner's existing ChatGPT Plus and Google AI Pro subscriptions as
+  the primary AI resources. Do not activate paid Gemini/Cloud/other AI API
+  billing or add a new paid service without explicit authorization. Prefer the
+  least intensive already-paid option that meets source-reviewed extraction
+  quality; test settings on a bounded sample before changing them.
 - Ask up to three focused profile questions per response, ordered by processed
   offer score from highest to lowest. Prioritize incomplete matches and audit
   apparent matches for false positives. Collect only practical duration,

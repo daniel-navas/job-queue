@@ -43,3 +43,14 @@ Private APIs and session expiry may require explicit reconnect. See
 docs/performance-spike.md and docs/storage-and-discovery-options.md.
 
 Use **Retoques del heavy:**; read this file fresh.
+
+## Follow-up: AI provider plan (2026-09-20)
+
+No implementation has changed the classifier after this delivery. The owner
+does not authorize any additional AI billing: the only resources to consider
+are existing ChatGPT Plus and Google AI Pro subscriptions. Terra medium remains
+production. Before any Gemini work, read `docs/ai-provider-plan.md`: it defines
+the bounded, no-import evaluation of Google AI Pro through Antigravity CLI,
+prohibits Gemini API/Cloud billing and automatic provider fallback, and records
+the local-model alternative as untested. `docs/ai-context.md` links the same
+plan for general cross-chat handoff.
