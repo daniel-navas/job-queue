@@ -164,8 +164,21 @@ test('independent project preferences add instead of collapsing to one signal', 
   assert.equal(result.rating.fields.project.contribution,3);
   assert.match(result.rating.fields.project.reason,/additive/i);
 });
-test('stack is unscored and duplicate technologies are omitted', () => {
-  const offer = job({ requirements:[requirement('nestjs')],stack:[requirement('nestjs'),requirement('aws')] });
-  assert.deepEqual(matchTags(offer,profile).stack.map(t=>t.label),['AWS']);
-  assert.equal(evaluateJob(offer,profile,preferences,scoring,null).rating.fields.stack,undefined);
+test('stack familiarity adds a capped optional advantage and keeps unresolved facts visible', () => {
+  const evaluate = facts => evaluateJob({ ...job(facts), processingStatus: 'processed' }, profile, preferences, scoring, null);
+  const empty = evaluate({ stack: [] });
+  const allMatched = evaluate({ stack: [requirement('node.js'), requirement('react')] });
+  const halfMatched = evaluate({ stack: [requirement('node.js'), requirement('kubernetes')] });
+  const noMatch = evaluate({ stack: [requirement('kubernetes')] });
+  const unknown = evaluate({ stack: [requirement('go')] });
+  const deduplicated = evaluate({ requirements: [requirement('nestjs')], stack: [requirement('nestjs'), requirement('node.js')] });
+
+  assert.deepEqual(empty.rating.fields.stack, { score: 0, reason: '0/0 confirmed stack advantages; optional non-matches and unresolved facts receive no advantage credit.', weight: 0.5, contribution: 0 });
+  assert.equal(allMatched.rating.fields.stack.contribution, 0.5);
+  assert.equal(halfMatched.rating.fields.stack.score, 0.5);
+  assert.equal(halfMatched.rating.fields.stack.contribution, 0.25);
+  assert.equal(noMatch.rating.fields.stack.contribution, 0);
+  assert.equal(noMatch.evaluation.status, 'complete');
+  assert.equal(unknown.evaluation.status, 'needs-info');
+  assert.deepEqual(deduplicated.tags.stack.map(tag => tag.label), ['Node.js']);
 });

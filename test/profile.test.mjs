@@ -2,6 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { catalog } from '../src/tag-catalog.mjs';
+import { matchRequirement } from '../src/matching.mjs';
+import { requirement } from '../test-support/fixtures.mjs';
 
 const profile = JSON.parse(await readFile(new URL('../profile/matching.json', import.meta.url)));
 const preferences = JSON.parse(await readFile(new URL('../config/preferences.json', import.meta.url)));
@@ -43,4 +45,8 @@ test('editable profile and preferences contain valid deterministic inputs', () =
 test('profile records the owner-confirmed production and transaction capabilities', () => {
   assert.equal(profile.capabilities['data-integrity']?.knowledgeLevel, 'intermediate');
   assert.equal(profile.capabilities['production-operations']?.knowledgeLevel, 'intermediate');
+});
+
+test('the editable profile resolves an explicit zero-experience technology as a non-match', () => {
+  assert.equal(matchRequirement(requirement('kubernetes'), profile).assessment, 'no-match');
 });

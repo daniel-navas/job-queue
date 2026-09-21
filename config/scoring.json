@@ -8,6 +8,7 @@
     "experience": 1,
     "requiredTechnologies": 2,
     "preferredTechnologies": 0.5,
+    "stack": 0.5,
     "publishedRecency": 1
   },
   "recencyBands": [

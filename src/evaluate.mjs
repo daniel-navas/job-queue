@@ -28,6 +28,8 @@ export function evaluateJob(job, profile, preferences, scoring, monthlySalary, n
       const values = tags?.[key] || [];
       rating.fields[key] = { score: coverageScore(values), reason: `${values.filter(t => t.score === 1).length}/${values.length} confirmed matches; unknown or insufficient evidence receives no match credit.` };
     }
+    const stack = tags?.stack || [];
+    rating.fields.stack = { score: coverageScore(stack), reason: `${stack.filter(tag => tag.assessment === 'match').length}/${stack.length} confirmed stack advantages; optional non-matches and unresolved facts receive no advantage credit.` };
     // Each configured project or work trait is an independent preference.
     // Catalog validation prevents mutually exclusive audience tags.
     const signals = [rating.fields.project.score, ...project.map(tag => tag.score)];

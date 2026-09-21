@@ -50,7 +50,7 @@ export function evaluationConfig() {
       projectTags: { 'hr-platform': -1, 'mixed-audience': 1, 'crypto-trading': 1, 'growth-work': 1 },
     },
     scoring: {
-      weights: { roleFocus: 1, workplace: 1, project: 1, experience: 1, requiredTechnologies: 2, preferredTechnologies: 0.5 },
+      weights: { roleFocus: 1, workplace: 1, project: 1, experience: 1, requiredTechnologies: 2, preferredTechnologies: 0.5, stack: 0.5 },
       recencyBands: [],
     },
   };
