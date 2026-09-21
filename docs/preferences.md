@@ -198,6 +198,10 @@ which would favor verbose ads. Tag numbers are hidden. Match uses green `✓`;
 required/experience non-match uses red `×`; optional non-match uses blue `–`;
 missing profile information uses amber `?`; and unmapped uses gray `◇`.
 Tooltips retain profile and source evidence, so color is never the only signal.
+When a known autonomy, duration, or recency threshold causes a required
+non-match, append only that effective threshold to the red tag (for example,
+`Requires Independent`) and compare the current and required values in its
+tooltip. Do not add threshold suffixes to matching or optional tags.
 Company stack is deduplicated against required/preferred tags and contributes
 at most +0.5 for confirmed familiarity. AI
 selects project/requirement tags from config/tag-catalog.json, never creates

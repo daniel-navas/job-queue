@@ -8,6 +8,8 @@ export function experienceMonths(periods) {
 }
 const levels = { basic: 1, independent: 2, advanced: 3 };
 const knowledgeLevels = { basic: 1, intermediate: 2, advanced: 3 };
+const titleCase = value => value[0].toUpperCase() + value.slice(1);
+const durationText = months => months % 12 === 0 ? `${months / 12}+ year${months === 12 ? '' : 's'}` : `${months}+ months`;
 
 const recencyCutoff = (requirement, currentYear) => Number.isInteger(requirement.lastUsedYear)
   ? requirement.lastUsedYear
@@ -34,13 +36,23 @@ function assessTechnology(technology, requirement, currentYear, stack) {
   }
   const cutoff = recencyCutoff(requirement, currentYear);
   const checks = [
-    { needed: true, known: levels[technology.autonomy] !== undefined, passes: (levels[technology.autonomy] || 0) >= levels[requirement.autonomy || 'independent'], label: 'autonomy' },
-    { needed: requirement.minMonths !== null, known: Number.isFinite(technology.practicalMonths), passes: technology.practicalMonths >= requirement.minMonths, label: 'duration' },
-    { needed: cutoff !== null, known: Number.isInteger(technology.lastUsedYear), passes: technology.lastUsedYear >= cutoff, label: 'recency' },
+    { needed: true, known: levels[technology.autonomy] !== undefined, passes: (levels[technology.autonomy] || 0) >= levels[requirement.autonomy || 'independent'], label: 'autonomy', shortfall: () => ({
+      hint: `Requires ${titleCase(requirement.autonomy || 'independent')}`,
+      comparison: `Current: ${titleCase(technology.autonomy)} (${technology.label}). Required: ${titleCase(requirement.autonomy || 'independent')}.`,
+    }) },
+    { needed: requirement.minMonths !== null, known: Number.isFinite(technology.practicalMonths), passes: technology.practicalMonths >= requirement.minMonths, label: 'duration', shortfall: () => ({
+      hint: `Requires ${durationText(requirement.minMonths)}`,
+      comparison: `Current: ${durationText(technology.practicalMonths).replace('+', '')} (${technology.label}). Required: ${durationText(requirement.minMonths)}.`,
+    }) },
+    { needed: cutoff !== null, known: Number.isInteger(technology.lastUsedYear), passes: technology.lastUsedYear >= cutoff, label: 'recency', shortfall: () => ({
+      hint: `Requires use in ${cutoff}+`,
+      comparison: `Current: last used ${technology.lastUsedYear} (${technology.label}). Required: ${cutoff}+.`,
+    }) },
   ].filter(check => check.needed);
   const missing = checks.filter(check => !check.known).map(check => check.label);
   if (missing.length) return { assessment: 'unknown', evidence: `${detail} Missing ${missing.join(', ')} information.` };
-  if (checks.some(check => !check.passes)) return { assessment: 'no-match', evidence: `${detail} Known values do not meet every threshold.` };
+  const failed = checks.find(check => !check.passes);
+  if (failed) return { assessment: 'no-match', evidence: `${detail} Known values do not meet every threshold.`, shortfall: failed.shortfall() };
   return { assessment: 'match', evidence: detail };
 }
 
@@ -93,7 +105,7 @@ export function matchRequirement(requirement, profile, currentYear = new Date().
   } else {
     result = { assessment: 'unmapped', evidence: 'No approved catalog mapping exists for this criterion.' };
   }
-  return { label: requirementLabel(requirement), score: result.assessment === 'match' ? 1 : 0, assessment: result.assessment, evidence: result.evidence, source: requirement.evidence };
+  return { label: requirementLabel(requirement), score: result.assessment === 'match' ? 1 : 0, assessment: result.assessment, evidence: result.evidence, source: requirement.evidence, ...(result.shortfall ? { shortfall: result.shortfall } : {}) };
 }
 
 export function matchTags(job, profile, currentYear = new Date().getUTCFullYear()) {

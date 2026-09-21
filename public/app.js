@@ -130,8 +130,10 @@ function tagsHTML(tags, group) {
           : tag.assessment === 'unknown'
             ? { icon: '?', className: 'assessment-unknown', meaning: 'Profile information needed' }
             : { icon: '◇', className: 'assessment-unmapped', meaning: 'Unmapped' };
-    const explanation = `${presentation.meaning}. Assessment: ${tag.evidence} Offer: ${tag.source}`;
-    return `<span tabindex="0" class="match-tag ${presentation.className}" aria-label="${escape(tag.label + ': ' + explanation)}" title="${escape(explanation)}"><b aria-hidden="true">${presentation.icon}</b>${escape(tag.label)}</span>`;
+    const comparison = required && tag.assessment === 'no-match' && tag.shortfall ? ` ${tag.shortfall.comparison}` : '';
+    const explanation = `${presentation.meaning}.${comparison} Assessment: ${tag.evidence} Offer: ${tag.source}`;
+    const visibleLabel = required && tag.assessment === 'no-match' && tag.shortfall ? `${tag.label} · ${tag.shortfall.hint}` : tag.label;
+    return `<span tabindex="0" class="match-tag ${presentation.className}" aria-label="${escape(tag.label + ': ' + explanation)}" title="${escape(explanation)}"><b aria-hidden="true">${presentation.icon}</b>${escape(visibleLabel)}</span>`;
   }).join('') + '</span>';
 }
 

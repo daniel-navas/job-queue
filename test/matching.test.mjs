@@ -112,6 +112,30 @@ test('technology thresholds enforce duration, autonomy and last use at their bou
   assert.equal(matchRequirement(requirement('docker'), profile).score, 0, 'Default technology autonomy is independent');
   assert.equal(matchRequirement(requirement('kubernetes'), profile).score, 0, 'Docker does not establish Kubernetes experience');
 });
+
+test('known technology shortfalls expose the effective threshold and comparison', () => {
+  const noExperience = label => ({ label, practicalMonths: 0, autonomy: 'unknown', lastUsedYear: null, professionalUse: false });
+  const completeRelationalProfile = { ...profile, technologies: {
+    ...profile.technologies,
+    mysql: noExperience('MySQL'), mariadb: noExperience('MariaDB'), 'sql-server': noExperience('SQL Server'),
+  } };
+  const autonomy = matchRequirement(requirement('relational-db'), completeRelationalProfile, 2026);
+  const duration = matchRequirement(requirement('nestjs', { minMonths: 48 }), profile, 2026);
+  const recency = matchRequirement(requirement('nestjs', { lastUsedYear: 2024 }), profile, 2026);
+
+  assert.deepEqual(autonomy.shortfall, {
+    hint: 'Requires Independent',
+    comparison: 'Current: Basic (PostgreSQL). Required: Independent.',
+  });
+  assert.deepEqual(duration.shortfall, {
+    hint: 'Requires 4+ years',
+    comparison: 'Current: 3 years (NestJS). Required: 4+ years.',
+  });
+  assert.deepEqual(recency.shortfall, {
+    hint: 'Requires use in 2024+',
+    comparison: 'Current: last used 2023 (NestJS). Required: 2024+.',
+  });
+});
 const facts = { requirements: [], preferred: [], stack: [], projectTags: [], software: null, work: null };
 const job = (data = {}) => { const value = { ...facts, ...data }; return { id: 'any-new-id', summary: { facts: value, fields: displayFields(value) } }; };
 test('experience deduplicates boundary overlaps and excludes gaps', () => {

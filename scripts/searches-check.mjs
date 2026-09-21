@@ -34,6 +34,7 @@ try {
     requirements: [
       requirement('node.js', { evidence: 'Node.js.' }),
       requirement('kubernetes', { evidence: 'Kubernetes.' }),
+      requirement('relational-db', { evidence: 'Intermediate relational database knowledge.' }),
       requirement('unmapped', { kind: 'unknown', label: 'Unusual platform certification', evidence: 'Unusual platform certification.' }),
     ],
     preferred: [
@@ -79,9 +80,11 @@ try {
   await page.getByText(/3–7 years · Software engineering/).waitFor();
   assert.ok(await page.getByText('Complete', { exact: true }).count());
   assert.ok(await page.getByText('Pending analysis', { exact: true }).count());
-  assert.ok(await page.getByText('Needs info · 4/6', { exact: true }).count());
+  assert.ok(await page.getByText('Needs info · 5/7', { exact: true }).count());
   await page.getByRole('button', { name: /Mixed evaluation offer/ }).click();
-  await page.getByText('Evaluation · 4/6 resolved · 1 profile gap · 1 unmapped', { exact: true }).waitFor();
+  await page.getByText('Evaluation · 5/7 resolved · 1 profile gap · 1 unmapped', { exact: true }).waitFor();
+  await page.getByText(/Relational databases · Requires Independent/).waitFor();
+  assert.match(await page.getByLabel(/Relational databases: Required non-match/).getAttribute('title'), /Current: Basic \(PostgreSQL\)\. Required: Independent\./);
   for (const [className, accessibleName] of [
     ['assessment-match', 'Node.js: Match'],
     ['assessment-no-match-required', 'Kubernetes: Required non-match'],
