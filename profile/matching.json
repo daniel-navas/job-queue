@@ -137,9 +137,72 @@
       "lastUsedYear": 2019,
       "professionalUse": true
     },
+    "rust": {
+      "label": "Rust",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "c++": {
+      "label": "C++",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "csharp": {
+      "label": "C#",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "kotlin": {
+      "label": "Kotlin",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "mariadb": {
+      "label": "MariaDB",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "sql-server": {
+      "label": "SQL Server",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "terraform": {
+      "label": "Terraform",
+      "practicalMonths": 6,
+      "autonomy": "basic",
+      "lastUsedYear": 2022,
+      "professionalUse": true
+    },
+    "aws-cdk": {
+      "label": "AWS CDK",
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
     "go": {
       "label": "Go",
-      "practicalMonths": null,
+      "practicalMonths": 0,
+      "autonomy": "unknown",
+      "lastUsedYear": null,
+      "professionalUse": false
+    },
+    "scala": {
+      "label": "Scala",
+      "practicalMonths": 0,
       "autonomy": "unknown",
       "lastUsedYear": null,
       "professionalUse": false
@@ -240,6 +303,13 @@
     "containerization": {
       "confirmed": true,
       "evidence": "Owner confirmed 12 practical months with Docker and professional containerization work."
+    },
+    "iac": {
+      "confirmed": true,
+      "practicalMonths": 6,
+      "autonomy": "basic",
+      "lastUsedYear": 2022,
+      "evidence": "Owner confirmed approximately six practical months of basic Terraform infrastructure-as-code work at Foodology."
     },
     "performance-optimization": {
       "confirmed": true,

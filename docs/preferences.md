@@ -117,12 +117,24 @@ unconvertible salary stays neutral.
 
 ## Interaction
 
-Until the core profile is complete, end each response with up to three focused
+Until the core profile is complete, end each response with up to two focused
 profile questions. Order them by processed-offer score from highest to lowest,
 prioritize incomplete or questionable tag matches, and audit possible false
-positives as well as false negatives. For each technology or measurable
-capability, collect only current autonomy, total practical experience, and last
-used. Do not repeat known facts or collect unrelated inventory speculatively.
+positives as well as false negatives. Every question must name the exact
+canonical tag ID and its human-readable catalog label before asking for
+evidence. For a family tag, inspect its complete configured member list first,
+state which members are already known, and ask about all remaining members
+together so the owner is not questioned repeatedly about the same family.
+Never ask again for a value already recorded in `profile/matching.json` unless
+the question explicitly audits whether that recorded value is wrong.
+
+For each technology or measurable capability, collect only current autonomy,
+total practical experience, and last-used year. Do not collect unrelated
+inventory speculatively. A criterion stored as `unknown` / `unmapped` is not a
+canonical profile tag and must never be presented as though it were one. Follow
+the review process in `docs/tag-catalog.md` first; ask the owner about their
+profile only after the criterion has been mapped to an existing tag or a new
+human-reviewed tag has been approved.
 
 Keep top controls compact, scores next to field labels, and source toggles beside values. The owner refreshes
 Chrome directly; do not open the page in Codex after changes.

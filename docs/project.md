@@ -53,7 +53,7 @@ The extraction/matching boundary is recorded in decision 0002.
   billing or add a new paid service without explicit authorization. Prefer the
   least intensive already-paid option that meets source-reviewed extraction
   quality; test settings on a bounded sample before changing them.
-- Ask up to three focused profile questions per response, ordered by processed
+- Ask up to two focused profile questions per response, ordered by processed
   offer score from highest to lowest. Prioritize incomplete matches and audit
   apparent matches for false positives. Collect only practical duration,
   current autonomy, and last-used year for a technology or measurable capability.
