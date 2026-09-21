@@ -23,6 +23,10 @@ architecture, or dependency until the product need justifies it.
 ## Working Principles
 
 - Inspect the repository before proposing or changing implementation.
+- Treat an explicit owner instruction to implement, build, fix, or change as
+  authorization to execute immediately. Do not interpose a specification,
+  implementation plan, or approval checkpoint unless the owner explicitly asks
+  for planning or a missing decision would materially change the result.
 - Lead with the intended outcome and keep communication concise.
 - Explain behavior using plain component roles in the owner's language:
   finder, classifier, and queue. State whether a browser opens, what data leaves

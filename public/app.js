@@ -26,7 +26,10 @@ function render() {
   $('#ai-status').textContent = data.ai?.error ? data.ai.message : '';
   $('#ai-status').classList.toggle('failure', !!data.ai?.error);
   $('#scan').innerHTML = data.scan?.running ? `<span class="spinner" aria-hidden="true"></span>${escape(/^Searching \d+\/\d+$/.test(data.scan.message) ? data.scan.message : 'Searching…')}` : 'Find opportunities';
-  $('#run-status').textContent = data.scan?.running ? (data.scan.message === 'Sign in to LinkedIn' ? data.scan.message : '') : data.scan?.finishedAt ? (data.scan.error ? data.scan.message : `${data.scan.added ?? 0} offers added`) : '';
+  const scanStatus = data.scan?.running ? (data.scan.message === 'Sign in to LinkedIn' ? data.scan.message : '') : data.scan?.finishedAt ? (data.scan.error ? data.scan.message : `${data.scan.added ?? 0} offers added`) : '';
+  const reviewStatus = data.catalogReview?.recommended && !data.scan?.running && !data.scan?.error && !data.ai?.running && !data.ai?.error && !data.connection?.running && !data.connection?.error
+    ? `${data.catalogReview.pending} tag${data.catalogReview.pending === 1 ? '' : 's'} pending review` : '';
+  $('#run-status').textContent = [scanStatus, reviewStatus].filter(Boolean).join(' · ');
   $('#run-status').title = $('#run-status').textContent;
   $('#scan').title = enabled.length ? (data.scan?.running && data.scan.query ? data.scan.query : `${enabled.length} LinkedIn searches`) : 'Enable a search in Searches';
   $('#run-status').classList.toggle('failure', !!data.scan?.error);

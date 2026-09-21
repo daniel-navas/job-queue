@@ -45,16 +45,11 @@ context, not automatically positive signals.
 - Future additions require a human-reviewed meaning, kind, label, and source
   example. Add regression cases for semantic boundaries. Do not automatically
   accept AI proposals into the catalog or candidate profile.
-- When profile completion encounters an `unmapped` criterion, first search the
-  current catalog, aliases, families, and compatibility normalizers for an
-  existing semantic match. If none exists, explain that `unmapped` is only the
-  storage fallback and identify the source-derived display label separately.
-  Decide whether the criterion is concrete, differentiating, reusable across
-  offers, and representable in the structured profile before questioning the
-  owner. If it qualifies, propose its kind, canonical ID, label, definition,
-  source example, matching dimensions, and boundary regression test for human
-  approval. Do not collect a profile answer that cannot yet be stored or
-  matched deterministically.
+- Review `unmapped` criteria in compact batches through
+  `docs/unmapped-review.md`, separately from routine profile questions. Search
+  catalog keys, aliases, families, and compatibility normalizers before
+  proposing a new concept. Do not collect a profile answer that cannot yet be
+  stored or matched deterministically.
 - Generic teamwork, problem solving, communication, debugging, code review, Git basics,
   Agile ceremonies, clean code, adaptability, ownership and fast-paced work
   are non-differentiating. New extraction cannot select them. The compatibility

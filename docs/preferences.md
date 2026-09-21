@@ -131,10 +131,11 @@ the question explicitly audits whether that recorded value is wrong.
 For each technology or measurable capability, collect only current autonomy,
 total practical experience, and last-used year. Do not collect unrelated
 inventory speculatively. A criterion stored as `unknown` / `unmapped` is not a
-canonical profile tag and must never be presented as though it were one. Follow
-the review process in `docs/tag-catalog.md` first; ask the owner about their
-profile only after the criterion has been mapped to an existing tag or a new
-human-reviewed tag has been approved.
+canonical profile tag and must never be presented as though it were one. Handle
+those candidates in the separate batched process in
+`docs/unmapped-review.md`; ask the owner about their profile only after the
+criterion has been mapped to an existing tag or a new human-reviewed tag has
+been approved.
 
 Keep top controls compact, scores next to field labels, and source toggles beside values. The owner refreshes
 Chrome directly; do not open the page in Codex after changes.

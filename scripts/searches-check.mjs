@@ -29,6 +29,7 @@ try {
   await writeFile(path.join(root, 'profile/matching.json'), JSON.stringify(scenarioProfile));
   await writeFile(path.join(root, 'config/preferences.json'), JSON.stringify(preferences));
   await writeFile(path.join(root, 'config/scoring.json'), JSON.stringify(scoring));
+  await writeFile(path.join(root, 'config/unmapped-review.json'), JSON.stringify({ schemaVersion: 1, reviewThreshold: 1, decisions: [] }));
   const search = normalizeSearch({ id: 'backend', provider: 'linkedin', name: 'Backend · Colombia', query: 'backend engineer', location: 'Colombia', workplace: 'any', datePosted: 'month', enabled: true });
   await writeFile(path.join(root, 'config/searches.json'), JSON.stringify({ searches: [search] }));
   const source = { id: '100', title: 'Backend Engineer', company: 'Example', location: 'Colombia', description: 'Backend. Remote in Colombia. 3-7 years.', status: 'new', history: [], discoveries: [{ search, firstSeen: '2026-09-14', lastSeen: '2026-09-14' }] };
@@ -69,6 +70,13 @@ try {
   assert.equal((await fetch(`${base}/api/linkedin/connect`, { method: 'POST', headers: { Origin: 'https://untrusted.example' } })).status, 403);
   const initial = await get();
   assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 2);
+  const jobsResponse = await (await fetch(`${base}/api/jobs`)).json();
+  assert.deepEqual(jobsResponse.catalogReview, { pending: 1, threshold: 1, recommended: true });
+  await writeFile(path.join(root, 'config/unmapped-review.json'), '{"schemaVersion":1,"reviewThreshold":0,"decisions":[]}');
+  const malformedReviewResponse = await (await fetch(`${base}/api/jobs`)).json();
+  assert.ok(malformedReviewResponse.jobs.length > 0);
+  assert.equal('catalogReview' in malformedReviewResponse, false);
+  await writeFile(path.join(root, 'config/unmapped-review.json'), JSON.stringify({ schemaVersion: 1, reviewThreshold: 1, decisions: [] }));
   const invalid = await post({ version: initial.version, search: { ...search, provider: 'other' } }); assert.equal(invalid.status, 400);
   browser = await chromium.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: true });
   const page = await browser.newPage({ viewport: { width: 1440, height: 1000 } });
@@ -83,6 +91,8 @@ try {
   await detail.close();
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto(base); await page.locator('.job').first().waitFor();
+  await page.getByText('1 tag pending review', { exact: true }).waitFor();
+  assert.equal(await page.locator('#run-status a, #run-status button').count(), 0);
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   await page.getByText(/3–7 years · Software engineering/).waitFor();
   assert.ok(await page.getByText('Complete', { exact: true }).count());
