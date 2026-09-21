@@ -29,7 +29,25 @@ try {
   const card = emptyCard({ id: source.id, roleFocus: { value: 'backend', evidence: 'Backend.' }, workplaceMode: { value: 'remote', evidence: 'Remote in Colombia.' }, requirements: [
     requirement('professional', { kind: 'experience', minMonths: 36, maxMonths: 84, evidence: '3-7 years.' }),
   ] });
-  const jobs = [ { ...source, summary: { fields: card, version: summaryVersion, inputHash: fingerprint(source) } }, { ...source, id: '101', title: 'Pending offer' }, { ...source, id: '102', title: 'Legacy offer', discoveries: undefined, searchUrl: 'https://www.linkedin.com/jobs/search/?keywords=old&location=Colombia' } ];
+  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation offer', discoveries: [], description: 'Node.js. Kubernetes. Unusual platform certification. Go. React.' };
+  const mixedCard = emptyCard({ id: mixedSource.id,
+    requirements: [
+      requirement('node.js', { evidence: 'Node.js.' }),
+      requirement('kubernetes', { evidence: 'Kubernetes.' }),
+      requirement('unmapped', { kind: 'unknown', label: 'Unusual platform certification', evidence: 'Unusual platform certification.' }),
+    ],
+    preferred: [
+      requirement('kubernetes', { evidence: 'Kubernetes.' }),
+      requirement('go', { evidence: 'Go.' }),
+    ],
+    stack: [requirement('react', { evidence: 'React.' })],
+  });
+  const jobs = [
+    { ...source, summary: { fields: card, version: summaryVersion, inputHash: fingerprint(source) } },
+    { ...source, id: '101', title: 'Pending offer' },
+    { ...source, id: '102', title: 'Legacy offer', discoveries: undefined, searchUrl: 'https://www.linkedin.com/jobs/search/?keywords=old&location=Colombia' },
+    { ...mixedSource, summary: { fields: mixedCard, version: summaryVersion, inputHash: fingerprint(mixedSource) } },
+  ];
   await writeFile(path.join(root, 'data/queue.json'), JSON.stringify({ jobs }));
   const queueBefore = await readFile(path.join(root, 'data/queue.json'), 'utf8');
   const socket = net.createServer(); socket.listen(0, '127.0.0.1'); await once(socket, 'listening'); const port = socket.address().port; await new Promise(resolve => socket.close(resolve));
@@ -57,7 +75,24 @@ try {
   await detail.close();
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto(base); await page.locator('.job').first().waitFor();
-  await page.getByText('3–7 years · Software engineering', { exact: true }).waitFor();
+  await page.getByRole('button', { name: /Backend Engineer/ }).click();
+  await page.getByText(/3–7 years · Software engineering/).waitFor();
+  assert.ok(await page.getByText('Complete', { exact: true }).count());
+  assert.ok(await page.getByText('Pending analysis', { exact: true }).count());
+  assert.ok(await page.getByText('Needs info · 4/6', { exact: true }).count());
+  await page.getByRole('button', { name: /Mixed evaluation offer/ }).click();
+  await page.getByText('Evaluation · 4/6 resolved · 1 profile gap · 1 unmapped', { exact: true }).waitFor();
+  for (const [className, accessibleName] of [
+    ['assessment-match', 'Node.js: Match'],
+    ['assessment-no-match-required', 'Kubernetes: Required non-match'],
+    ['assessment-no-match-optional', 'Kubernetes: Optional non-match'],
+    ['assessment-unknown', 'Go: Profile information needed'],
+    ['assessment-unmapped', 'Unusual platform certification: Unmapped'],
+  ]) assert.equal(await page.locator(`.${className}[aria-label^="${accessibleName}"]`).count(), 1);
+  await mkdir('.local', { recursive: true });
+  await page.screenshot({ path: '.local/evaluation-desktop.png' });
+  await page.getByRole('button', { name: /Backend Engineer/ }).click();
+  await page.getByText('Evaluation · Complete', { exact: true }).waitFor();
   assert.deepEqual(await page.locator('.coverage').allInnerTexts(), ['1/1']);
   await page.getByRole('button', { name: 'Mark as closed', exact: true }).click();
   await page.getByRole('button', { name: 'All opportunities', exact: false }).click();
@@ -66,7 +101,7 @@ try {
   assert.equal(await page.getByRole('button', { name: 'Reopen', exact: true }).count(), 1);
   await page.getByRole('button', { name: 'Reopen', exact: true }).click();
   await page.getByRole('button', { name: 'New', exact: false }).click();
-  assert.equal(await page.locator('.job').count(), 3);
+  assert.equal(await page.locator('.job').count(), 4);
   await page.locator('.search-origin summary').click(); await page.getByText('First found 2026-09-14 · Last seen 2026-09-14').waitFor();
   await page.getByRole('button', { name: 'Searches', exact: true }).click();
   await page.locator('.search-row').waitFor();
@@ -83,7 +118,7 @@ try {
   await page.locator('[data-offers="backend"]').click();
   assert.equal(await page.locator('.job').count(), 2);
   await page.getByRole('button', { name: 'Clear search filter' }).click();
-  assert.equal(await page.locator('.job').count(), 3);
+  assert.equal(await page.locator('.job').count(), 4);
   await page.getByRole('button', { name: 'Searches', exact: true }).click();
   const checkbox = page.getByRole('checkbox', { name: 'Enable backend engineer' });
   await checkbox.uncheck();
@@ -145,7 +180,7 @@ try {
   await page.getByRole('status').filter({ hasText: '3 offers added' }).waitFor();
   assert.equal(await page.locator('header #run-status').count(), 1);
   assert.equal((await page.locator('header').boundingBox()).height, headerHeight);
-  console.log('Search UI/API checks passed: availability, add/edit/toggle, stale edit, metrics, provenance, filtering, keyboard, and no runtime errors.');
+  console.log('Search UI/API checks passed: availability, evaluation lifecycle, tag semantics, add/edit/toggle, stale edit, metrics, provenance, filtering, keyboard, and no runtime errors.');
 } finally {
   if (browser) await browser.close();
   if (child && child.exitCode === null) { child.kill(); await once(child, 'exit'); }

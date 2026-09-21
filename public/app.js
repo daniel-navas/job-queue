@@ -30,9 +30,9 @@ function render() {
   $('#run-status').title = $('#run-status').textContent;
   $('#scan').title = enabled.length ? (data.scan?.running && data.scan.query ? data.scan.query : `${enabled.length} LinkedIn searches`) : 'Enable a search in Searches';
   $('#run-status').classList.toggle('failure', !!data.scan?.error);
-  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''} ${job.availability?.status === 'closed' ? 'job-closed' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="list-states">${processingBadge(job.processingStatus)}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</span></span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Weighted priority score')}</span><span class="list-footer"><span class="muted">${escape(job.location || 'Location not provided')}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more opportunities.</p></div>';
+  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''} ${job.availability?.status === 'closed' ? 'job-closed' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="list-states">${evaluationBadge(job.evaluation)}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</span></span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Weighted priority score')}</span><span class="list-footer"><span class="muted">${escape(job.location || 'Location not provided')}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more opportunities.</p></div>';
   const job = data.jobs.find(j => j.id === selected);
-  $('#detail').innerHTML = job ? `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, 'Weighted priority score')}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</div><div class="detail-subrow"><div class="detail-meta"><span>${escape(job.company || 'Company not provided')}</span>${publishedHTML(job)}</div><div class="detail-controls"><div class="actions"><button class="primary" data-status="interesting">${job.status === 'interesting' ? '✓ Interesting' : '☆ Interested'}</button><button data-reject="${job.id}">Dismiss</button>${job.status !== 'new' ? '<button data-status="new">Restore to new</button>' : ''}<button data-availability="${job.availability?.status === 'closed' ? 'open' : 'closed'}">${job.availability?.status === 'closed' ? 'Reopen' : 'Mark as closed'}</button></div><button class="detail-id" data-copy-id="${escape(job.reference)}" title="Copy offer ID">${escape(job.reference)}</button></div></div></div>${job.reason ? `<div class="feedback"><strong>Your feedback</strong><p>${escape(job.reason)}</p></div>` : ''}<hr>${summaryHTML(job)}<details class="original"><summary>Full description</summary><div class="description">${escape(job.description || 'Description not captured. Open LinkedIn for details.')}</div></details>` : '<div class="empty">Select an opportunity to see the details.</div>';
+  $('#detail').innerHTML = job ? `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, 'Weighted priority score')}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</div><div class="detail-subrow"><div class="detail-meta"><span>${escape(job.company || 'Company not provided')}</span>${publishedHTML(job)}</div><div class="detail-controls"><div class="actions"><button class="primary" data-status="interesting">${job.status === 'interesting' ? '✓ Interesting' : '☆ Interested'}</button><button data-reject="${job.id}">Dismiss</button>${job.status !== 'new' ? '<button data-status="new">Restore to new</button>' : ''}<button data-availability="${job.availability?.status === 'closed' ? 'open' : 'closed'}">${job.availability?.status === 'closed' ? 'Reopen' : 'Mark as closed'}</button></div><button class="detail-id" data-copy-id="${escape(job.reference)}" title="Copy offer ID">${escape(job.reference)}</button></div></div></div>${evaluationSummary(job.evaluation)}${job.reason ? `<div class="feedback"><strong>Your feedback</strong><p>${escape(job.reason)}</p></div>` : ''}<hr>${summaryHTML(job)}<details class="original"><summary>Full description</summary><div class="description">${escape(job.description || 'Description not captured. Open LinkedIn for details.')}</div></details>` : '<div class="empty">Select an opportunity to see the details.</div>';
 }
 $('#tabs').onclick = event => { const tab = event.target.closest('[data-tab]'); if (tab) { active = tab.dataset.tab; render(); } };
 $('#search').oninput = render;
@@ -67,15 +67,25 @@ function summaryHTML(job) {
   return provenanceHTML(job) + '<dl class="facts">' + Object.entries(names).map(([key, label]) => {
     const fact = job.summary.fields[key];
     const rating = job.rating.fields[key] || { score: 0, reason: 'Neutral' };
-    return `<div><dt><span>${label}</span>${['requiredTechnologies', 'preferredTechnologies', 'experience'].includes(key) && job.tags?.[key]?.length ? coverageBadge(job.tags[key], rating) : contributionBadge(rating)}</dt><dd><span>${key === 'roleFocus' ? `<strong>${escape(roleFocus(job, data.preferences).label)}</strong>` : key === 'workplace' ? `<strong>${escape(workplaceMode(job, data.preferences).label)}</strong><span class="workplace-detail">${escape(fact?.value || job.location || '')}</span>` : job.tags?.[key]?.length ? tagsHTML(job.tags[key]) : key === 'salary' && job.monthlySalary ? salaryHTML(job) : key === 'project' && fact ? projectHTML(fact.value) : fact ? escape(fact.value) : '<span class="muted">Not stated</span>'}${key === 'project' && job.projectTags?.length ? tagsHTML(job.projectTags) : ''}${key === 'companyType' && job.summary.fields.client ? `<small class="client-context">Client: ${escape(job.summary.fields.client.value)} <button class="source-toggle" aria-label="Client source" aria-expanded="false" data-source="client">Source</button></small>` : ''}</span><span class="field-tools">${fact ? `<button class="source-toggle" aria-label="Source for ${label}" aria-expanded="false" data-source="${key}">Source</button>` : ''}</span>${key === 'companyType' && job.summary.fields.client ? `<blockquote id="source-client" class="source-quote" hidden>${escape(job.summary.fields.client.evidence)}</blockquote>` : ''}${fact ? `<blockquote id="source-${key}" class="source-quote" hidden>${escape(fact.evidence)}</blockquote>` : ''}</dd></div>`;
-  }).join('') + (job.tags?.stack?.length ? `<div><dt><span>Company stack</span></dt><dd>${tagsHTML(job.tags.stack)}</dd></div>` : '') + '</dl>';
+    return `<div><dt><span>${label}</span>${['requiredTechnologies', 'preferredTechnologies', 'experience'].includes(key) && job.tags?.[key]?.length ? coverageBadge(job.tags[key], rating) : contributionBadge(rating)}</dt><dd><span>${key === 'roleFocus' ? `<strong>${escape(roleFocus(job, data.preferences).label)}</strong>` : key === 'workplace' ? `<strong>${escape(workplaceMode(job, data.preferences).label)}</strong><span class="workplace-detail">${escape(fact?.value || job.location || '')}</span>` : job.tags?.[key]?.length ? tagsHTML(job.tags[key], key) : key === 'salary' && job.monthlySalary ? salaryHTML(job) : key === 'project' && fact ? projectHTML(fact.value) : fact ? escape(fact.value) : '<span class="muted">Not stated</span>'}${key === 'project' && job.projectTags?.length ? tagsHTML(job.projectTags, 'project') : ''}${key === 'companyType' && job.summary.fields.client ? `<small class="client-context">Client: ${escape(job.summary.fields.client.value)} <button class="source-toggle" aria-label="Client source" aria-expanded="false" data-source="client">Source</button></small>` : ''}</span><span class="field-tools">${fact ? `<button class="source-toggle" aria-label="Source for ${label}" aria-expanded="false" data-source="${key}">Source</button>` : ''}</span>${key === 'companyType' && job.summary.fields.client ? `<blockquote id="source-client" class="source-quote" hidden>${escape(job.summary.fields.client.evidence)}</blockquote>` : ''}${fact ? `<blockquote id="source-${key}" class="source-quote" hidden>${escape(fact.evidence)}</blockquote>` : ''}</dd></div>`;
+  }).join('') + (job.tags?.stack?.length ? `<div><dt><span>Company stack</span>${coverageBadge(job.tags.stack, job.rating.fields.stack)}</dt><dd>${tagsHTML(job.tags.stack, 'stack')}</dd></div>` : '') + '</dl>';
 }
 
 function ratingBadge(score, reason) { const value = score === null ? '—' : Number(score.toFixed(2)).toString(); return `<span class="rating ${score > 0 ? 'positive' : score < 0 ? 'negative' : 'neutral'}" title="${escape(reason)}" aria-label="${escape(reason)}: ${score ?? 'unrated'}">${score > 0 ? '+' : ''}${value}</span>`; }
 
-function processingBadge(status) {
-  const labels = { processed: 'Processed', pending: 'Pending', 'no-description': 'No description' };
-  return `<span class="processing-state state-${status}"><i aria-hidden="true"></i>${labels[status] || 'Pending'}</span>`;
+function evaluationBadge(evaluation = {}) {
+  const status = evaluation.status || 'pending-analysis';
+  const labels = { complete: 'Complete', 'needs-info': `Needs info · ${evaluation.resolved ?? 0}/${evaluation.total ?? 0}`, 'pending-analysis': 'Pending analysis' };
+  return `<span class="processing-state state-${status}"><i aria-hidden="true"></i>${labels[status]}</span>`;
+}
+
+function evaluationSummary(evaluation = {}) {
+  if (evaluation.status === 'complete') return '<p class="evaluation-summary">Evaluation · Complete</p>';
+  if (evaluation.status !== 'needs-info') return '<p class="evaluation-summary">Evaluation · Pending analysis</p>';
+  const segments = [`${evaluation.resolved}/${evaluation.total} resolved`];
+  if (evaluation.profileGaps) segments.push(`${evaluation.profileGaps} profile gap${evaluation.profileGaps === 1 ? '' : 's'}`);
+  if (evaluation.unmapped) segments.push(`${evaluation.unmapped} unmapped`);
+  return `<p class="evaluation-summary">Evaluation · ${segments.join(' · ')}</p>`;
 }
 
 function contributionBadge(rating) {
@@ -107,8 +117,22 @@ function salaryHTML(job) {
   return `<strong title="${escape(salary.assumption)}">${estimate}${salary.currency || '(currency unspecified)'} ${range(salary)}/month${qualifier}</strong>${salary.cop ? ` <span title="Converted ${salary.cop.date}">· ≈ COP ${range(salary.cop)}/month</span>` : salary.conversionUnavailable ? ' <small>COP rate unavailable</small>' : ''}`;
 }
 
-function tagsHTML(tags) {
-  return '<span class="match-tags">' + tags.map(tag => `<span tabindex="0" class="match-tag ${tag.score > 0 ? 'positive' : tag.score < 0 ? 'negative' : 'neutral'}" title="${escape('Assessment: ' + tag.evidence + '\nOffer: ' + tag.source)}">${escape(tag.label)}</span>`).join('') + '</span>';
+function tagsHTML(tags, group) {
+  return '<span class="match-tags">' + tags.map(tag => {
+    if (!tag.assessment) return `<span tabindex="0" class="match-tag ${tag.score > 0 ? 'positive' : tag.score < 0 ? 'negative' : 'neutral'}" title="${escape('Assessment: ' + tag.evidence + '\nOffer: ' + tag.source)}">${escape(tag.label)}</span>`;
+    const required = group === 'requiredTechnologies' || group === 'experience';
+    const presentation = tag.assessment === 'match'
+      ? { icon: '✓', className: 'assessment-match', meaning: 'Match' }
+      : tag.assessment === 'no-match' && required
+        ? { icon: '×', className: 'assessment-no-match-required', meaning: 'Required non-match' }
+        : tag.assessment === 'no-match'
+          ? { icon: '–', className: 'assessment-no-match-optional', meaning: 'Optional non-match' }
+          : tag.assessment === 'unknown'
+            ? { icon: '?', className: 'assessment-unknown', meaning: 'Profile information needed' }
+            : { icon: '◇', className: 'assessment-unmapped', meaning: 'Unmapped' };
+    const explanation = `${presentation.meaning}. Assessment: ${tag.evidence} Offer: ${tag.source}`;
+    return `<span tabindex="0" class="match-tag ${presentation.className}" aria-label="${escape(tag.label + ': ' + explanation)}" title="${escape(explanation)}"><b aria-hidden="true">${presentation.icon}</b>${escape(tag.label)}</span>`;
+  }).join('') + '</span>';
 }
 
 function coverageBadge(tags, rating) { const matched = tags.filter(tag => tag.score === 1).length; return `<span class="score-parts"><span class="coverage" title="Backed profile matches">${matched}/${tags.length}</span>${contributionBadge(rating)}</span>`; }
