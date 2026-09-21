@@ -36,6 +36,26 @@ test('OR assessments preserve unknown alternatives until one matches or all are 
   assert.equal(matchRequirement(requirement('any', { alternatives: ['kubernetes', 'node.js'] }), profile).assessment, 'match');
 });
 
+test('technology families evaluate their real members without inventing a missing umbrella profile entry', () => {
+  const noExperience = label => ({
+    label, practicalMonths: 0, autonomy: 'unknown', lastUsedYear: null, professionalUse: false,
+  });
+  const completeFamily = {
+    ...profile,
+    technologies: {
+      postgresql: noExperience('PostgreSQL'),
+      mysql: noExperience('MySQL'),
+      mariadb: noExperience('MariaDB'),
+      'sql-server': noExperience('SQL Server'),
+    },
+  };
+  const incompleteFamily = structuredClone(completeFamily);
+  delete incompleteFamily.technologies['sql-server'];
+
+  assert.equal(matchRequirement(requirement('relational-db'), completeFamily).assessment, 'no-match');
+  assert.equal(matchRequirement(requirement('relational-db'), incompleteFamily).assessment, 'unknown');
+});
+
 test('capability assessments require only the profile dimensions named by the criterion', () => {
   const capabilities = {
     ...profile,

@@ -75,7 +75,8 @@ export function matchRequirement(requirement, profile, currentYear = new Date().
       const key = canonical(alternative);
       const capability = catalog.technology[key]?.capability;
       if (capability) results.push(assessCapability(profile.capabilities?.[capability], requirement, currentYear));
-      for (const member of [...new Set([key, ...members(key)])]) results.push(assessTechnology(profile.technologies?.[member], requirement, currentYear, options.stack === true));
+      const profileKeys = profile.technologies?.[key] ? [key, ...members(key)] : members(key);
+      for (const member of [...new Set(profileKeys)]) results.push(assessTechnology(profile.technologies?.[member], requirement, currentYear, options.stack === true));
     }
     result = aggregateAlternatives(results);
   } else if (requirement.kind === 'experience') {
