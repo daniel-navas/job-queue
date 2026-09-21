@@ -113,7 +113,7 @@ test('technology thresholds enforce duration, autonomy and last use at their bou
   assert.equal(matchRequirement(requirement('kubernetes'), profile).score, 0, 'Docker does not establish Kubernetes experience');
 });
 
-test('known technology shortfalls expose the effective threshold and comparison', () => {
+test('known technology shortfalls expose the bare effective threshold', () => {
   const noExperience = label => ({ label, practicalMonths: 0, autonomy: 'unknown', lastUsedYear: null, professionalUse: false });
   const completeRelationalProfile = { ...profile, technologies: {
     ...profile.technologies,
@@ -123,18 +123,29 @@ test('known technology shortfalls expose the effective threshold and comparison'
   const duration = matchRequirement(requirement('nestjs', { minMonths: 48 }), profile, 2026);
   const recency = matchRequirement(requirement('nestjs', { lastUsedYear: 2024 }), profile, 2026);
 
-  assert.deepEqual(autonomy.shortfall, {
-    hint: 'Requires Independent',
-    comparison: 'Current: Basic (PostgreSQL). Required: Independent.',
+  assert.deepEqual(autonomy.shortfall, { hint: 'Independent' });
+  assert.deepEqual(duration.shortfall, { hint: '4+ years' });
+  assert.deepEqual(recency.shortfall, { hint: '2024+' });
+});
+
+test('technology families explain a non-match with the strongest known member and group confirmed negatives', () => {
+  const noExperience = label => ({
+    label, practicalMonths: 0, autonomy: 'unknown', lastUsedYear: null, professionalUse: false,
   });
-  assert.deepEqual(duration.shortfall, {
-    hint: 'Requires 4+ years',
-    comparison: 'Current: 3 years (NestJS). Required: 4+ years.',
-  });
-  assert.deepEqual(recency.shortfall, {
-    hint: 'Requires use in 2024+',
-    comparison: 'Current: last used 2023 (NestJS). Required: 2024+.',
-  });
+  const compiledProfile = { ...profile, technologies: {
+    ...profile.technologies,
+    go: noExperience('Go'), rust: noExperience('Rust'), 'c++': noExperience('C++'),
+    csharp: noExperience('C#'), kotlin: noExperience('Kotlin'), scala: noExperience('Scala'),
+  } };
+
+  const result = matchRequirement(requirement('compiled-language'), compiledProfile, 2026);
+
+  assert.equal(result.assessment, 'no-match');
+  assert.deepEqual(result.shortfall, { hint: 'Independent' });
+  assert.deepEqual(result.profileSummary, [
+    'Java · Basic · 6 months · last used 2019',
+    'None: Go, Rust, C++, C#, Kotlin, Scala',
+  ]);
 });
 const facts = { requirements: [], preferred: [], stack: [], projectTags: [], software: null, work: null };
 const job = (data = {}) => { const value = { ...facts, ...data }; return { id: 'any-new-id', summary: { facts: value, fields: displayFields(value) } }; };

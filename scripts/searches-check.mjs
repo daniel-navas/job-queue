@@ -20,7 +20,13 @@ try {
   await mkdir(path.join(root, 'data'));
   // Fixed scoring inputs keep UI expectations independent of owner calibration.
   const { preferences, scoring } = evaluationConfig();
-  await writeFile(path.join(root, 'profile/matching.json'), JSON.stringify(matchingProfile()));
+  const scenarioProfile = matchingProfile();
+  const noExperience = label => ({ label, practicalMonths: 0, autonomy: 'unknown', lastUsedYear: null, professionalUse: false });
+  Object.assign(scenarioProfile.technologies, {
+    go: noExperience('Go'), rust: noExperience('Rust'), 'c++': noExperience('C++'),
+    csharp: noExperience('C#'), kotlin: noExperience('Kotlin'), scala: noExperience('Scala'),
+  });
+  await writeFile(path.join(root, 'profile/matching.json'), JSON.stringify(scenarioProfile));
   await writeFile(path.join(root, 'config/preferences.json'), JSON.stringify(preferences));
   await writeFile(path.join(root, 'config/scoring.json'), JSON.stringify(scoring));
   const search = normalizeSearch({ id: 'backend', provider: 'linkedin', name: 'Backend · Colombia', query: 'backend engineer', location: 'Colombia', workplace: 'any', datePosted: 'month', enabled: true });
@@ -34,12 +40,13 @@ try {
     requirements: [
       requirement('node.js', { evidence: 'Node.js.' }),
       requirement('kubernetes', { evidence: 'Kubernetes.' }),
+      requirement('compiled-language', { label: 'Compiled statically typed languages', evidence: 'Go or a similar compiled statically typed language.' }),
       requirement('relational-db', { evidence: 'Intermediate relational database knowledge.' }),
       requirement('unmapped', { kind: 'unknown', label: 'Unusual platform certification', evidence: 'Unusual platform certification.' }),
     ],
     preferred: [
       requirement('kubernetes', { evidence: 'Kubernetes.' }),
-      requirement('go', { evidence: 'Go.' }),
+      requirement('angular', { evidence: 'Angular.' }),
     ],
     stack: [requirement('react', { evidence: 'React.' })],
   });
@@ -80,16 +87,20 @@ try {
   await page.getByText(/3–7 years · Software engineering/).waitFor();
   assert.ok(await page.getByText('Complete', { exact: true }).count());
   assert.ok(await page.getByText('Pending analysis', { exact: true }).count());
-  assert.ok(await page.getByText('Needs info · 5/7', { exact: true }).count());
+  assert.ok(await page.getByText('Needs info · 6/8', { exact: true }).count());
   await page.getByRole('button', { name: /Mixed evaluation offer/ }).click();
-  await page.getByText('Evaluation · 5/7 resolved · 1 profile gap · 1 unmapped', { exact: true }).waitFor();
-  await page.getByText(/Relational databases · Requires Independent/).waitFor();
-  assert.match(await page.getByLabel(/Relational databases: Required non-match/).getAttribute('title'), /Current: Basic \(PostgreSQL\)\. Required: Independent\./);
+  await page.getByText('Evaluation · 6/8 resolved · 1 profile gap · 1 unmapped', { exact: true }).waitFor();
+  await page.getByText(/Compiled languages · Independent/).waitFor();
+  const compiledTooltip = await page.getByLabel(/Compiled languages: Required non-match/).getAttribute('title');
+  assert.equal(compiledTooltip, 'Java · Basic · 6 months · last used 2019\nNone: Go, Rust, C++, C#, Kotlin, Scala');
+  assert.doesNotMatch(compiledTooltip, /Requires|Assessment:|Offer:/);
+  await page.getByText(/Relational databases · Independent/).waitFor();
+  assert.doesNotMatch(await page.getByLabel(/Relational databases: Required non-match/).getAttribute('title'), /Requires|Assessment:|Offer:/);
   for (const [className, accessibleName] of [
     ['assessment-match', 'Node.js: Match'],
     ['assessment-no-match-required', 'Kubernetes: Required non-match'],
     ['assessment-no-match-optional', 'Kubernetes: Optional non-match'],
-    ['assessment-unknown', 'Go: Profile information needed'],
+    ['assessment-unknown', 'Angular: Profile information needed'],
     ['assessment-unmapped', 'Unusual platform certification: Unmapped'],
   ]) assert.equal(await page.locator(`.${className}[aria-label^="${accessibleName}"]`).count(), 1);
   await mkdir('.local', { recursive: true });

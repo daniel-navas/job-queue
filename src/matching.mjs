@@ -20,40 +20,54 @@ const explicitNoTechnology = technology => technology?.practicalMonths === 0
   && technology.lastUsedYear === null
   && technology.professionalUse === false;
 
-function aggregateAlternatives(results) {
-  if (results.some(result => result.assessment === 'match')) return results.find(result => result.assessment === 'match');
-  if (results.length && results.every(result => result.assessment === 'no-match')) return results[0];
-  return results.find(result => result.assessment === 'unknown') || { assessment: 'unknown', evidence: 'Not established in the profile.' };
+function profileSummary(results) {
+  const facts = [...new Map(results.filter(result => result.profileFact).map(result => [result.profileFact.label, result.profileFact])).values()];
+  const lines = facts.filter(fact => fact.status === 'known').map(fact => fact.line);
+  const none = facts.filter(fact => fact.status === 'none').map(fact => fact.label);
+  const missing = facts.filter(fact => fact.status === 'missing').map(fact => fact.label);
+  if (none.length) lines.push(`None: ${none.join(', ')}`);
+  if (missing.length) lines.push(`Missing: ${missing.join(', ')}`);
+  return lines;
 }
 
-function assessTechnology(technology, requirement, currentYear, stack) {
-  if (!technology) return { assessment: 'unknown', evidence: 'Technology is not recorded in the profile.' };
+function aggregateAlternatives(results) {
+  let selected;
+  if (results.some(result => result.assessment === 'match')) selected = results.find(result => result.assessment === 'match');
+  else if (results.length && results.every(result => result.assessment === 'no-match')) selected = results.find(result => result.shortfall) || results[0];
+  else selected = results.find(result => result.assessment === 'unknown') || { assessment: 'unknown', evidence: 'Not established in the profile.' };
+  return { ...selected, profileSummary: profileSummary(results) };
+}
+
+function assessTechnology(technology, requirement, currentYear, stack, label) {
+  if (!technology) return { assessment: 'unknown', evidence: 'Technology is not recorded in the profile.', profileFact: { label, status: 'missing' } };
   const detail = `${technology.label}: ${technology.autonomy ?? 'unknown'}, ${technology.practicalMonths ?? 'unknown'} practical months, last used ${technology.lastUsedYear ?? 'unknown'}.`;
-  if (explicitNoTechnology(technology)) return { assessment: 'no-match', evidence: `${detail} The owner confirmed no practical experience.` };
+  const summaryParts = [technology.label];
+  if (levels[technology.autonomy] !== undefined) summaryParts.push(titleCase(technology.autonomy));
+  if (Number.isFinite(technology.practicalMonths) && technology.practicalMonths > 0) summaryParts.push(durationText(technology.practicalMonths).replace('+', ''));
+  if (Number.isInteger(technology.lastUsedYear)) summaryParts.push(`last used ${technology.lastUsedYear}`);
+  const profileFact = { label: technology.label, status: 'known', line: summaryParts.join(' · ') };
+  if (explicitNoTechnology(technology)) return { assessment: 'no-match', evidence: `${detail} The owner confirmed no practical experience.`, profileFact: { label: technology.label, status: 'none' } };
   if (stack) {
-    if (Number.isFinite(technology.practicalMonths) && technology.practicalMonths > 0) return { assessment: 'match', evidence: detail };
-    return { assessment: 'unknown', evidence: `${detail} Practical exposure is not confirmed.` };
+    if (Number.isFinite(technology.practicalMonths) && technology.practicalMonths > 0) return { assessment: 'match', evidence: detail, profileFact };
+    return { assessment: 'unknown', evidence: `${detail} Practical exposure is not confirmed.`, profileFact };
   }
   const cutoff = recencyCutoff(requirement, currentYear);
   const checks = [
     { needed: true, known: levels[technology.autonomy] !== undefined, passes: (levels[technology.autonomy] || 0) >= levels[requirement.autonomy || 'independent'], label: 'autonomy', shortfall: () => ({
-      hint: `Requires ${titleCase(requirement.autonomy || 'independent')}`,
-      comparison: `Current: ${titleCase(technology.autonomy)} (${technology.label}). Required: ${titleCase(requirement.autonomy || 'independent')}.`,
+      hint: titleCase(requirement.autonomy || 'independent'),
     }) },
     { needed: requirement.minMonths !== null, known: Number.isFinite(technology.practicalMonths), passes: technology.practicalMonths >= requirement.minMonths, label: 'duration', shortfall: () => ({
-      hint: `Requires ${durationText(requirement.minMonths)}`,
-      comparison: `Current: ${durationText(technology.practicalMonths).replace('+', '')} (${technology.label}). Required: ${durationText(requirement.minMonths)}.`,
+      hint: durationText(requirement.minMonths),
     }) },
     { needed: cutoff !== null, known: Number.isInteger(technology.lastUsedYear), passes: technology.lastUsedYear >= cutoff, label: 'recency', shortfall: () => ({
-      hint: `Requires use in ${cutoff}+`,
-      comparison: `Current: last used ${technology.lastUsedYear} (${technology.label}). Required: ${cutoff}+.`,
+      hint: `${cutoff}+`,
     }) },
   ].filter(check => check.needed);
   const missing = checks.filter(check => !check.known).map(check => check.label);
-  if (missing.length) return { assessment: 'unknown', evidence: `${detail} Missing ${missing.join(', ')} information.` };
+  if (missing.length) return { assessment: 'unknown', evidence: `${detail} Missing ${missing.join(', ')} information.`, profileFact };
   const failed = checks.find(check => !check.passes);
-  if (failed) return { assessment: 'no-match', evidence: `${detail} Known values do not meet every threshold.`, shortfall: failed.shortfall() };
-  return { assessment: 'match', evidence: detail };
+  if (failed) return { assessment: 'no-match', evidence: `${detail} Known values do not meet every threshold.`, shortfall: failed.shortfall(), profileFact };
+  return { assessment: 'match', evidence: detail, profileFact };
 }
 
 function assessCapability(capability, requirement, currentYear) {
@@ -88,7 +102,7 @@ export function matchRequirement(requirement, profile, currentYear = new Date().
       const capability = catalog.technology[key]?.capability;
       if (capability) results.push(assessCapability(profile.capabilities?.[capability], requirement, currentYear));
       const profileKeys = profile.technologies?.[key] ? [key, ...members(key)] : members(key);
-      for (const member of [...new Set(profileKeys)]) results.push(assessTechnology(profile.technologies?.[member], requirement, currentYear, options.stack === true));
+      for (const member of [...new Set(profileKeys)]) results.push(assessTechnology(profile.technologies?.[member], requirement, currentYear, options.stack === true, catalog.technology[member]?.label || member));
     }
     result = aggregateAlternatives(results);
   } else if (requirement.kind === 'experience') {
@@ -105,7 +119,7 @@ export function matchRequirement(requirement, profile, currentYear = new Date().
   } else {
     result = { assessment: 'unmapped', evidence: 'No approved catalog mapping exists for this criterion.' };
   }
-  return { label: requirementLabel(requirement), score: result.assessment === 'match' ? 1 : 0, assessment: result.assessment, evidence: result.evidence, source: requirement.evidence, ...(result.shortfall ? { shortfall: result.shortfall } : {}) };
+  return { label: requirementLabel(requirement), score: result.assessment === 'match' ? 1 : 0, assessment: result.assessment, evidence: result.evidence, source: requirement.evidence, ...(result.shortfall ? { shortfall: result.shortfall } : {}), ...(result.profileSummary?.length ? { profileSummary: result.profileSummary } : {}) };
 }
 
 export function matchTags(job, profile, currentYear = new Date().getUTCFullYear()) {

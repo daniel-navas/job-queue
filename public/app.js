@@ -130,10 +130,15 @@ function tagsHTML(tags, group) {
           : tag.assessment === 'unknown'
             ? { icon: '?', className: 'assessment-unknown', meaning: 'Profile information needed' }
             : { icon: '◇', className: 'assessment-unmapped', meaning: 'Unmapped' };
-    const comparison = required && tag.assessment === 'no-match' && tag.shortfall ? ` ${tag.shortfall.comparison}` : '';
-    const explanation = `${presentation.meaning}.${comparison} Assessment: ${tag.evidence} Offer: ${tag.source}`;
+    const tooltip = tag.profileSummary?.join('\n') || (tag.assessment === 'unknown'
+      ? 'Profile information missing'
+      : tag.assessment === 'unmapped'
+        ? 'Catalog mapping needed'
+        : tag.assessment === 'match'
+          ? 'Confirmed'
+          : 'Not confirmed');
     const visibleLabel = required && tag.assessment === 'no-match' && tag.shortfall ? `${tag.label} · ${tag.shortfall.hint}` : tag.label;
-    return `<span tabindex="0" class="match-tag ${presentation.className}" aria-label="${escape(tag.label + ': ' + explanation)}" title="${escape(explanation)}"><b aria-hidden="true">${presentation.icon}</b>${escape(visibleLabel)}</span>`;
+    return `<span tabindex="0" class="match-tag ${presentation.className}" aria-label="${escape(tag.label + ': ' + presentation.meaning + '. ' + tooltip)}" title="${escape(tooltip)}"><b aria-hidden="true">${presentation.icon}</b>${escape(visibleLabel)}</span>`;
   }).join('') + '</span>';
 }
 
