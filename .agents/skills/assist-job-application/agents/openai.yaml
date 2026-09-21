@@ -1,0 +1,4 @@
+interface:
+  display_name: "Assist with JobQueue applications"
+  short_description: "Tailor application answers and learn approved style"
+  default_prompt: "Use $assist-job-application for JQ-008 cover letter."

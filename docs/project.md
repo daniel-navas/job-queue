@@ -73,9 +73,18 @@ scores for any job ID, duplicates do not reset decisions, and profile/config
 changes rerank cached facts without AI. The owner can use the queue instead of
 reading full LinkedIn descriptions during an actual job-search trial.
 
+## Manual application-writing assistance
+
+The owner may request cover letters or application-form answers in chat by JQ
+reference. The repo-scoped `assist-job-application` skill uses the full saved
+offer, confirmed profile facts, owner-approved voice examples, and optional
+public company research. Only owner-approved final text and reusable feedback
+are saved under private `.local/`. The owner reviews and submits manually; this
+does not add application actions, status tracking, or AI-generated queue scores.
+
 ## Later, not implemented
 
-Application assistance and tracking, then progressively approved submissions,
-then interviews/preparation/calendar. Future providers should feed the same
-source contract. No application, recruiter message, scheduling, or external
-submission is authorized merely by marking a vacancy Interested today.
+Application tracking, then progressively approved submissions, then
+interviews/preparation/calendar. Future providers should feed the same source
+contract. No application, recruiter message, scheduling, or external submission
+is authorized merely by marking a vacancy Interested today.
