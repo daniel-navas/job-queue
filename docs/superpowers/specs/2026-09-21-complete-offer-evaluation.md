@@ -1,7 +1,7 @@
 # Complete offer evaluation
 
 Date: 2026-09-21  
-Status: Proposed for owner review
+Status: Implemented
 
 ## Outcome
 
@@ -108,8 +108,10 @@ missing information. Kubernetes currently has this representation.
 
 ### Capability criteria
 
-`confirmed: false` is a resolved non-match. `confirmed: true` still requires
-any explicitly demanded autonomy, duration, knowledge, or recency values. A
+`confirmed: false` is a resolved non-match. `confirmed: true` establishes basic
+conceptual familiarity, preserving the existing profile rule, but intermediate
+or advanced knowledge requires an explicit `knowledgeLevel`. Explicit autonomy,
+duration, and recency thresholds require their corresponding profile values. A
 missing value matters only when the listing requires that dimension.
 
 ### General experience criteria

@@ -13,6 +13,9 @@ without changing the implementation:
   configured preference contributes, while descriptive neutral tags add zero.
 - Requirements, nice-to-haves, and general experience contribute their backed
   fraction. Initial weights are 2, 0.5, and 1 respectively.
+- Confirmed company-stack familiarity contributes its backed fraction with a
+  weight of 0.5. It is an optional advantage capped at +0.5; non-matches never
+  subtract points and unresolved stack facts receive no credit.
 - Publication recency contributes at most one point: 1 through day 1, 0.8
   through day 3, 0.5 through day 7, 0.2 through day 14, then 0. This is a
   review-priority heuristic, not a claimed acceptance probability.
@@ -144,11 +147,13 @@ and show a non-copyable low-emphasis JQ reference at bottom right. In the detail
 header, keep the LinkedIn link at top-right, actions
 and metadata together on a compact second row, and the copyable JQ reference at
 the far right of that row. The desktop header should use two rows total.
-Show one compact processing state in the existing company row: `Processed`
-means current structured extraction plus deterministic matching/scoring,
-`Pending` means the complete description still needs current extraction.
-Incomplete legacy records are hidden from the review UI. Only `Processed`
-offers show a numeric score; stale extractions must not appear current.
+Show one compact evaluation state in the existing company row: `Pending
+analysis` means there is no current structured extraction, `Needs info · R/T`
+means only R of T relevant criteria have definitive candidate outcomes, and
+`Complete` means every current criterion is resolved. A current extraction with
+no relevant criteria is complete. Incomplete legacy records are hidden from the
+review UI. Only offers with current extraction show a numeric score; stale
+extractions must not appear current.
 Availability is separate from owner review. `Mark as closed` removes an offer
 from the active status tabs and pending AI processing without changing its
 score, facts, `New`/`Interesting`/`Dismissed` decision, or reason. Closed offers
@@ -158,13 +163,21 @@ LinkedIn search results is not proof that an offer closed.
 
 ## Requirement tags
 
-Every processed offer uses the same matcher in `src/matching.mjs`.
+Every processed offer uses the same matcher in `src/matching.mjs`. Requirements,
+nice-to-haves, general experience, and deduplicated company stack form the
+evaluation denominator. Each criterion is `match`, `no-match`, `unknown` when a
+needed profile fact is absent, or `unmapped` when catalog work is required.
+Match and no-match are resolved; unknown and unmapped block completeness.
+These outcomes recalculate locally on refresh without AI or per-offer storage.
 Preserve OR alternatives as one criterion and separate genuinely independent
 AND criteria. Identical canonical criteria do not count twice. Exclude generic
 employer values/personality rhetoric from criteria; concrete unsupported
-qualifications remain unknown and visible. Internal 1 means confirmed match;
-0 means unknown or insufficient evidence, not proof of inability. Tooltips
-show profile and source evidence. No per-tag numbers are shown.
+qualifications remain unknown and visible. Numeric score compatibility remains
+1 for match and 0 otherwise, but the explicit assessment—not the score—drives
+completeness and presentation. A confirmed zero-experience technology record
+(`practicalMonths: 0`, unknown autonomy, no last-used year, and
+`professionalUse: false`) is a resolved non-match. Tooltips show profile and
+source evidence. No per-tag numbers are shown.
 Generic professional hygiene is deliberately outside both numerator and
 denominator: teamwork/problem solving/communication, generic debugging, code review, Git basics,
 Agile ceremonies, clean code, adaptability, ownership, and fast-paced work.
@@ -181,8 +194,12 @@ evaluation time. Explicit calendar-year cutoffs remain absolute. Never store a
 relative phrase as a fixed extraction-year cutoff.
 Experience and technology groups contribute their matched fraction. Requirements
 and nice-to-haves show a matched/total count. Never add raw counts to the score,
-which would favor verbose ads. Tag numbers are hidden; colors and evidence tooltips remain. Company
-stack is contextual and deduplicated against required/preferred tags. AI
+which would favor verbose ads. Tag numbers are hidden. Match uses green `✓`;
+required/experience non-match uses red `×`; optional non-match uses blue `–`;
+missing profile information uses amber `?`; and unmapped uses gray `◇`.
+Tooltips retain profile and source evidence, so color is never the only signal.
+Company stack is deduplicated against required/preferred tags and contributes
+at most +0.5 for confirmed familiarity. AI
 selects project/requirement tags from config/tag-catalog.json, never creates
 new tag IDs or numeric preferences. Concrete missing categories stay unmapped,
 visible and neutral until reviewed. Configured project/work tags contribute

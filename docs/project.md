@@ -17,6 +17,10 @@ marketing, accounts, multi-user infrastructure, or additional providers.
    local code. Profile, preference and weight changes require no AI calls.
 4. Show compact decision cards, source quotes, weighted contributions, and a
    priority-ordered review queue. Unknown remains visible and is not invented.
+   Each relevant requirement, nice-to-have, experience criterion, and company
+   stack technology is explicitly assessed as match, non-match, missing profile
+   information, or unmapped. The queue shows whether that evaluation is pending,
+   needs information, or complete.
 5. Preserve reviews, reasons, availability history, source records, stable IDs
    and original CVs. Manually closed offers leave active review tabs but remain
    recoverable in All opportunities.
