@@ -88,6 +88,13 @@ provisional preference or one-off observation into a permanent rule.
 
 The owner may use separate chats for different models or tightly scoped
 deliveries. There are no named workstream types and no model-to-task mapping.
+When the owner requests a specification, treat it as a self-contained handoff
+for a later implementer, often a lighter model, not as a document the owner
+must review by default. Make the approved scope, boundaries, concrete behavior,
+and verification clear enough to implement from the repository alone. Do not
+ask for a routine spec approval; ask only if a remaining product choice could
+materially change the result. Writing a spec does not itself authorize
+implementation or create another task.
 Treat repository documentation as the handoff between chats. Before substantive
 work, read `docs/project.md`, `docs/ai-context.md`, and any relevant decision
 records; after work, update the narrow authoritative source and replace stale

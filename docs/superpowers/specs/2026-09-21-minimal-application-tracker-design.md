@@ -1,6 +1,11 @@
 # Minimal application tracker
 
-Status: proposed for owner review; not implemented.
+Status: ready for implementation handoff; not implemented.
+
+This spec is for an implementer working in the same checkout. Read
+`AGENTS.md`, `docs/project.md`, `docs/ai-context.md`, and `docs/quality.md`
+before changing code. Implement only the first release below, not the later
+possibilities. Preserve unrelated local changes and private queue data.
 
 ## Intent
 
@@ -41,8 +46,9 @@ The detail panel shows the same job context, a short timeline, and one
    fixed number or order of rounds.
 3. `End process` records `Rejected`, `Withdrawn`, or `No response`, plus an
    optional date and note. `Offer received` is a simple outcome; `Accepted`
-   can close it. No negotiation or offer-detail form. An ended process can be
-   reopened without losing prior history.
+   can close it. `Offer received` remains active until accepted or otherwise
+   ended. No negotiation or offer-detail form. An ended process can be reopened
+   without losing prior history.
 4. Allow the owner to correct an erroneous date, name, state, or outcome, and
    remove an accidentally added milestone. Corrections do not delete the
    underlying job or its review history. An accidental `Mark as applied` can
@@ -105,6 +111,11 @@ alter unrelated queue fields. Notes are plain text and escaped for display.
   `Mark as applied` does not duplicate submission.
 - Desktop UI/API checks cover list selection, correction, and empty states.
   No live LinkedIn scan or AI extraction is required for these checks.
+
+Run `npm test` and the isolated desktop UI/API scenarios in
+`node scripts/searches-check.mjs`, extending their synthetic fixtures for the
+tracker. Do not write to the owner's live queue or process real offers to
+verify this feature. Report what was and was not verified.
 
 ## Later, deliberately open
 
