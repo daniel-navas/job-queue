@@ -2,10 +2,80 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { matchingProfile, evaluationConfig, requirement } from '../test-support/fixtures.mjs';
 import { experienceMonths, matchTags, matchRequirement } from '../src/matching.mjs';
-import { evaluateJob } from '../src/evaluate.mjs';
+import { evaluateJob, evaluationProgress } from '../src/evaluate.mjs';
 import { displayFields } from '../src/facts.mjs';
 const profile = matchingProfile();
 const { preferences, scoring } = evaluationConfig();
+test('candidate assessments distinguish confirmed negatives, missing facts, and unmapped criteria', () => {
+  const explicitNoProfile = {
+    ...profile,
+    technologies: {
+      ...profile.technologies,
+      kubernetes: {
+        label: 'Kubernetes', practicalMonths: 0, autonomy: 'unknown',
+        lastUsedYear: null, professionalUse: false,
+      },
+    },
+  };
+  const missingProfile = {
+    ...profile,
+    technologies: { ...profile.technologies, kubernetes: undefined },
+  };
+
+  assert.equal(matchRequirement(requirement('kubernetes'), explicitNoProfile).assessment, 'no-match');
+  assert.equal(matchRequirement(requirement('kubernetes'), missingProfile).assessment, 'unknown');
+  assert.equal(matchRequirement(requirement('kubernetes'), profile).assessment, 'no-match');
+  assert.equal(matchRequirement(requirement('unmapped', { kind: 'unknown' }), profile).assessment, 'unmapped');
+});
+
+test('OR assessments preserve unknown alternatives until one matches or all are known negatives', () => {
+  const missingGo = { ...profile, technologies: { ...profile.technologies, go: undefined } };
+
+  assert.equal(matchRequirement(requirement('any', { alternatives: ['kubernetes', 'go'] }), missingGo).assessment, 'unknown');
+  assert.equal(matchRequirement(requirement('any', { alternatives: ['kubernetes'] }), profile).assessment, 'no-match');
+  assert.equal(matchRequirement(requirement('any', { alternatives: ['kubernetes', 'node.js'] }), profile).assessment, 'match');
+});
+
+test('capability assessments require only the profile dimensions named by the criterion', () => {
+  const capabilities = {
+    ...profile,
+    capabilities: {
+      ...profile.capabilities,
+      denied: { confirmed: false, evidence: 'Owner denied it.' },
+      conceptual: { confirmed: true, evidence: 'Owner confirmed familiarity.' },
+    },
+  };
+
+  assert.equal(matchRequirement(requirement('denied', { kind: 'capability' }), capabilities).assessment, 'no-match');
+  assert.equal(matchRequirement(requirement('conceptual', { kind: 'capability', knowledgeLevel: 'basic' }), capabilities).assessment, 'match');
+  assert.equal(matchRequirement(requirement('conceptual', { kind: 'capability', knowledgeLevel: 'advanced' }), capabilities).assessment, 'unknown');
+  assert.equal(matchRequirement(requirement('conceptual', { kind: 'capability', minMonths: 12 }), capabilities).assessment, 'unknown');
+});
+
+test('evaluation progress counts only definitive candidate outcomes as resolved', () => {
+  const processed = { processingStatus: 'processed' };
+  const resolvedTags = {
+    requiredTechnologies: [{ assessment: 'match' }],
+    preferredTechnologies: [{ assessment: 'no-match' }],
+    experience: [], stack: [],
+  };
+  const mixedTags = {
+    ...resolvedTags,
+    preferredTechnologies: [{ assessment: 'unknown' }],
+    stack: [{ assessment: 'unmapped' }],
+  };
+
+  assert.deepEqual(evaluationProgress(processed, resolvedTags), {
+    status: 'complete', resolved: 2, total: 2, profileGaps: 0, unmapped: 0,
+  });
+  assert.deepEqual(evaluationProgress(processed, mixedTags), {
+    status: 'needs-info', resolved: 1, total: 3, profileGaps: 1, unmapped: 1,
+  });
+  assert.equal(evaluationProgress({ processingStatus: 'pending' }, null).status, 'pending-analysis');
+  assert.deepEqual(evaluationProgress(processed, {
+    requiredTechnologies: [], preferredTechnologies: [], experience: [], stack: [],
+  }), { status: 'complete', resolved: 0, total: 0, profileGaps: 0, unmapped: 0 });
+});
 test('technology thresholds enforce duration, autonomy and last use at their boundaries', () => {
   for (const [key, months, autonomy, year] of [
     ['react', 36, 'independent', 2022], ['docker', 12, 'basic', 2023],

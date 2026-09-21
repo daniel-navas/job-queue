@@ -30,7 +30,7 @@ export function matchingProfile() {
       docker: technology('Docker', 12, 'basic', 2023),
       gcp: technology('GCP', 12, 'independent', 2026),
       nosql: technology('NoSQL', 12, 'basic', 2022),
-      kubernetes: technology('Kubernetes', 0, 'unknown', null),
+      kubernetes: { ...technology('Kubernetes', 0, 'unknown', null), professionalUse: false },
     },
     capabilities: {
       financial: { confirmed: true, evidence: 'Synthetic financial systems experience.' },

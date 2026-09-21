@@ -1,6 +1,24 @@
 import { rateJob, salaryPreference, coverageScore, publishedRecency, weightedTotal } from './rating.mjs';
 import { matchTags, projectTags } from './matching.mjs';
 
+export function evaluationProgress(job, tags) {
+  if (job.processingStatus !== 'processed' || !tags) {
+    return { status: 'pending-analysis', resolved: 0, total: 0, profileGaps: 0, unmapped: 0 };
+  }
+  const criteria = ['requiredTechnologies', 'preferredTechnologies', 'experience', 'stack']
+    .flatMap(key => tags[key] || []);
+  const resolved = criteria.filter(tag => tag.assessment === 'match' || tag.assessment === 'no-match').length;
+  const profileGaps = criteria.filter(tag => tag.assessment === 'unknown').length;
+  const unmapped = criteria.filter(tag => tag.assessment === 'unmapped').length;
+  return {
+    status: resolved === criteria.length ? 'complete' : 'needs-info',
+    resolved,
+    total: criteria.length,
+    profileGaps,
+    unmapped,
+  };
+}
+
 // Pure evaluation: every processed offer uses this path, without AI or writes.
 export function evaluateJob(job, profile, preferences, scoring, monthlySalary, now = Date.now()) {
   const tags = matchTags(job, profile, new Date(now).getUTCFullYear()), rating = rateJob(job, preferences);
@@ -23,5 +41,5 @@ export function evaluateJob(job, profile, preferences, scoring, monthlySalary, n
       field.contribution = Math.round(field.score * field.weight * 100) / 100;
     }
   }
-  return { ...job, tags, projectTags: project, rating, monthlySalary };
+  return { ...job, tags, evaluation: evaluationProgress(job, tags), projectTags: project, rating, monthlySalary };
 }
