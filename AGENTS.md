@@ -23,10 +23,6 @@ architecture, or dependency until the product need justifies it.
 ## Working Principles
 
 - Inspect the repository before proposing or changing implementation.
-- Interpret an explicit owner instruction to `implement` as authorization to
-  implement and verify the agreed change. Do not substitute a specification or
-  additional approval gate. Create a design/specification without implementation
-  only when the owner explicitly asks to design, plan, specify, or review first.
 - Lead with the intended outcome and keep communication concise.
 - Explain behavior using plain component roles in the owner's language:
   finder, classifier, and queue. State whether a browser opens, what data leaves
