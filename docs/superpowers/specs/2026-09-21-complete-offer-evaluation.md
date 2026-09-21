@@ -28,6 +28,11 @@ currently shows `Processed`:
   criteria have a definitive result.
 - `Complete`: extraction is current and every relevant criterion is resolved.
 
+A current extraction with zero relevant criteria is `Complete`: there is no
+candidate fact left to collect. `Complete` describes the present source,
+catalog, profile, and scoring configuration; it is recalculated rather than an
+immutable historical assertion.
+
 Do not display `Extracted`, `Evaluated`, or `Provisional`. The numeric score
 remains the score supported by current facts. `Needs info` already communicates
 that unresolved positive contributions may still change it.
@@ -47,6 +52,11 @@ Company-stack technologies use the same canonical technology catalog and
 candidate profile as requirements and nice-to-haves. No second vocabulary or
 profile model is introduced. A stack item already represented by a requirement
 or nice-to-have remains deduplicated as it is today.
+
+New stack extraction accepts canonical technology criteria only. A concrete
+technology that is not yet in the catalog remains `unknown` / `unmapped` until
+catalog review. The current stored stack already contains only technology
+criteria, so this restriction does not require offer migration or reprocessing.
 
 Project/work tags are already closed enums validated against the project
 catalog and require no candidate answer. They affect the score where configured
@@ -69,6 +79,11 @@ result:
 - `unmapped`: the extracted concept has no approved canonical representation.
 
 The last two states are unresolved. `match` and `no-match` are resolved.
+
+Expose the assessment alongside the existing tag data. Keep numeric compatibility
+for scoring: `match` maps to `score: 1`; every other assessment maps to
+`score: 0`. Completeness and visual semantics must use the assessment, never
+attempt to reconstruct it from the numeric score.
 
 This result is derived at refresh time and is not written into each queue
 record. Source facts remain cached in the offer, while candidate facts remain
@@ -96,6 +111,14 @@ missing information. Kubernetes currently has this representation.
 `confirmed: false` is a resolved non-match. `confirmed: true` still requires
 any explicitly demanded autonomy, duration, knowledge, or recency values. A
 missing value matters only when the listing requires that dimension.
+
+### General experience criteria
+
+An explicit professional-experience duration is resolved from the union of the
+profile's employment periods: it is a match when the duration reaches the
+published minimum and a non-match otherwise. A missing or malformed employment
+history is unknown rather than a confirmed zero. Any experience concept that
+cannot be represented by the approved experience catalog remains unmapped.
 
 ### OR criteria
 
@@ -135,6 +158,11 @@ resolving it as a match can increase the score. An empty stack contributes
 zero. The total stack contribution can never exceed `+0.5`, so verbose listings
 cannot dominate ranking.
 
+Represent the unweighted fraction as `rating.fields.stack.score` and let the
+existing weighted-total path apply the configured `0.5` weight. This preserves
+the single centralized scoring mechanism and exposes the calculation in the
+same tooltip format as other contributions.
+
 ## Visual language
 
 Every displayed criterion combines color, icon, text/tooltip, and source
@@ -164,7 +192,7 @@ Preserve the compact two-row offer header. Immediately below the header and
 before the existing provenance/facts content, show one compact evaluation line:
 
 ```text
-Evaluation · 8/10 resolved · 1 profile question · 1 unmapped
+Evaluation · 8/10 resolved · 1 profile gap · 1 unmapped
 ```
 
 Omit zero-valued segments. When complete, show `Evaluation · Complete`. The
@@ -173,12 +201,17 @@ reason, such as missing duration, insufficient autonomy, confirmed zero
 experience, or missing catalog mapping, and retain the listing quote and profile
 evidence already exposed by the tag.
 
+`Profile gap` counts unresolved criteria, not conversational questions. One
+owner answer may resolve several gaps or offers, and one OR criterion may
+require asking about several alternatives together.
+
 No profile editor, manual per-offer override, new tab, modal, or additional
 dashboard is part of this change.
 
 ## Completion workflow
 
-Unresolved items feed the existing owner-question workflow rather than a new UI:
+Unresolved items support the existing owner-question workflow rather than
+creating a new automated messaging path:
 
 1. Review unmapped criteria against catalog keys, aliases, families, and
    compatibility normalization. Add a catalog entry only through the existing
@@ -187,6 +220,12 @@ Unresolved items feed the existing owner-question workflow rather than a new UI:
    processed offer and reusable facts that resolve multiple offers.
 3. Record positive and explicit negative answers in both profile sources.
 4. Refresh the app to recompute every offer locally.
+
+The evaluated job returned by the existing jobs API includes the offer-level
+summary (`status`, resolved count, total count, profile-gap count, unmapped
+count) and each tag assessment/reason. The UI and an agent inspecting the queue
+consume that same derived data. JobQueue does not initiate a conversation,
+schedule questions, or write profile answers itself.
 
 The owner is never asked again for Kubernetes unless explicitly auditing the
 stored answer: it is already a resolved negative fact.
