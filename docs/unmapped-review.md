@@ -34,11 +34,13 @@ is used, so merely reaching the threshold consumes no Codex usage.
    full offer descriptions or the candidate profile to a model.
 2. Group equivalent concepts across offers and compare them with catalog keys,
    aliases, families, and compatibility normalization.
-3. For each group, propose one of: map to an existing tag, create a canonical
-   tag, split distinct meanings, exclude a non-differentiating criterion, or
-   keep it unmapped until there is enough evidence.
-4. Present the compact proposal to the owner. Do not apply semantic catalog or
-   profile decisions without approval.
+3. Review the entire pending batch autonomously. For each group, decide whether
+   to map an existing tag, create a canonical tag, split distinct meanings,
+   exclude a non-differentiating criterion, or keep it unmapped until there is
+   enough evidence. Do not interrupt the cycle for item-by-item approval.
+4. Present one compact, stably numbered proposal covering every candidate. The
+   owner can identify objections by number. Do not apply semantic catalog or
+   profile decisions until that batch-level objection window is complete.
 5. Record approved decisions in `config/unmapped-review.json`, update the
    catalog/normalizer/profile as appropriate, and add boundary regression tests.
    Decisions must be generic and source-based, never per-offer exceptions.
