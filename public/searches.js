@@ -21,7 +21,7 @@ export function initSearches(api, refresh, filterOffers) {
       <label for="search-query">Query</label><textarea id="search-query" required maxlength="500" rows="2"></textarea>
       <label for="search-location">Location</label><input id="search-location" required maxlength="150">
       <div class="search-fields"><div><label for="search-workplace">Work mode</label><select id="search-workplace"><option value="any">Any</option><option value="remote">Remote</option></select></div><div><label for="search-date">Date posted</label><select id="search-date"><option value="month">Past month</option><option value="week">Past week</option><option value="day">Past 24 hours</option><option value="any">Any date</option></select></div></div>
-      <p class="searches-note">Search intent does not confirm an offer’s location or visa support.</p>
+      <p class="searches-note">Search intent does not confirm a job’s location or visa support.</p>
       <div class="actions"><button type="button" id="search-cancel">Cancel</button><button class="primary" type="submit">Save search</button></div>
     </form><p id="searches-error" role="alert"></p>`;
   document.body.append(dialog);
@@ -34,7 +34,7 @@ export function initSearches(api, refresh, filterOffers) {
       const stats = state.stats?.find(s => s.id === search.id && s.provider === search.provider) ?? {};
       return `<div class="search-row"><input type="checkbox" data-enable="${escape(search.id)}" aria-label="Enable ${escape(search.query)}" ${search.enabled ? 'checked' : ''}>
         <div class="search-copy"><strong>${escape(search.query)}</strong>${listCriteria(search)}</div>
-        <div class="search-metrics"><button data-offers="${escape(search.id)}" title="Show offers found with these criteria">${stats.captured ?? 0} offers</button><small>${stats.processed ?? 0} processed · avg ${stats.meanRating ?? '—'}</small><small>${stats.exclusive ?? 0} exclusive · ${stats.interesting ?? 0} interested</small><small>${stats.runs ? `${stats.runs} runs · last ${escape(stats.lastRun?.capturedAt?.slice(0, 10))}${stats.lastRun?.status !== 'complete' ? ' · interrupted' : ''}` : 'Not run yet'}${stats.historicalCaptured > stats.captured ? ` · ${stats.historicalCaptured} across all criteria` : ''}</small></div>
+        <div class="search-metrics"><button data-offers="${escape(search.id)}" title="Show jobs found with these criteria">${stats.captured ?? 0} jobs</button><small>${stats.processed ?? 0} processed · avg ${stats.meanRating ?? '—'}</small><small>${stats.exclusive ?? 0} exclusive · ${stats.interesting ?? 0} interested</small><small>${stats.runs ? `${stats.runs} runs · last ${escape(stats.lastRun?.capturedAt?.slice(0, 10))}${stats.lastRun?.status !== 'complete' ? ' · interrupted' : ''}` : 'Not run yet'}${stats.historicalCaptured > stats.captured ? ` · ${stats.historicalCaptured} across all criteria` : ''}</small></div>
         <button class="search-edit" data-edit="${escape(search.id)}" aria-label="Edit ${escape(search.query)}">Edit</button></div>`;
     }).join('') || '<p class="muted">Add your first LinkedIn search.</p>';
   }

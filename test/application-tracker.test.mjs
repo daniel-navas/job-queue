@@ -6,6 +6,43 @@ import path from 'node:path';
 import { Queue, mergeJobs } from '../src/queue.mjs';
 import { applicationView } from '../src/application-tracker.mjs';
 
+test('applying implies interest and correcting a mistaken application restores the exact review state', async () => {
+  for (const original of [
+    { status: 'new', reason: '' },
+    { status: 'interesting', reason: '' },
+    { status: 'dismissed', reason: 'Wrong location' },
+  ]) {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'jq-application-review-'));
+    try {
+      const queue = new Queue(root);
+      queue.state.jobs = [{ id: 'one', ...original, history: [] }];
+      await queue.save();
+      await queue.updateApplication('one', { type: 'submit', date: '2026-09-21' });
+      assert.equal(queue.state.jobs[0].status, 'interesting');
+      assert.equal(queue.state.jobs[0].reason, '');
+      await queue.updateApplication('one', { type: 'submit', date: '2026-09-21' });
+      await queue.updateApplication('one', { type: 'undo-submit' });
+      assert.equal(queue.state.jobs[0].application, undefined);
+      assert.equal(queue.state.jobs[0].status, original.status);
+      assert.equal(queue.state.jobs[0].reason, original.reason);
+    } finally { await rm(root, { recursive: true, force: true }); }
+  }
+});
+
+test('undoing dismissal restores the review decision that preceded it', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'jq-dismiss-toggle-'));
+  try {
+    const queue = new Queue(root);
+    queue.state.jobs = [{ id: 'one', status: 'interesting', reason: '', history: [] }];
+    await queue.save();
+    await queue.review('one', 'dismissed', 'Not a fit');
+    assert.equal(queue.state.jobs[0].reviewStatusBeforeDismissal, 'interesting');
+    await queue.review('one', 'interesting', '');
+    assert.equal(queue.state.jobs[0].status, 'interesting');
+    assert.equal(queue.state.jobs[0].reviewStatusBeforeDismissal, undefined);
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
 test('submission persists independently of review and rediscovery', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'jq-application-'));
   try {

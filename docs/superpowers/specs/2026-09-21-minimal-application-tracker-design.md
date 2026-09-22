@@ -11,22 +11,21 @@ queue data in any future extension.
 Give the owner one place to answer: where have I applied, which interview is
 next, does it need scheduling, and which processes have ended? Keep the first
 release manual and small. The tracker must be able to accept verified updates
-from future automation without changing the owner's existing opportunity
-review decisions.
+from future automation without losing the owner's prior job-review decision.
 
 The owner expects to accept an offer in most cases, so offer negotiation is not
 a first-release workflow.
 
 ## Boundary and navigation
 
-Keep the desktop two-pane layout. Add `Applications` as a peer of
-`Opportunities`, not another `New`/`Interesting`/`Dismissed` filter. The existing
-tabs remain review decisions. `Interested` does not imply applied. A job can
-be marked applied even if its AI analysis is pending or its LinkedIn posting
-is now closed. Posting availability, review decision, and application progress
-remain independent. A tracked job leaves the `New` and `Interesting` review
-tabs so active decisions stay focused; it remains in `All opportunities` with
-its current application stage and in `Applications`.
+Keep the desktop two-pane layout. Add `Applications` as a peer of `Jobs`, not
+another `New`/`Interesting`/`Dismissed` filter. The existing tabs remain review
+decisions. `Interested` does not imply applied, while `Applied` implies
+`Interested`. A job can be marked applied even if its AI analysis is pending or
+LinkedIn now shows it as closed. LinkedIn availability, review decision, and
+application progress remain separate. A tracked job leaves the `New` and
+`Interesting` review tabs so active decisions stay focused; it remains in `All
+jobs` with its current application stage and in `Applications`.
 
 The `Applications` list contains tracked jobs only. Active processes come
 first; ended processes remain accessible in a compact `Closed` filter. Each
@@ -36,9 +35,10 @@ The detail panel shows the same job context, a short timeline, and one
 
 ## First-release actions and display
 
-1. `Mark as applied` on an opportunity starts tracking and records the actual
-   application date (default today, editable). The action never submits an
-   application or opens a browser. Repeated clicks cannot create duplicates.
+1. `Applied` on a job starts tracking, records the actual application date
+   (default today, editable), and sets the review decision to `Interested` in
+   the same transaction. The action never submits an application or opens a
+   browser. Repeated clicks cannot create duplicates.
 2. `Add interview` records a short free-text round name (for example,
    `Recruiter` or `System design`). The owner selects `Needs scheduling`,
    `Scheduled` with a date/time, or `Completed`. A pending interview can later
@@ -52,8 +52,9 @@ The detail panel shows the same job context, a short timeline, and one
    without losing prior history.
 4. Allow the owner to correct an erroneous date, name, state, or outcome, and
    remove an accidentally added milestone. Corrections do not delete the
-   underlying job or its review history. An accidental `Mark as applied` can
-   be undone only while no later tracker milestone exists.
+   underlying job or its review history. `Not applied` corrects an accidental
+   application only while no later tracker milestone exists and restores the
+   exact review decision and reason that preceded it.
 
 The current stage is derived: `Applied` after submission, `Interviewing` once
 an interview exists, `Offer received` if recorded, and a closed outcome when
@@ -87,7 +88,7 @@ integration, browser action, network request, AI call, or external message is
 part of this release. Candidate profile data stays local.
 
 Duplicate LinkedIn discoveries must preserve the `application` object. A
-closed posting does not hide an active application. Existing jobs have no
+closed job does not hide an active application. Existing jobs have no
 application object and must not be inferred as applied from `Interesting` or
 other review history. The public JQ reference is display-only; persistence
 uses the stable source ID.
@@ -104,13 +105,16 @@ alter unrelated queue fields. Notes are plain text and escaped for display.
 ## Verification for the first release
 
 - A job can be marked applied and appears in `Applications` after restart.
-- Its review decision and posting availability stay unchanged, while its card
-  leaves `New`/`Interesting` and remains recoverable in `All opportunities`.
+- Applying sets the review decision to `Interested`; correcting it with `Not
+  applied` restores the exact previous decision and reason. LinkedIn
+  availability remains unchanged.
+- The applied card leaves `New`/`Interesting` and remains recoverable in `All
+  jobs`.
 - Scheduling, rescheduling, completing, and adding another interview produce
   the correct next-action line and timeline.
 - Ended processes leave the active list, remain recoverable, and can reopen.
 - Duplicate imports preserve progress; invalid writes roll back; repeated
-  `Mark as applied` does not duplicate submission.
+  `Applied` actions do not duplicate submission.
 - Desktop UI/API checks cover list selection, correction, and empty states.
   No live LinkedIn scan or AI extraction is required for these checks.
 

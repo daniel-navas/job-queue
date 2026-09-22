@@ -4,7 +4,7 @@ const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 let data = { jobs: [] }, active = 'new', selected, rejecting, view = 'opportunities', applicationFilter = 'active', editingEvent = null;
 let discoveryFilter = null;
-const labels = { new: 'New', interesting: 'Interesting', dismissed: 'Dismissed', all: 'All opportunities' };
+const labels = { new: 'New', interesting: 'Interesting', dismissed: 'Dismissed', all: 'All jobs' };
 async function api(url, body) { const response = await fetch(url, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}); const result = await response.json(); if (!response.ok) throw new Error(result.error); return result; }
 function error(err) { $('#error').textContent = err.message; }
 async function refresh() { data = await api('/api/jobs'); render(); }
@@ -14,18 +14,18 @@ function render() {
   for (const id of ['searches-open', 'scan', 'summarize']) $(`#${id}`).hidden = tracking;
   $('#run-status').hidden = tracking;
   $('#ai-status').hidden = tracking;
-  $('#jobs').setAttribute('aria-label', tracking ? 'Applications' : 'Opportunities');
-  $('#detail').setAttribute('aria-label', tracking ? 'Application details' : 'Opportunity details');
-  $('#search').placeholder = tracking ? 'Search applications or ID…' : 'Search offers or ID…';
-  $('#search').setAttribute('aria-label', tracking ? 'Search applications' : 'Search opportunities');
-  $('#tabs').setAttribute('aria-label', tracking ? 'Application status' : 'Opportunity status');
+  $('#jobs').setAttribute('aria-label', tracking ? 'Applications' : 'Jobs');
+  $('#detail').setAttribute('aria-label', tracking ? 'Application details' : 'Job details');
+  $('#search').placeholder = tracking ? 'Search applications or ID…' : 'Search jobs or ID…';
+  $('#search').setAttribute('aria-label', tracking ? 'Search applications' : 'Search jobs');
+  $('#tabs').setAttribute('aria-label', tracking ? 'Application status' : 'Job status');
   if (tracking) { renderApplications(); return; }
   const reviewable = job => job.availability?.status !== 'closed' && !job.application;
   $('#tabs').innerHTML = Object.entries(labels).map(([key, label]) => `<button data-tab="${key}" class="tab ${active === key ? 'active' : ''}" aria-pressed="${active === key}">${label} <span>${data.jobs.filter(j => key === 'all' || (j.status === key && reviewable(j))).length}</span></button>`).join('');
   const query = $('#search').value.toLowerCase();
   const jobs = data.jobs.filter(j => (active === 'all' || (j.status === active && reviewable(j))) && (!discoveryFilter || j.discoveries?.some(d => d.search.provider === discoveryFilter.provider && d.search.id === discoveryFilter.id && d.search.revision === discoveryFilter.revision)) && `${j.reference} ${j.id} ${j.title} ${j.company} ${j.location}`.toLowerCase().includes(query)).sort(compareJobs);
   if (!jobs.some(j => j.id === selected)) selected = jobs[0]?.id;
-  $('#count').textContent = `${jobs.length} opportunities${discoveryFilter ? ` · ${discoveryFilter.query}` : ''}`;
+  $('#count').textContent = `${jobs.length} jobs${discoveryFilter ? ` · ${discoveryFilter.query}` : ''}`;
   $('#clear-discovery').hidden = !discoveryFilter;
   const enabled = data.searches?.searches?.filter(s => s.enabled) ?? [];
   $('#scan').disabled = data.scan?.running || data.connection?.running || !enabled.length;
@@ -33,20 +33,31 @@ function render() {
   const pendingCount = data.ai?.pending ?? 0;
   const nextBatch = Math.min(2, pendingCount);
   $('#summarize').innerHTML = data.ai?.running ? `<span class="spinner" aria-hidden="true"></span>${data.ai.processed}/${data.ai.total} ready` : `Process ${nextBatch} · ${pendingCount} pending`;
-  $('#summarize').title = `Summarize the next ${nextBatch} of ${pendingCount} eligible offers using Codex`;
+  $('#summarize').title = `Summarize the next ${nextBatch} of ${pendingCount} eligible jobs using Codex`;
   $('#ai-status').textContent = data.ai?.error ? data.ai.message : '';
   $('#ai-status').classList.toggle('failure', !!data.ai?.error);
-  $('#scan').innerHTML = data.scan?.running ? `<span class="spinner" aria-hidden="true"></span>${escape(/^Searching \d+\/\d+$/.test(data.scan.message) ? data.scan.message : 'Searching…')}` : 'Find opportunities';
-  const scanStatus = data.scan?.running ? (data.scan.message === 'Sign in to LinkedIn' ? data.scan.message : '') : data.scan?.finishedAt ? (data.scan.error ? data.scan.message : `${data.scan.added ?? 0} offers added`) : '';
+  $('#scan').innerHTML = data.scan?.running ? `<span class="spinner" aria-hidden="true"></span>${escape(/^Searching \d+\/\d+$/.test(data.scan.message) ? data.scan.message : 'Searching…')}` : 'Find jobs';
+  const scanStatus = data.scan?.running ? (data.scan.message === 'Sign in to LinkedIn' ? data.scan.message : '') : data.scan?.finishedAt ? (data.scan.error ? data.scan.message : `${data.scan.added ?? 0} jobs added`) : '';
   const reviewStatus = data.catalogReview?.recommended && !data.scan?.running && !data.scan?.error && !data.ai?.running && !data.ai?.error && !data.connection?.running && !data.connection?.error
     ? `${data.catalogReview.pending} tag${data.catalogReview.pending === 1 ? '' : 's'} pending review` : '';
   $('#run-status').textContent = [scanStatus, reviewStatus].filter(Boolean).join(' · ');
   $('#run-status').title = $('#run-status').textContent;
   $('#scan').title = enabled.length ? (data.scan?.running && data.scan.query ? data.scan.query : `${enabled.length} LinkedIn searches`) : 'Enable a search in Searches';
   $('#run-status').classList.toggle('failure', !!data.scan?.error);
-  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''} ${job.availability?.status === 'closed' ? 'job-closed' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="list-states">${evaluationBadge(job.evaluation)}${active === 'all' && job.application ? `<span class="application-stage">${escape(stageLabels[job.applicationView?.stage] || 'Applied')}</span>` : ''}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</span></span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Weighted priority score')}</span><span class="list-footer"><span class="muted">${escape(job.location || 'Location not provided')}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more opportunities.</p></div>';
+  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''} ${job.availability?.status === 'closed' ? 'job-closed' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="list-states">${evaluationBadge(job.evaluation)}${active === 'all' && job.application ? `<span class="application-stage">${escape(stageLabels[job.applicationView?.stage] || 'Applied')}</span>` : ''}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</span></span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Weighted priority score')}</span><span class="list-footer"><span class="muted">${escape(job.location || 'Location not provided')}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more jobs.</p></div>';
   const job = data.jobs.find(j => j.id === selected);
-  $('#detail').innerHTML = job ? `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, 'Weighted priority score')}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</div><div class="detail-meta"><span>${escape(job.company || 'Company not provided')}</span>${publishedHTML(job)}<button class="detail-id" data-copy-id="${escape(job.reference)}" title="Copy offer ID">${escape(job.reference)}</button></div><div class="detail-actions"><button class="primary" data-status="interesting">${job.status === 'interesting' ? '✓ Interesting' : '☆ Interested'}</button><button data-reject="${job.id}">Dismiss</button><button data-app-start>${job.application ? 'View application' : 'Mark as applied'}</button><details class="detail-more"><summary aria-label="More actions" title="More actions">···</summary><div class="detail-menu">${job.status !== 'new' ? '<button data-status="new">Restore to new</button>' : ''}<button data-availability="${job.availability?.status === 'closed' ? 'open' : 'closed'}">${job.availability?.status === 'closed' ? 'Reopen' : 'Mark as closed'}</button></div></details></div></div>${evaluationSummary(job.evaluation)}${job.reason ? `<div class="feedback"><strong>Your feedback</strong><p>${escape(job.reason)}</p></div>` : ''}<hr>${summaryHTML(job)}<details class="original"><summary>Full description</summary><div class="description">${escape(job.description || 'Description not captured. Open LinkedIn for details.')}</div></details>` : '<div class="empty">Select an opportunity to see the details.</div>';
+  $('#detail').innerHTML = job ? `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, 'Weighted priority score')}${job.application ? `<span class="application-stage">${escape(stageLabels[job.applicationView?.stage] || 'Applied')}</span>` : ''}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</div><div class="detail-meta"><span>${escape(job.company || 'Company not provided')}</span>${publishedHTML(job)}<button class="detail-id" data-copy-id="${escape(job.reference)}" title="Copy job ID">${escape(job.reference)}</button></div>${jobActions(job)}</div>${job.reason ? `<div class="feedback"><strong>Your feedback</strong><p>${escape(job.reason)}</p></div>` : ''}<hr>${summaryHTML(job)}<details class="original"><summary>Full description</summary><div class="description">${escape(job.description || 'Description not captured. Open LinkedIn for details.')}</div></details>` : '<div class="empty">Select a job to see the details.</div>';
+}
+function jobActions(job) {
+  const closed = job.availability?.status === 'closed';
+  const more = `<details class="detail-more"><summary aria-label="More actions" title="More actions">···</summary><div class="detail-menu"><button data-availability="${closed ? 'open' : 'closed'}" aria-pressed="${closed}">Closed</button></div></details>`;
+  if (job.application) return `<div class="detail-actions detail-actions-minimal">${more}</div>`;
+  const interested = job.status === 'interesting';
+  const dismissed = job.status === 'dismissed';
+  const dismiss = dismissed
+    ? `<button class="dismissed-active" data-status="${escape(job.reviewStatusBeforeDismissal || 'new')}" aria-pressed="true" title="Undo dismissal">Dismissed</button>`
+    : `<button data-reject="${escape(job.id)}" aria-pressed="false">Dismiss</button>`;
+  return `<div class="detail-actions"><button class="${interested ? 'primary' : ''}" data-status="${interested ? 'new' : 'interesting'}" aria-pressed="${interested}">Interested</button>${dismiss}<button data-app-start>Applied</button>${more}</div>`;
 }
 const stageLabels = { applied: 'Applied', interviewing: 'Interviewing', 'offer-received': 'Offer received', rejected: 'Rejected', withdrawn: 'Withdrawn', 'no-response': 'No response', accepted: 'Accepted' };
 const localDate = value => { const date = value ? new Date(value) : new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; };
@@ -64,7 +75,7 @@ function renderApplications() {
   if (!jobs.some(job => job.id === selected)) selected = jobs[0]?.id;
   $('#count').textContent = `${jobs.length} ${applicationFilter === 'active' ? 'active applications' : 'closed applications'}`;
   $('#clear-discovery').hidden = true;
-  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''}"><button class="job-open" data-open="${escape(job.id)}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="application-stage">${escape(stageLabels[job.applicationView.stage])}</span></span><span class="list-title"><h2>${escape(job.title)}</h2></span><span class="list-footer"><span class="muted">${escape(job.applicationView.nextAction || stageLabels[job.applicationView.stage])}${job.applicationView.nextAt ? ` · ${escape(shownDate(job.applicationView.nextAt))}` : ''}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || `<div class="empty"><h2>${applicationFilter === 'active' && !tracked.length ? 'No applications yet' : 'No applications here'}</h2><p>${applicationFilter === 'active' && !tracked.length ? 'Mark a job as applied from Opportunities to start tracking it.' : 'Try another filter or search.'}</p></div>`;
+  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''}"><button class="job-open" data-open="${escape(job.id)}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="application-stage">${escape(stageLabels[job.applicationView.stage])}</span></span><span class="list-title"><h2>${escape(job.title)}</h2></span><span class="list-footer"><span class="muted">${escape(job.applicationView.nextAction || stageLabels[job.applicationView.stage])}${job.applicationView.nextAt ? ` · ${escape(shownDate(job.applicationView.nextAt))}` : ''}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || `<div class="empty"><h2>${applicationFilter === 'active' && !tracked.length ? 'No applications yet' : 'No applications here'}</h2><p>${applicationFilter === 'active' && !tracked.length ? 'Use Applied from Jobs to start tracking one.' : 'Try another filter or search.'}</p></div>`;
   const job = data.jobs.find(item => item.id === selected);
   $('#detail').innerHTML = job ? applicationDetail(job) : '<div class="empty">Select an application to see its progress.</div>';
 }
@@ -75,7 +86,8 @@ function applicationDetail(job) {
     const when = event.type === 'interview' ? event.scheduledAt || event.completedAt : event.date || event.at;
     return `<li><span><strong>${escape(label)}</strong>${when ? `<small>${escape(shownDate(when))}</small>` : ''}${event.note ? `<p>${escape(event.note)}</p>` : ''}</span>${event.type === 'reopen' ? '' : `<button data-app-${event.type === 'submission' ? 'submission' : 'edit'}${event.id ? `="${escape(event.id)}"` : ''} aria-label="Edit ${escape(label)}">Edit</button>`}</li>`;
   }).join('');
-  return `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2></div><p class="muted">${escape(job.company || 'Company not provided')} · ${escape(job.reference)}</p></div><div class="application-progress"><span class="application-stage">${escape(stageLabels[progress.stage])}</span><strong>${escape(progress.nextAction || stageLabels[progress.stage])}</strong>${progress.nextAt ? `<span>${escape(shownDate(progress.nextAt))}</span>` : ''}</div><div class="actions">${progress.closed ? '<button class="primary" data-app-reopen>Reopen process</button>' : '<button class="primary" data-app-update>Update progress</button>'}${application.events.length ? '' : '<button data-app-undo>Undo applied</button>'}</div><h3>Timeline</h3><ol class="application-timeline">${timeline}</ol>`;
+  const correction = application.events.length ? '' : '<details class="detail-more"><summary aria-label="More actions" title="More actions">···</summary><div class="detail-menu"><button data-app-undo>Not applied</button></div></details>';
+  return `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2></div><p class="muted">${escape(job.company || 'Company not provided')} · ${escape(job.reference)}</p></div><div class="application-progress"><span class="application-stage">${escape(stageLabels[progress.stage])}</span><strong>${escape(progress.nextAction || stageLabels[progress.stage])}</strong>${progress.nextAt ? `<span>${escape(shownDate(progress.nextAt))}</span>` : ''}</div><div class="actions application-actions">${progress.closed ? '<button class="primary" data-app-reopen>Reopen process</button>' : '<button class="primary" data-app-update>Update progress</button>'}${correction}</div><h3>Timeline</h3><ol class="application-timeline">${timeline}</ol>`;
 }
 function setApplicationFields() {
   const action = $('#application-action').value;
@@ -97,7 +109,7 @@ function openApplicationDialog(action, eventId = null) {
   editingEvent = event || null;
   $('#application-form').reset();
   $('#application-action').value = action === 'edit' ? (event.type === 'interview' ? 'update-interview' : 'update-outcome') : action;
-  $('#application-title').textContent = action === 'submit' ? 'Mark as applied' : action === 'submission' ? 'Edit application date' : action === 'edit' ? 'Edit update' : 'Update progress';
+  $('#application-title').textContent = action === 'submit' ? 'Applied' : action === 'submission' ? 'Edit application date' : action === 'edit' ? 'Edit update' : 'Update progress';
   if (action === 'submission') $('#application-action').value = 'update-submission';
   $('#application-save').textContent = action === 'submit' ? 'Save application' : 'Save update';
   $('#application-date').value = action === 'submission' ? job.application.submission.date : event?.date || event?.completedAt || localDate();
@@ -137,17 +149,24 @@ $('#search').oninput = render;
 $('#jobs').onclick = event => { const item = event.target.closest('[data-open]'); if (item) { selected = item.dataset.open; render(); } };
 $('#detail').onclick = async event => {
   const copy = event.target.closest('[data-copy-id]');
-  if (copy) { try { await navigator.clipboard.writeText(copy.dataset.copyId); copy.textContent = 'Copied'; setTimeout(() => { copy.textContent = copy.dataset.copyId; }, 900); } catch { error(new Error('Could not copy the offer ID.')); } return; }
+  if (copy) { try { await navigator.clipboard.writeText(copy.dataset.copyId); copy.textContent = 'Copied'; setTimeout(() => { copy.textContent = copy.dataset.copyId; }, 900); } catch { error(new Error('Could not copy the job ID.')); } return; }
   const source = event.target.closest('[data-source]');
   if (source) { const quote = document.getElementById(`source-${source.dataset.source}`); quote.hidden = !quote.hidden; source.setAttribute('aria-expanded', String(!quote.hidden)); return; }
   const reject = event.target.closest('[data-reject]');
   if (reject) { rejecting = selected; const job = data.jobs.find(j => j.id === rejecting); $('#reject-title').textContent = job.title; $('#reason').value = job.reason; $('#reject-dialog').showModal(); return; }
-  if (event.target.closest('[data-app-start]')) { const job = data.jobs.find(j => j.id === selected); if (job.application) { view = 'applications'; applicationFilter = job.applicationView?.closed ? 'closed' : 'active'; render(); } else openApplicationDialog('submit'); return; }
+  if (event.target.closest('[data-app-start]')) { openApplicationDialog('submit'); return; }
   if (event.target.closest('[data-app-update]')) { openApplicationDialog('add-interview'); return; }
   if (event.target.closest('[data-app-reopen]')) { try { await api('/api/application', { id: selected, change: { type: 'reopen' } }); applicationFilter = 'active'; await refresh(); } catch (err) { error(err); } return; }
   const edit = event.target.closest('[data-app-edit]');
   if (edit) { openApplicationDialog('edit', edit.dataset.appEdit); return; }
-  if (event.target.closest('[data-app-undo]')) { try { await api('/api/application', { id: selected, change: { type: 'undo-submit' } }); await refresh(); } catch (err) { error(err); } return; }
+  if (event.target.closest('[data-app-undo]')) {
+    if (!confirm('Remove this application from JobQueue? This only corrects the tracker.')) return;
+    const job = data.jobs.find(item => item.id === selected);
+    const previousStatus = job.application?.previousReview?.status || job.status || 'new';
+    try { await api('/api/application', { id: selected, change: { type: 'undo-submit' } }); view = 'opportunities'; active = previousStatus; await refresh(); }
+    catch (err) { error(err); }
+    return;
+  }
   if (event.target.closest('[data-app-submission]')) { openApplicationDialog('submission'); return; }
   const button = event.target.closest('[data-status]');
   if (button) { try { await api('/api/review', { id: selected, status: button.dataset.status }); await refresh(); } catch (err) { error(err); } }
@@ -182,15 +201,6 @@ function evaluationBadge(evaluation = {}) {
   const status = evaluation.status || 'pending-analysis';
   const labels = { complete: 'Complete', 'needs-info': `Needs info · ${evaluation.resolved ?? 0}/${evaluation.total ?? 0}`, 'pending-analysis': 'Pending analysis' };
   return `<span class="processing-state state-${status}"><i aria-hidden="true"></i>${labels[status]}</span>`;
-}
-
-function evaluationSummary(evaluation = {}) {
-  if (evaluation.status === 'complete') return '<p class="evaluation-summary">Evaluation · Complete</p>';
-  if (evaluation.status !== 'needs-info') return '<p class="evaluation-summary">Evaluation · Pending analysis</p>';
-  const segments = [`${evaluation.resolved}/${evaluation.total} resolved`];
-  if (evaluation.profileGaps) segments.push(`${evaluation.profileGaps} profile gap${evaluation.profileGaps === 1 ? '' : 's'}`);
-  if (evaluation.unmapped) segments.push(`${evaluation.unmapped} unmapped`);
-  return `<p class="evaluation-summary">Evaluation · ${segments.join(' · ')}</p>`;
 }
 
 function contributionBadge(rating) {

@@ -128,6 +128,8 @@ export class Queue {
     return this.mutate(() => {
       const job = this.state.jobs.find(job => job.id === id);
       if (!job) throw new Error('Job not found');
+      if (status === 'dismissed' && job.status !== 'dismissed') job.reviewStatusBeforeDismissal = ['new', 'interesting'].includes(job.status) ? job.status : 'new';
+      if (job.status === 'dismissed' && status !== 'dismissed') delete job.reviewStatusBeforeDismissal;
       job.status = status; job.reason = reason.trim();
       job.history.push({ status, reason: job.reason, at: new Date().toISOString() });
     });
@@ -146,9 +148,23 @@ export class Queue {
     return this.mutate(() => {
       const job = this.state.jobs.find(job => job.id === id);
       if (!job) throw new Error('Job not found');
+      const previousApplication = job.application;
+      const previousReview = previousApplication?.previousReview;
       const application = changeApplication(job.application, change);
-      if (application) job.application = application;
-      else delete job.application;
+      if (application) {
+        if (!previousApplication) {
+          application.previousReview = { status: job.status, reason: job.reason ?? '' };
+          job.status = 'interesting'; job.reason = '';
+          job.history.push({ status: 'interesting', reason: '', at: new Date().toISOString() });
+        }
+        job.application = application;
+      } else {
+        delete job.application;
+        if (previousReview && ['new', 'interesting', 'dismissed'].includes(previousReview.status)) {
+          job.status = previousReview.status; job.reason = previousReview.reason ?? '';
+          job.history.push({ status: job.status, reason: job.reason, at: new Date().toISOString() });
+        }
+      }
       return job.application ?? null;
     });
   }

@@ -10,7 +10,7 @@ Run `npm install`, then `npm start`. Open http://127.0.0.1:4317 in Chrome.
 
 - **Searches → Connect LinkedIn** opens Chrome for sign-in and learns LinkedIn's
   current request templates. Use Reconnect when the saved connection expires.
-- **Find opportunities** calls LinkedIn endpoints directly with that saved
+- **Find jobs** calls LinkedIn endpoints directly with that saved
   connection. It does not launch Chrome or fall back to a browser. Searches and
   missing descriptions are fetched sequentially, at most five details/search.
   Only complete jobs enter the UI.
@@ -21,7 +21,7 @@ Run `npm install`, then `npm start`. Open http://127.0.0.1:4317 in Chrome.
   available. **Pending** means a complete source still needs AI extraction.
 - **Interested** saves a decision; **Dismiss** saves a reason. Neither submits
   an application. Use the LinkedIn link to apply manually.
-- **Mark as applied** records a submission date. **Applications** groups active
+- **Applied** records a submission date. **Applications** groups active
   and closed processes; use **Update progress** for interview scheduling and
   outcomes. This tracker is manual, local, and never submits an application.
 
@@ -68,7 +68,7 @@ Raw responses live in unique run folders
 under .local/linkedin-captures; the latest manifest is data/linkedin-poc.json.
 The collector stops on security challenges/rate limiting. Failed runs retain
 completed captures and show a visible error. It does not guarantee exhaustive
-search coverage. Live offers, descriptions, classifications, reviews,
+search coverage. Live jobs, descriptions, classifications, reviews,
 application milestones and search history live in data/jobqueue.sqlite,
 excluded from Git. On first startup the
 app imports data/queue.json once, preserves it, and saves a private copy under

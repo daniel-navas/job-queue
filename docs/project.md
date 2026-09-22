@@ -23,14 +23,19 @@ infrastructure, or additional providers.
    information, or unmapped. The queue shows whether that evaluation is pending,
    needs information, or complete.
 5. Preserve reviews, reasons, availability history, source records, stable IDs
-   and original CVs. Manually closed offers leave active review tabs but remain
-   recoverable in All opportunities.
+   and original CVs. Manually closed jobs leave active review tabs but remain
+   recoverable in All jobs.
 6. Manage LinkedIn searches locally with per-offer historical criteria and
    measured capture results. Definitions and provenance identify their provider;
    review skills are provider-specific. Only LinkedIn is currently implemented.
 7. Track manually submitted applications, interviews, and outcomes separately
-   from review decisions and posting availability. Preserve progress through
+   from review decisions and LinkedIn availability. Preserve progress through
    rediscovery. No application is submitted by the tracker.
+
+The owner-facing vocabulary is intentionally small: `Jobs` are vacancies under
+review, `Applications` are tracked processes after applying, `Role` is the job
+title, and `Offer` is reserved for an employment offer received from a company.
+Do not use Opportunity, Posting, or Listing as competing UI names.
 
 Machine-readable preferences live in config/preferences.json; weights and
 recency bands in config/scoring.json; candidate facts in profile/matching.json.
