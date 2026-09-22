@@ -1,69 +1,70 @@
 # Active unmapped-tag proposal
 
 Date: 2026-09-22. Scope: all 56 pending fingerprints. Numbers remain stable
-until this proposal is applied or replaced. `Existing` reuses the catalog,
-`New` adds canonical entries, `Rewrite` preserves compound source meaning with
-explicit AND/OR mappings, and `Defer` keeps a real criterion outside the skill
-catalog until the correct structured field exists.
+until this proposal is applied or replaced. This is a **catalog review**: each
+row decides whether the extracted label already has a canonical tag, needs a
+new canonical tag or family, is too broad and must be split by the extractor,
+or belongs outside the catalog. Requirement alternatives/conjunctions are a
+separate extraction-quality TODO, not a catalog property.
 
-| # | Initial tag | Group | Action and final tag(s) | Why |
+| # | Initial tag | Catalog decision | Final catalog result | Why |
 |---:|---|---|---|---|
-| 1 | Advanced automation | Automation | Create `capability:workflow-automation` — Workflow automation | Concrete automation engineering, not generic process improvement. |
-| 2 | AI or automation integration | AI / automation | Map as OR: existing `ai-integration` or new `workflow-automation` | The offer explicitly accepts either route. |
-| 3 | AI technology applications | AI | Map to existing `capability:ai-integration` — AI integration | It describes applying AI inside products or workflows. |
-| 4 | AI-first solutions | AI | Map to existing `capability:ai-integration` — AI integration | AI-first product work is covered without inventing another synonym. |
-| 5 | AI, ML, or agent systems | AI | Map as OR: `ai-integration`, new `machine-learning`, or `ai-agents` | These are three valid but distinct ways to satisfy the criterion. |
-| 6 | Airline industry experience | Domain experience | Create `capability:airline-domain-experience` — Airline domain experience | Product tag would describe the job; this asks about candidate experience. |
-| 7 | API design and management | APIs | Split as AND: new `api-design` + new `api-lifecycle-management` | Designing APIs and governing their lifecycle are separate abilities. |
-| 8 | API design knowledge | APIs | Create/reuse new `capability:api-design` — API design | Specific conceptual API-design knowledge is missing from the catalog. |
-| 9 | API design principles | APIs | Assign to new `capability:api-design` — API design | Same canonical meaning as #8. |
-| 10 | API development | APIs | Create `capability:api-development` — API development | Building APIs is broader than the existing REST-only tag. |
-| 11 | API knowledge | APIs / architecture | Split as AND: `distributed` + new `api-design` + `cloud-native` | The source lists all three knowledge areas, not one umbrella skill. |
-| 12 | API orchestration | APIs | Assign to existing `capability:api-integration` — API integrations | Aggregating and transforming backend API data is API integration. |
-| 13 | Asynchronous workflows | Architecture / cloud | Split as AND: new `asynchronous-workflows` + `distributed` + new `cloud-infrastructure` | The source independently asks for all three. |
-| 14 | Azure networking | Cloud | Split as AND: existing `technology:azure` + new `capability:cloud-networking` | Azure familiarity alone does not prove networking knowledge. |
-| 15 | BFF or middleware integration | APIs | Assign to existing `capability:api-integration` — API integrations | BFF/middleware work is a concrete API-integration form. |
-| 16 | ClickHouse or Aurora | Database technologies | Map as OR: new `technology:clickhouse` or new `technology:amazon-aurora` | Named technologies should remain separate alternatives. |
-| 17 | Cloud infrastructure | Cloud | Create `capability:cloud-infrastructure` — Cloud infrastructure | Neither cloud-native applications nor IaC fully covers infrastructure work. |
-| 18 | Cloud service operations and optimization | Cloud | Create `capability:cloud-operations` — Cloud operations and optimization | Combines operating cloud services with explicit optimization responsibility. |
-| 19 | Consumer product shipping | Product experience | Create `capability:consumer-product-experience` — Consumer product experience | Candidate experience is distinct from a job’s `project:consumer` classification. |
-| 20 | Customer growth and provisioning | Growth / operations | Map as OR: `growth-engineering` or new `service-provisioning`; ignore “operational excellence” | Growth/onboarding and provisioning are concrete; the remaining phrase is vague. |
-| 21 | Data infrastructure knowledge | Data / distributed systems | Split as AND: `data-engineering` + `distributed` | Deep data-infrastructure knowledge does not replace distributed-systems knowledge. |
-| 22 | Data sourcing and integration | Data | Create `capability:data-integration` — Data integration | This is candidate integration work, not the existing product-domain tag. |
-| 23 | Data-driven applications or dashboards | Data | Map as OR: new `data-applications` or existing `data-visualization` | Preserve both the application and dashboard paths stated by the offer. |
-| 24 | Database engineering | Databases | Create `capability:database-engineering` — Database engineering | Do not infer the full discipline from one narrower DB skill. |
-| 25 | Database performance tradeoffs | Databases | Split as AND: existing `data-integrity` + `query-optimization` | The evidence explicitly requires integrity/transactions and performance tradeoffs. |
-| 26 | Design systems experience | Frontend architecture | Create `capability:design-systems` — Design systems | Shared component/design-library work is a reusable specialty. |
-| 27 | Developer platforms and tooling | Developer tooling | Create `capability:developer-platforms` — Developer platforms | Candidate platform experience is not the same as a developer-tools product tag. |
-| 28 | DevOps, CI/CD, or cloud infrastructure | Delivery / cloud | Map as OR: `devops`, `ci-cd`, or new `cloud-infrastructure`; ignore “systems engineering” | Three concrete alternatives remain; the last phrase is too broad. |
-| 29 | Energy sector experience | Domain experience | Create `capability:energy-domain-experience` — Energy domain experience | Separate candidate history from `project:energy-utilities`. |
-| 30 | FinOps and cloud cost optimization | Cloud economics | Create `capability:finops` — FinOps | This is a recognized, measurable cloud-cost specialty. |
-| 31 | High-traffic reliable systems | Reliability / scale | Split as AND: new `large-scale-systems` + new `high-availability` | High traffic and reliability are both explicit requirements. |
-| 32 | Highly available production systems | Reliability | Create `capability:high-availability` — High availability | More specific than merely operating production services. |
-| 33 | JSON and HTTP fundamentals | Web protocols | Create `capability:http-fundamentals` — HTTP fundamentals; keep JSON as context | HTTP/status-code knowledge is measurable; JSON alone does not need another tag. |
-| 34 | Large or distributed codebases | Engineering scale | Create `capability:large-codebase-experience` — Large codebase experience | A distributed codebase is not necessarily a distributed runtime system. |
-| 35 | Large-scale consumer products | Product / scale | Split as AND: new `large-scale-systems` + new `consumer-product-experience` | The source requires both scale and consumer-product context. |
-| 36 | Lending or related domain | Domain experience | Assign to existing `capability:financial` — Financial domain | Lending, banking and fintech are already covered by this canonical domain. |
-| 37 | MCP or agentic workflows | AI / developer tooling | Map as OR: `technology:mcp`, `ai-agents`, or new `developer-platforms` | Preserve the three alternatives instead of inventing one mixed tag. |
-| 38 | Micro-frontends | Frontend architecture | Create `capability:micro-frontends` — Micro-frontends | This is an architectural capability, not a framework. |
-| 39 | Modern web technologies | Frontend technologies | Map as OR: existing `javascript`, `typescript`, or `react` | The evidence names these concrete acceptable alternatives. |
-| 40 | OOP and design patterns | Software design | Create `capability:object-oriented-design` — Object-oriented design | Captures OOP plus design-pattern knowledge without tying it to a language. |
-| 41 | Other server-side language | Languages | Defer; keep unmapped for now | “Other” depends on the job’s primary language; a static family would create false matches. |
-| 42 | Platform reliability improvements | Reliability | Assign to new `capability:high-availability` — High availability | Reliability and uptime improvements share the canonical capability from #32. |
-| 43 | Production systems exposure | Production | Assign to existing `capability:production-operations` — Production operations | Operating live services is stronger evidence and safely satisfies exposure. |
-| 44 | PST timezone overlap | Work availability | Defer; move later to a timezone/availability field | It is a real constraint, but not a technology or capability. |
-| 45 | Python or data engineering exposure | Data / language | Map as OR: existing `technology:python` or `capability:data-engineering` | Either alternative explicitly satisfies the offer. |
-| 46 | Recommendation personalization or search | Search / recommendations | Map as OR: new `recommendation-systems`, `personalization`, or `search-engineering` | These specialties overlap but are not interchangeable profile facts. |
-| 47 | SABRE knowledge | Travel technology | Create `technology:sabre` — Sabre | A named industry platform belongs in technologies. |
-| 48 | Security standards | Security | Assign to existing `capability:secure-coding` — Secure coding | Secrets management and data protection fit application-security practice. |
-| 49 | Self-healing systems | Reliability | Create `capability:self-healing-systems` — Self-healing systems | More specific than general high availability or observability. |
-| 50 | Self-service onboarding platforms | Platforms / growth / automation | Map as OR: new `self-service-platforms`, `growth-engineering`, or new `workflow-automation` | The offer names three distinct acceptable product experiences. |
-| 51 | Software supply chain security | Security | Split as AND: existing `secure-coding` + new `software-supply-chain-security` | Secure coding does not by itself prove dependency/build-chain security. |
-| 52 | Software testing | Testing | Create `capability:software-testing` — Software testing | Broader than automated testing; the source does not limit the subtype. |
-| 53 | Technical debt management | Maintainability | Create `capability:technical-debt-management` — Technical debt management | Concrete engineering-planning capability, not generic clean-code rhetoric. |
-| 54 | Testing knowledge | Testing | Assign to new `software-testing` as conceptual knowledge; ignore generic design/debugging | Retain the specific measurable portion of the mixed sentence. |
-| 55 | VBA or PowerShell automation | Automation technologies | Map as OR: new `technology:vba` or new `technology:powershell` | Named technologies remain separate alternatives. |
-| 56 | Workflow automation solutions | Automation | Assign to new `capability:workflow-automation` — Workflow automation | Same canonical engineering capability introduced by #1. |
+| 1 | Advanced automation | Create canonical capability | `capability:workflow-automation` — Workflow automation | Concrete automation engineering, not generic process improvement. |
+| 2 | AI or automation integration | Split source phrase | Existing `ai-integration`; new `workflow-automation` | It names two catalog concepts, not one combined tag. |
+| 3 | AI technology applications | Reuse existing tag | `capability:ai-integration` — AI integration | Applying AI inside products/workflows fits the definition. |
+| 4 | AI-first solutions | Reuse existing tag | `capability:ai-integration` — AI integration | Do not create a second broad AI-product synonym. |
+| 5 | AI, ML, or agent systems | Split source phrase | `ai-integration`, new `machine-learning`, existing `ai-agents` | The umbrella contains distinct AI specialties. |
+| 6 | Airline industry experience | Create canonical capability | `capability:airline-domain-experience` — Airline domain experience | Candidate experience differs from a product-domain tag. |
+| 7 | API design and management | Split source phrase | New `api-design`; new `api-lifecycle-management` | Design and lifecycle governance are separate concepts. |
+| 8 | API design knowledge | Create canonical capability | `capability:api-design` — API design | Precise conceptual API-design knowledge is missing. |
+| 9 | API design principles | Reuse proposed tag | `capability:api-design` — API design | Same concept as #8. |
+| 10 | API development | Create canonical capability | `capability:api-development` — API development | Broader than the existing REST-specific capability. |
+| 11 | API knowledge | Reject umbrella; split extraction | Existing `distributed`, new `api-design`, existing `cloud-native` | The evidence lists independent concepts. |
+| 12 | API orchestration | Reuse existing tag | `capability:api-integration` — API integrations | Aggregating backend service data fits this tag. |
+| 13 | Asynchronous workflows | Split source phrase | New `asynchronous-workflows`, existing `distributed`, new `cloud-infrastructure` | The source combines three concepts. |
+| 14 | Azure networking | Split source phrase | Existing `technology:azure`; new `cloud-networking` | A platform and a networking capability are distinct. |
+| 15 | BFF or middleware integration | Reuse existing tag | `capability:api-integration` — API integrations | BFF/middleware is an API-integration form. |
+| 16 | ClickHouse or Aurora | Split into technologies | New `technology:clickhouse`; new `technology:amazon-aurora` | Named products must remain individual technologies. |
+| 17 | Cloud infrastructure | Create canonical capability | `capability:cloud-infrastructure` — Cloud infrastructure | Cloud-native apps and IaC do not cover it fully. |
+| 18 | Cloud service operations and optimization | Create canonical capability | `capability:cloud-operations` — Cloud operations and optimization | It is a specific operational responsibility. |
+| 19 | Consumer product shipping | Create canonical capability | `capability:consumer-product-experience` — Consumer product experience | Candidate history differs from product audience. |
+| 20 | Customer growth and provisioning | Split; ignore generic fragment | Existing `growth-engineering`; new `service-provisioning` | Ignore only “operational excellence”. |
+| 21 | Data infrastructure knowledge | Split source phrase | Existing `data-engineering`; existing `distributed` | Data infrastructure and distributed systems remain separate. |
+| 22 | Data sourcing and integration | Create canonical capability | `capability:data-integration` — Data integration | Candidate work, not the product-domain tag. |
+| 23 | Data-driven applications or dashboards | Split source phrase | New `data-applications`; existing `data-visualization` | Applications and dashboards are distinct valid concepts. |
+| 24 | Database engineering | Create canonical capability | `capability:database-engineering` — Database engineering | Do not infer the discipline from a narrow DB skill. |
+| 25 | Database performance tradeoffs | Split source phrase | Existing `data-integrity`; existing `query-optimization` | Integrity and performance are separately concrete. |
+| 26 | Design systems experience | Create canonical capability | `capability:design-systems` — Design systems | Reusable UI-system work is a specialty. |
+| 27 | Developer platforms and tooling | Create canonical capability | `capability:developer-platforms` — Developer platforms | Candidate platform work differs from project classification. |
+| 28 | DevOps, CI/CD, or cloud infrastructure | Split; ignore generic fragment | Existing `devops`, `ci-cd`; new `cloud-infrastructure` | Ignore only vague “systems engineering”. |
+| 29 | Energy sector experience | Create canonical capability | `capability:energy-domain-experience` — Energy domain experience | Candidate history differs from `project:energy-utilities`. |
+| 30 | FinOps and cloud cost optimization | Create canonical capability | `capability:finops` — FinOps | Measurable cloud-cost specialty. |
+| 31 | High-traffic reliable systems | Split source phrase | New `large-scale-systems`; new `high-availability` | Scale and reliability are different capabilities. |
+| 32 | Highly available production systems | Create canonical capability | `capability:high-availability` — High availability | More specific than production operations. |
+| 33 | JSON and HTTP fundamentals | Create canonical capability | `capability:http-fundamentals` — HTTP fundamentals | JSON stays supporting context, not a separate tag. |
+| 34 | Large or distributed codebases | Create canonical capability | `capability:large-codebase-experience` — Large codebase experience | Codebase scale is not runtime distribution. |
+| 35 | Large-scale consumer products | Split source phrase | New `large-scale-systems`; new `consumer-product-experience` | Scale and consumer experience are separate. |
+| 36 | Lending or related domain | Reuse existing tag | `capability:financial` — Financial domain | Lending/banking/fintech are already covered. |
+| 37 | MCP or agentic workflows | Split source phrase | Existing `technology:mcp`, `ai-agents`; new `developer-platforms` | These are separate technologies/capabilities. |
+| 38 | Micro-frontends | Create canonical capability | `capability:micro-frontends` — Micro-frontends | Architectural capability, not a framework. |
+| 39 | Modern web technologies | Split into technologies | Existing `javascript`, `typescript`, `react` | The source already names concrete technologies. |
+| 40 | OOP and design patterns | Create canonical capability | `capability:object-oriented-design` — Object-oriented design | Language-independent software-design knowledge. |
+| 41 | Other server-side language | Defer outside current catalog | No catalog change | “Other” depends on the job’s primary language. |
+| 42 | Platform reliability improvements | Reuse proposed tag | `capability:high-availability` — High availability | Reliability/uptime work shares #32's concept. |
+| 43 | Production systems exposure | Reuse existing tag | `capability:production-operations` — Production operations | A stronger existing concept covers exposure. |
+| 44 | PST timezone overlap | Defer outside skill catalog | Future availability/time-zone field | Real requirement, but not a technology/capability. |
+| 45 | Python or data engineering exposure | Split source phrase | Existing `technology:python`; existing `data-engineering` | Language and data capability remain distinct. |
+| 46 | Recommendation personalization or search | Split source phrase | New `recommendation-systems`, `personalization`, `search-engineering` | Related specialties are not interchangeable facts. |
+| 47 | SABRE knowledge | Create canonical technology | `technology:sabre` — Sabre | Named travel-industry platform. |
+| 48 | Security standards | Reuse existing tag | `capability:secure-coding` — Secure coding | Secrets and data protection fit the definition. |
+| 49 | Self-healing systems | Create canonical capability | `capability:self-healing-systems` — Self-healing systems | More specific than reliability or observability. |
+| 50 | Self-service onboarding platforms | Split source phrase | New `self-service-platforms`, existing `growth-engineering`, new `workflow-automation` | It names distinct product-work concepts. |
+| 51 | Software supply chain security | Split source phrase | Existing `secure-coding`; new `software-supply-chain-security` | Application security differs from build/dependency security. |
+| 52 | Software testing | Create canonical capability | `capability:software-testing` — Software testing | Broader than automated testing. |
+| 53 | Technical debt management | Create canonical capability | `capability:technical-debt-management` — Technical debt management | Concrete planning/maintainability capability. |
+| 54 | Testing knowledge | Reuse proposed tag; ignore generic fragments | `capability:software-testing` — Software testing | Keep testing; ignore generic design/debugging. |
+| 55 | VBA or PowerShell automation | Split into technologies | New `technology:vba`; new `technology:powershell` | Named technologies stay separate. |
+| 56 | Workflow automation solutions | Reuse proposed tag | `capability:workflow-automation` — Workflow automation | Same concept as #1. |
 
 ## Practical meaning
 

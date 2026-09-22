@@ -46,6 +46,8 @@ architecture, or dependency until the product need justifies it.
 - Distinguish observed facts, inferences, decisions, and unresolved questions.
 - Never claim that behavior was verified when it was not.
 - Verify changes in proportion to their risk and report the evidence.
+- After every commit, push, or explicit remote synchronization, report the
+  current items in `docs/todos.md` in a concise, practical form.
 
 ## Durable Project Memory
 
