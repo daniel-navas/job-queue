@@ -23,7 +23,9 @@ Run `npm install`, then `npm start`. Open http://127.0.0.1:4317 in Chrome.
   an application. Use the LinkedIn link to apply manually.
 - **Applied** records a submission date. **Applications** groups active
   and closed processes; use **Update progress** for interview scheduling and
-  outcomes. This tracker is manual, local, and never submits an application.
+  outcomes. If application tracking was accidental, **Not applied** is
+  available before any later milestone and restores the job's prior review
+  decision. This tracker is manual, local, and never submits an application.
 
 AI requires the existing signed-in Codex CLI. The worker uses an ephemeral
 read-only run without this conversation, project files, or candidate profile.

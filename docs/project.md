@@ -30,7 +30,9 @@ infrastructure, or additional providers.
    review skills are provider-specific. Only LinkedIn is currently implemented.
 7. Track manually submitted applications, interviews, and outcomes separately
    from review decisions and LinkedIn availability. Preserve progress through
-   rediscovery. No application is submitted by the tracker.
+   rediscovery. Applying records a local date and implies `Interested`;
+   correcting an accidental application before later milestones restores the
+   exact prior review decision. No application is submitted by the tracker.
 
 The owner-facing vocabulary is intentionally small: `Jobs` are vacancies under
 review, `Applications` are tracked processes after applying, `Role` is the job
