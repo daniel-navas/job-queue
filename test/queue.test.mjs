@@ -110,7 +110,7 @@ test('run imports attribute only observed results, preserve rediscoveries, and a
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
-test('legacy migration preserves ordered records and metadata exactly, backed up and imported once', async () => {
+test('legacy migration preserves ordered records and metadata while backfilling tracker state', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'jq-sqlite-migrate-'));
   try {
     await mkdir(path.join(root, 'data'));
@@ -121,14 +121,16 @@ test('legacy migration preserves ordered records and metadata exactly, backed up
     const legacy = JSON.stringify(original, null, 2) + '\n';
     await writeFile(path.join(root, 'data/queue.json'), legacy);
     const queue = new Queue(root); await queue.load();
-    assert.deepEqual(queue.state, original);
-    assert.deepEqual(await readStoredJobs(root), original.jobs);
+    const normalized = structuredClone(original);
+    normalized.jobs[1].reviewStatusBeforeDismissal = 'new';
+    assert.deepEqual(queue.state, normalized);
+    assert.deepEqual(await readStoredJobs(root), normalized.jobs);
     const backups = await readdir(path.join(root, 'data/backups'));
     assert.equal(backups.length, 1);
     assert.equal(await readFile(path.join(root, 'data/backups', backups[0]), 'utf8'), legacy);
     await writeFile(path.join(root, 'data/queue.json'), JSON.stringify({ jobs: [{ id: 'stale' }] }));
     const restored = new Queue(root); await restored.load();
-    assert.deepEqual(restored.state, original);
+    assert.deepEqual(restored.state, normalized);
     assert.deepEqual(restored.state, queue.state);
     assert.equal((await readdir(path.join(root, 'data/backups'))).length, 1);
   } finally { await rm(root, { recursive: true, force: true }); }

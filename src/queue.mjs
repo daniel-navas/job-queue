@@ -6,6 +6,34 @@ import { changeApplication } from './application-tracker.mjs';
 export { backupQueue, readStoredJobs } from './queue-storage.mjs';
 
 const text = value => (typeof value === 'string' ? value : value?.text)?.trim() || null;
+const reviewStatuses = ['new', 'interesting', 'dismissed'];
+
+function reviewBeforeDismissal(job) {
+  const history = job.history ?? [];
+  for (let index = history.length - 1; index >= 0; index -= 1) {
+    const status = history[index]?.status;
+    if (status === 'new' || status === 'interesting') return status;
+  }
+  return 'new';
+}
+
+function normalizeTrackerState(job) {
+  let changed = false;
+  if (job.status === 'dismissed' && !['new', 'interesting'].includes(job.reviewStatusBeforeDismissal)) {
+    job.reviewStatusBeforeDismissal = reviewBeforeDismissal(job);
+    changed = true;
+  }
+  if (job.application && !job.application.previousReview) {
+    job.application.previousReview = { status: reviewStatuses.includes(job.status) ? job.status : 'new', reason: job.reason ?? '' };
+    if (job.status !== 'interesting' || job.reason) {
+      job.status = 'interesting';
+      job.reason = '';
+      (job.history ??= []).push({ status: 'interesting', reason: '', at: new Date().toISOString() });
+    }
+    changed = true;
+  }
+  return changed;
+}
 
 export function normalizeCaptures(payloads, metadata = []) {
   // Legacy search-card metadata can hydrate a detail-only response. Never seed
@@ -54,6 +82,9 @@ export class Queue {
   async load() {
     const db = await openStorage(this.root, this.state);
     try { this.state = storageState(db); } finally { db.close(); }
+    if (this.state.jobs.some(job => normalizeTrackerState(structuredClone(job)))) {
+      await this.mutate(() => { for (const job of this.state.jobs) normalizeTrackerState(job); });
+    }
   }
   async save() {
     const db = await openStorage(this.root, this.state);
@@ -128,6 +159,7 @@ export class Queue {
     return this.mutate(() => {
       const job = this.state.jobs.find(job => job.id === id);
       if (!job) throw new Error('Job not found');
+      if (job.application && status !== 'interesting') throw new Error('Applied jobs must remain interested');
       if (status === 'dismissed' && job.status !== 'dismissed') job.reviewStatusBeforeDismissal = ['new', 'interesting'].includes(job.status) ? job.status : 'new';
       if (job.status === 'dismissed' && status !== 'dismissed') delete job.reviewStatusBeforeDismissal;
       job.status = status; job.reason = reason.trim();

@@ -25,7 +25,7 @@ infrastructure, or additional providers.
 5. Preserve reviews, reasons, availability history, source records, stable IDs
    and original CVs. Manually closed jobs leave active review tabs but remain
    recoverable in All jobs.
-6. Manage LinkedIn searches locally with per-offer historical criteria and
+6. Manage LinkedIn searches locally with per-job historical criteria and
    measured capture results. Definitions and provenance identify their provider;
    review skills are provider-specific. Only LinkedIn is currently implemented.
 7. Track manually submitted applications, interviews, and outcomes separately
@@ -63,14 +63,14 @@ The extraction/matching boundary is recorded in decision 0002.
   least intensive already-paid option that meets source-reviewed extraction
   quality; test settings on a bounded sample before changing them.
 - Ask up to two focused profile questions per response, ordered by processed
-  offer score from highest to lowest. Prioritize incomplete matches and audit
+  job score from highest to lowest. Prioritize incomplete matches and audit
   apparent matches for false positives. Collect only practical duration,
   current autonomy, and last-used year for a technology or measurable capability.
 - For conceptual-knowledge questions, do not ask for artificial years of use.
   Give concise, practical examples of basic, intermediate, and advanced so the
   owner can calibrate the level consistently.
 - Source quotations prove provenance, not perfect AI interpretation. Extraction
-  errors must be fixed generically, not with hidden per-offer score exceptions.
+  errors must be fixed generically, not with hidden per-job score exceptions.
 - Keep the verified GitHub remote (`origin/main`) synchronized after coherent
   local changes. Inspect the diff before committing and do not publish
   unrelated changes from another workstream without reviewing them.
@@ -86,7 +86,7 @@ reading full LinkedIn descriptions during an actual job-search trial.
 
 The owner may request cover letters or application-form answers in chat by JQ
 reference. The repo-scoped `assist-job-application` skill uses the full saved
-offer, confirmed profile facts, owner-approved voice examples, and optional
+job, confirmed profile facts, owner-approved voice examples, and optional
 public company research. Only owner-approved final text and reusable feedback
 are saved under private `.local/`. The owner reviews and submits manually; this
 does not itself update the tracker or generate queue scores.

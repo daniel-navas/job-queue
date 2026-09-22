@@ -43,6 +43,64 @@ test('undoing dismissal restores the review decision that preceded it', async ()
   } finally { await rm(root, { recursive: true, force: true }); }
 });
 
+test('loading a legacy dismissal recovers its preceding review decision from history', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'jq-legacy-dismissal-'));
+  try {
+    const queue = new Queue(root);
+    queue.state.jobs = [{ id: 'one', status: 'dismissed', reason: 'Not a fit', history: [
+      { status: 'interesting', reason: '', at: '2026-09-20T12:00:00.000Z' },
+      { status: 'dismissed', reason: 'Not a fit', at: '2026-09-21T12:00:00.000Z' },
+    ] }];
+    await queue.save();
+
+    const restored = new Queue(root);
+    await restored.load();
+    assert.equal(restored.state.jobs[0].reviewStatusBeforeDismissal, 'interesting');
+    await restored.review('one', 'interesting', '');
+    assert.equal(restored.state.jobs[0].status, 'interesting');
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
+test('loading legacy applications enforces interest and preserves the review state for correction', async () => {
+  for (const original of [
+    { status: 'new', reason: '' },
+    { status: 'interesting', reason: '' },
+    { status: 'dismissed', reason: 'Wrong location' },
+  ]) {
+    const root = await mkdtemp(path.join(os.tmpdir(), 'jq-legacy-application-'));
+    try {
+      const queue = new Queue(root);
+      queue.state.jobs = [{ id: 'one', ...original, history: [], application: {
+        submission: { id: 'legacy', date: '2026-09-20', source: 'manual', createdAt: '2026-09-20T12:00:00.000Z' },
+        events: [],
+      } }];
+      await queue.save();
+
+      const restored = new Queue(root);
+      await restored.load();
+      assert.equal(restored.state.jobs[0].status, 'interesting');
+      assert.deepEqual(restored.state.jobs[0].application.previousReview, original);
+      await restored.updateApplication('one', { type: 'update-submission', date: '2026-09-21' });
+      await restored.updateApplication('one', { type: 'undo-submit' });
+      assert.equal(restored.state.jobs[0].status, original.status);
+      assert.equal(restored.state.jobs[0].reason, original.reason);
+    } finally { await rm(root, { recursive: true, force: true }); }
+  }
+});
+
+test('applied jobs cannot be reviewed as new or dismissed', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'jq-applied-review-'));
+  try {
+    const queue = new Queue(root);
+    queue.state.jobs = [{ id: 'one', status: 'new', reason: '', history: [] }];
+    await queue.save();
+    await queue.updateApplication('one', { type: 'submit', date: '2026-09-21' });
+    await assert.rejects(queue.review('one', 'new', ''), /Applied jobs/);
+    await assert.rejects(queue.review('one', 'dismissed', 'Not a fit'), /Applied jobs/);
+    assert.equal(queue.state.jobs[0].status, 'interesting');
+  } finally { await rm(root, { recursive: true, force: true }); }
+});
+
 test('submission persists independently of review and rediscovery', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'jq-application-'));
   try {

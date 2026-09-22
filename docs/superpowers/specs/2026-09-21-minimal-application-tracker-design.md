@@ -93,6 +93,12 @@ application object and must not be inferred as applied from `Interesting` or
 other review history. The public JQ reference is display-only; persistence
 uses the stable source ID.
 
+When loading records created before this behavior existed, preserve the live
+review decision as the correction target, normalize every applied job to
+`Interested`, and recover a dismissed job's preceding decision from review
+history. While an application exists, no API or domain path may change the
+review decision away from `Interested`.
+
 ## Failure and correction behavior
 
 Invalid or conflicting updates return a visible error and leave the stored
@@ -120,7 +126,7 @@ alter unrelated queue fields. Notes are plain text and escaped for display.
 
 Run `npm test` and the isolated desktop UI/API scenarios in
 `node scripts/searches-check.mjs`, extending their synthetic fixtures for the
-tracker. Do not write to the owner's live queue or process real offers to
+tracker. Do not write to the owner's live queue or process real jobs to
 verify this feature. Report what was and was not verified.
 
 ## Later, deliberately open

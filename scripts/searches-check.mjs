@@ -36,7 +36,7 @@ try {
   const card = emptyCard({ id: source.id, roleFocus: { value: 'backend', evidence: 'Backend.' }, workplaceMode: { value: 'remote', evidence: 'Remote in Colombia.' }, requirements: [
     requirement('professional', { kind: 'experience', minMonths: 36, maxMonths: 84, evidence: '3-7 years.' }),
   ] });
-  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation offer', discoveries: [], description: 'Node.js. Kubernetes. Unusual platform certification. Go. React.' };
+  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation job', discoveries: [], description: 'Node.js. Kubernetes. Unusual platform certification. Go. React.' };
   const mixedCard = emptyCard({ id: mixedSource.id,
     requirements: [
       requirement('node.js', { evidence: 'Node.js.' }),
@@ -53,8 +53,8 @@ try {
   });
   const jobs = [
     { ...source, summary: { fields: card, version: summaryVersion, inputHash: fingerprint(source) } },
-    { ...source, id: '101', title: 'Pending offer' },
-    { ...source, id: '102', title: 'Legacy offer', discoveries: undefined, searchUrl: 'https://www.linkedin.com/jobs/search/?keywords=old&location=Colombia' },
+    { ...source, id: '101', title: 'Pending job' },
+    { ...source, id: '102', title: 'Legacy job', discoveries: undefined, searchUrl: 'https://www.linkedin.com/jobs/search/?keywords=old&location=Colombia' },
     { ...mixedSource, summary: { fields: mixedCard, version: summaryVersion, inputHash: fingerprint(mixedSource) } },
   ];
   await writeFile(path.join(root, 'data/queue.json'), JSON.stringify({ jobs }));
@@ -99,7 +99,7 @@ try {
   assert.ok(await page.getByText('Complete', { exact: true }).count());
   assert.ok(await page.getByText('Pending analysis', { exact: true }).count());
   assert.ok(await page.getByText('Needs info · 6/8', { exact: true }).count());
-  await page.getByRole('button', { name: /Mixed evaluation offer/ }).click();
+  await page.getByRole('button', { name: /Mixed evaluation job/ }).click();
   assert.equal(await page.locator('#detail .evaluation-summary').count(), 0);
   await page.getByText(/Compiled languages · Independent/).waitFor();
   const compiledTooltip = await page.getByLabel(/Compiled languages: Required non-match/).getAttribute('title');
@@ -145,9 +145,6 @@ try {
   await page.getByRole('button', { name: 'Interesting', exact: false }).click();
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   assert.equal(await page.getByRole('button', { name: 'Interested', exact: true }).getAttribute('aria-pressed'), 'true');
-  await page.getByRole('button', { name: 'Interested', exact: true }).click();
-  await page.getByRole('button', { name: 'New', exact: false }).click();
-  await page.getByRole('button', { name: /Backend Engineer/ }).click();
   await page.getByRole('button', { name: 'Dismiss', exact: true }).click();
   await page.locator('#reason').fill('Not a fit');
   await page.getByRole('button', { name: 'Dismiss job', exact: true }).click();
@@ -155,6 +152,10 @@ try {
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   assert.equal(await page.getByRole('button', { name: 'Dismissed', exact: true }).getAttribute('aria-pressed'), 'true');
   await page.getByRole('button', { name: 'Dismissed', exact: true }).click();
+  await page.getByRole('button', { name: 'Interesting', exact: false }).click();
+  await page.getByRole('button', { name: /Backend Engineer/ }).click();
+  assert.equal(await page.getByRole('button', { name: 'Interested', exact: true }).getAttribute('aria-pressed'), 'true');
+  await page.getByRole('button', { name: 'Interested', exact: true }).click();
   await page.getByRole('button', { name: 'New', exact: false }).click();
   await page.locator('.search-origin summary').click(); await page.getByText('First found 2026-09-14 · Last seen 2026-09-14').waitFor();
   await page.getByRole('button', { name: 'Searches', exact: true }).click();
@@ -216,6 +217,7 @@ try {
   delete jobsWithoutAvailability[0].availability;
   delete jobsWithoutAvailability[0].availabilityHistory;
   const originalJobs = JSON.parse(queueBefore).jobs;
+  assert.deepEqual(jobsWithoutAvailability[0].history.map(entry => entry.status), ['interesting', 'dismissed', 'interesting', 'new']);
   jobsWithoutAvailability[0].history = originalJobs[0].history;
   delete jobsWithoutAvailability[0].reason;
   assert.deepEqual(jobsWithoutAvailability, originalJobs);
@@ -297,11 +299,11 @@ try {
   assert.equal((await readStoredJobs(root)).find(job => job.id === '100').application.events.length, 4);
   const dstPage = await browser.newPage({ viewport: { width: 1440, height: 900 }, timezoneId: 'America/New_York' });
   await dstPage.goto(base);
-  await dstPage.getByRole('button', { name: /Pending offer/ }).click();
+  await dstPage.getByRole('button', { name: /Pending job/ }).click();
   await dstPage.getByRole('button', { name: 'Applied', exact: true }).click();
   await dstPage.getByRole('button', { name: 'Save application', exact: true }).click();
   await dstPage.getByRole('button', { name: 'Applications', exact: true }).click();
-  await dstPage.getByRole('button', { name: /Pending offer/ }).click();
+  await dstPage.getByRole('button', { name: /Pending job/ }).click();
   await dstPage.getByRole('button', { name: 'Update progress', exact: true }).click();
   await dstPage.locator('#interview-name').fill('DST check');
   await dstPage.locator('#interview-state').selectOption('scheduled');
