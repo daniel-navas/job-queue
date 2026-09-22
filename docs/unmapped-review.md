@@ -39,14 +39,18 @@ is used, so merely reaching the threshold consumes no Codex usage.
    exclude a non-differentiating criterion, or keep it unmapped until there is
    enough evidence. Do not interrupt the cycle for item-by-item approval.
    When an unmapped source label is unconditionally the same meaning as an
-   existing canonical tag, record it as a reviewed alias and add a tested local
-   normalizer so the same wording resolves in current and future extractions.
-   Do not add speculative aliases merely because they might be useful.
+   existing canonical tag, record it as a reviewed alias. The compact catalog
+   supplied to the AI must include that alias so it can choose the canonical key
+   from the source context in future extractions. Do not add speculative aliases
+   merely because they might be useful, and do not automatically rewrite an
+   extraction merely because its raw text contains an alias.
 4. Present one compact, stably numbered proposal covering every candidate. The
    owner can identify objections by number. Do not apply semantic catalog or
    profile decisions until that batch-level objection window is complete.
 5. Record approved decisions in `config/unmapped-review.json`, update the
-   catalog/normalizer/profile as appropriate, and add boundary regression tests.
+   catalog/extraction prompt/profile as appropriate, and add boundary regression
+   tests. Apply an approved mapping to the reviewed stored criterion explicitly;
+   the presence of an alias alone never authorizes a raw-text reassignment.
    An alias needs evidence of unconditional semantic equivalence; a narrower or
    context-dependent phrase remains a source example rather than an alias.
    Decisions must be generic and source-based, never per-offer exceptions.
