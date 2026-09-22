@@ -24,7 +24,9 @@ Keep the desktop two-pane layout. Add `Applications` as a peer of
 tabs remain review decisions. `Interested` does not imply applied. A job can
 be marked applied even if its AI analysis is pending or its LinkedIn posting
 is now closed. Posting availability, review decision, and application progress
-remain independent.
+remain independent. A tracked job leaves the `New` and `Interesting` review
+tabs so active decisions stay focused; it remains in `All opportunities` with
+its current application stage and in `Applications`.
 
 The `Applications` list contains tracked jobs only. Active processes come
 first; ended processes remain accessible in a compact `Closed` filter. Each
@@ -102,7 +104,8 @@ alter unrelated queue fields. Notes are plain text and escaped for display.
 ## Verification for the first release
 
 - A job can be marked applied and appears in `Applications` after restart.
-- `Interesting`, `Dismissed`, and posting availability stay unchanged.
+- Its review decision and posting availability stay unchanged, while its card
+  leaves `New`/`Interesting` and remains recoverable in `All opportunities`.
 - Scheduling, rescheduling, completing, and adding another interview produce
   the correct next-action line and timeline.
 - Ended processes leave the active list, remain recoverable, and can reopen.

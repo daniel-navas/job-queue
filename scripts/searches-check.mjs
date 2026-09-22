@@ -224,6 +224,12 @@ try {
   await page.getByRole('button', { name: 'Mark as applied', exact: true }).click();
   await page.locator('#application-date').fill('2026-09-21');
   await page.getByRole('button', { name: 'Save application', exact: true }).click();
+  await page.waitForFunction(() => document.querySelector('#tabs [data-tab="new"]')?.textContent === 'New 3');
+  assert.equal(await page.getByRole('button', { name: 'New', exact: false }).innerText(), 'New 3');
+  assert.equal(await page.getByRole('button', { name: /Backend Engineer/ }).count(), 0);
+  await page.getByRole('button', { name: 'All opportunities', exact: false }).click();
+  await page.getByRole('button', { name: /Backend Engineer/ }).click();
+  await page.getByText('Applied', { exact: true }).waitFor();
   await page.getByRole('button', { name: 'Applications', exact: true }).click();
   await page.locator('#detail').getByText('Waiting for response', { exact: true }).waitFor();
   await page.getByRole('button', { name: 'Update progress', exact: true }).click();
