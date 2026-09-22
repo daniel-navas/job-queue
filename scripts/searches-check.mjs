@@ -240,8 +240,15 @@ try {
   assert.equal(await page.locator('header #run-status').count(), 1);
   assert.equal((await page.locator('header').boundingBox()).height, headerHeight);
   // Tracker UI and API use only this temporary queue; no real application is changed.
+  const workspaceNav = page.locator('#views');
+  const brand = page.locator('header > strong');
+  const jobNavBounds = await workspaceNav.boundingBox();
+  const brandBounds = await brand.boundingBox();
+  assert.ok(jobNavBounds.x - (brandBounds.x + brandBounds.width) < 32, 'the workspace switcher stays next to JobQueue');
   await page.getByRole('button', { name: 'Applications', exact: true }).click();
   await page.getByText('No applications yet', { exact: true }).waitFor();
+  const applicationNavBounds = await workspaceNav.boundingBox();
+  assert.ok(Math.abs(applicationNavBounds.x - jobNavBounds.x) < 1, 'the workspace switcher stays in the same place in Applications');
   await page.getByRole('button', { name: 'Jobs', exact: true }).click();
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   await page.getByRole('button', { name: 'Applied', exact: true }).click();

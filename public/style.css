@@ -17,7 +17,7 @@ header{height:46px}header button{padding:7px 10px}.toolbar{margin-top:5px;paddin
 /* Desktop layout only; small-device browsers scale the 1024px viewport. */
 body{min-width:1024px}
 .search-copy strong{overflow-wrap:anywhere}
-header{gap:18px}header>strong,header>.actions{flex:none}header #run-status{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;margin:0}#scan .spinner{border-color:#215c4944;border-top-color:#215c49}
+header{justify-content:flex-start;gap:18px}header>strong,header>.actions{flex:none}header>.actions{margin-left:auto}header #run-status{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;margin:0}#scan .spinner{border-color:#215c4944;border-top-color:#215c49}
 
 /* Application tracking reuses the existing two-pane workspace. */
 #views{display:flex;gap:3px;flex:none}#views button{border:0;background:transparent;padding:8px 10px;font-size:12px;color:#69766f}#views button[aria-pressed="true"]{background:#e6efe9;color:#236049;font-weight:600}
