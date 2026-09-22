@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { readFile, writeFile, mkdtemp, rm } from 'node:fs/promises';
+import { constants } from 'node:fs';
+import { readFile, writeFile, mkdtemp, rm, access } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { fields, schema, validateShape, displayFields } from './facts.mjs';
@@ -112,7 +113,17 @@ export function discardUnsupportedFacts(result, jobs) {
   return result;
 }
 
+export async function resolveCodexExecutable(env = process.env, bundled = process.platform === 'darwin' ? ['/Applications/ChatGPT.app/Contents/Resources/codex'] : []) {
+  if (env.CODEX_BIN) return env.CODEX_BIN;
+  for (const candidate of [...(env.PATH || '').split(path.delimiter).filter(Boolean).map(directory => path.join(directory, 'codex')), ...bundled]) {
+    try { await access(candidate, constants.X_OK); return candidate; }
+    catch (error) { if (!['ENOENT', 'EACCES', 'ENOTDIR'].includes(error.code)) throw error; }
+  }
+  throw new Error('Codex executable not found. Install the Codex CLI or set CODEX_BIN to its executable path.');
+}
+
 export async function runCodex(jobs, prompt, root) {
+  const executable = await resolveCodexExecutable();
   const directory = await mkdtemp(path.join(os.tmpdir(), 'jobqueue-ai-'));
   try {
     const schemaPath = path.join(directory, 'schema.json');
@@ -122,7 +133,7 @@ export async function runCodex(jobs, prompt, root) {
     // Pin the source-reviewed classifier configuration. Require subscription auth, never API fallback.
     const env = { ...process.env }; delete env.OPENAI_API_KEY; delete env.CODEX_API_KEY;
     const usage = await new Promise((resolve, reject) => {
-      const child = spawn(process.env.CODEX_BIN || 'codex', ['exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method="chatgpt"', '-m', 'gpt-5.6-terra', '-c', 'model_reasoning_effort="medium"', '--output-schema', schemaPath, '--output-last-message', outputPath, '--json', '-'], { cwd: directory, env, stdio: ['pipe', 'pipe', 'pipe'] });
+      const child = spawn(executable, ['exec', '--ignore-user-config', '--ephemeral', '--skip-git-repo-check', '--sandbox', 'read-only', '-c', 'forced_login_method="chatgpt"', '-m', 'gpt-5.6-terra', '-c', 'model_reasoning_effort="medium"', '--output-schema', schemaPath, '--output-last-message', outputPath, '--json', '-'], { cwd: directory, env, stdio: ['pipe', 'pipe', 'pipe'] });
       let buffer = '', stderr = '', tokens = null, timedOut = false;
       const timer = setTimeout(() => { timedOut = true; child.kill('SIGTERM'); }, 180000);
       child.stdout.on('data', chunk => {

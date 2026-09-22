@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { emptyCard, requirement } from '../test-support/fixtures.mjs';
 import { decodeExtraction, wireSchema } from '../src/extraction-wire.mjs';
 import { validateShape } from '../src/facts.mjs';
-import { runCodex } from '../src/summarize.mjs';
+import * as summarizer from '../src/summarize.mjs';
+const { runCodex } = summarizer;
 import { mkdtemp, writeFile, chmod, rm } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -81,6 +82,20 @@ console.log(JSON.stringify({ type: 'turn.completed', usage: { input_tokens: 10, 
   } finally {
     if (previous === undefined) delete process.env.CODEX_BIN;
     else process.env.CODEX_BIN = previous;
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test('runner locates bundled Codex when the server PATH has no Codex command', async () => {
+  const directory = await mkdtemp(path.join(os.tmpdir(), 'jq-codex-path-test-'));
+  try {
+    const bundled = path.join(directory, 'codex');
+    await writeFile(bundled, '#!/bin/sh\nexit 0\n');
+    await chmod(bundled, 0o700);
+    assert.equal(typeof summarizer.resolveCodexExecutable, 'function');
+    assert.equal(await summarizer.resolveCodexExecutable({ PATH: directory + '/empty' }, [bundled]), bundled);
+    assert.equal(await summarizer.resolveCodexExecutable({ CODEX_BIN: bundled, PATH: '' }, []), bundled);
+  } finally {
     await rm(directory, { recursive: true, force: true });
   }
 });
