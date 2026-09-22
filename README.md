@@ -1,7 +1,8 @@
 # JobQueue
 
 Personal, local LinkedIn job tracker: complete source capture → structured AI
-extraction → deterministic matching and ranking → manual review/application.
+extraction → deterministic matching and ranking → manual review and application
+tracking.
 
 ## Use
 
@@ -20,6 +21,9 @@ Run `npm install`, then `npm start`. Open http://127.0.0.1:4317 in Chrome.
   available. **Pending** means a complete source still needs AI extraction.
 - **Interested** saves a decision; **Dismiss** saves a reason. Neither submits
   an application. Use the LinkedIn link to apply manually.
+- **Mark as applied** records a submission date. **Applications** groups active
+  and closed processes; use **Update progress** for interview scheduling and
+  outcomes. This tracker is manual, local, and never submits an application.
 
 AI requires the existing signed-in Codex CLI. The worker uses an ephemeral
 read-only run without this conversation, project files, or candidate profile.
@@ -64,8 +68,9 @@ Raw responses live in unique run folders
 under .local/linkedin-captures; the latest manifest is data/linkedin-poc.json.
 The collector stops on security challenges/rate limiting. Failed runs retain
 completed captures and show a visible error. It does not guarantee exhaustive
-search coverage. Live offers, descriptions, classifications, reviews and search
-history live in data/jobqueue.sqlite, excluded from Git. On first startup the
+search coverage. Live offers, descriptions, classifications, reviews,
+application milestones and search history live in data/jobqueue.sqlite,
+excluded from Git. On first startup the
 app imports data/queue.json once, preserves it, and saves a private copy under
 data/backups. Later edits to that legacy JSON do not modify the live queue.
 Use `node scripts/backup-queue.mjs` for a database snapshot. Restore instructions

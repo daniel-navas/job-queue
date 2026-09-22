@@ -2,13 +2,24 @@ import { compareJobs, workplaceMode, roleFocus } from '/rating.js';
 import { initSearches, provenanceHTML } from '/searches.js';
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-let data = { jobs: [] }, active = 'new', selected, rejecting;
+let data = { jobs: [] }, active = 'new', selected, rejecting, view = 'opportunities', applicationFilter = 'active', editingEvent = null;
 let discoveryFilter = null;
 const labels = { new: 'New', interesting: 'Interesting', dismissed: 'Dismissed', all: 'All opportunities' };
 async function api(url, body) { const response = await fetch(url, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}); const result = await response.json(); if (!response.ok) throw new Error(result.error); return result; }
 function error(err) { $('#error').textContent = err.message; }
 async function refresh() { data = await api('/api/jobs'); render(); }
 function render() {
+  const tracking = view === 'applications';
+  for (const button of document.querySelectorAll('#views [data-view]')) button.setAttribute('aria-pressed', String(button.dataset.view === view));
+  for (const id of ['searches-open', 'scan', 'summarize']) $(`#${id}`).hidden = tracking;
+  $('#run-status').hidden = tracking;
+  $('#ai-status').hidden = tracking;
+  $('#jobs').setAttribute('aria-label', tracking ? 'Applications' : 'Opportunities');
+  $('#detail').setAttribute('aria-label', tracking ? 'Application details' : 'Opportunity details');
+  $('#search').placeholder = tracking ? 'Search applications or ID…' : 'Search offers or ID…';
+  $('#search').setAttribute('aria-label', tracking ? 'Search applications' : 'Search opportunities');
+  $('#tabs').setAttribute('aria-label', tracking ? 'Application status' : 'Opportunity status');
+  if (tracking) { renderApplications(); return; }
   const availableInQueue = job => job.availability?.status !== 'closed';
   $('#tabs').innerHTML = Object.entries(labels).map(([key, label]) => `<button data-tab="${key}" class="tab ${active === key ? 'active' : ''}" aria-pressed="${active === key}">${label} <span>${data.jobs.filter(j => key === 'all' || (j.status === key && availableInQueue(j))).length}</span></button>`).join('');
   const query = $('#search').value.toLowerCase();
@@ -35,9 +46,93 @@ function render() {
   $('#run-status').classList.toggle('failure', !!data.scan?.error);
   $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''} ${job.availability?.status === 'closed' ? 'job-closed' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="list-states">${evaluationBadge(job.evaluation)}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</span></span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Weighted priority score')}</span><span class="list-footer"><span class="muted">${escape(job.location || 'Location not provided')}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more opportunities.</p></div>';
   const job = data.jobs.find(j => j.id === selected);
-  $('#detail').innerHTML = job ? `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, 'Weighted priority score')}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</div><div class="detail-subrow"><div class="detail-meta"><span>${escape(job.company || 'Company not provided')}</span>${publishedHTML(job)}</div><div class="detail-controls"><div class="actions"><button class="primary" data-status="interesting">${job.status === 'interesting' ? '✓ Interesting' : '☆ Interested'}</button><button data-reject="${job.id}">Dismiss</button>${job.status !== 'new' ? '<button data-status="new">Restore to new</button>' : ''}<button data-availability="${job.availability?.status === 'closed' ? 'open' : 'closed'}">${job.availability?.status === 'closed' ? 'Reopen' : 'Mark as closed'}</button></div><button class="detail-id" data-copy-id="${escape(job.reference)}" title="Copy offer ID">${escape(job.reference)}</button></div></div></div>${evaluationSummary(job.evaluation)}${job.reason ? `<div class="feedback"><strong>Your feedback</strong><p>${escape(job.reason)}</p></div>` : ''}<hr>${summaryHTML(job)}<details class="original"><summary>Full description</summary><div class="description">${escape(job.description || 'Description not captured. Open LinkedIn for details.')}</div></details>` : '<div class="empty">Select an opportunity to see the details.</div>';
+  $('#detail').innerHTML = job ? `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, 'Weighted priority score')}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</div><div class="detail-subrow"><div class="detail-meta"><span>${escape(job.company || 'Company not provided')}</span>${publishedHTML(job)}</div><div class="detail-controls"><div class="actions"><button class="primary" data-status="interesting">${job.status === 'interesting' ? '✓ Interesting' : '☆ Interested'}</button><button data-reject="${job.id}">Dismiss</button>${job.status !== 'new' ? '<button data-status="new">Restore to new</button>' : ''}<button data-availability="${job.availability?.status === 'closed' ? 'open' : 'closed'}">${job.availability?.status === 'closed' ? 'Reopen' : 'Mark as closed'}</button><button data-app-start>${job.application ? 'View application' : 'Mark as applied'}</button></div><button class="detail-id" data-copy-id="${escape(job.reference)}" title="Copy offer ID">${escape(job.reference)}</button></div></div></div>${evaluationSummary(job.evaluation)}${job.reason ? `<div class="feedback"><strong>Your feedback</strong><p>${escape(job.reason)}</p></div>` : ''}<hr>${summaryHTML(job)}<details class="original"><summary>Full description</summary><div class="description">${escape(job.description || 'Description not captured. Open LinkedIn for details.')}</div></details>` : '<div class="empty">Select an opportunity to see the details.</div>';
 }
-$('#tabs').onclick = event => { const tab = event.target.closest('[data-tab]'); if (tab) { active = tab.dataset.tab; render(); } };
+const stageLabels = { applied: 'Applied', interviewing: 'Interviewing', 'offer-received': 'Offer received', rejected: 'Rejected', withdrawn: 'Withdrawn', 'no-response': 'No response', accepted: 'Accepted' };
+const localDate = value => { const date = value ? new Date(value) : new Date(); return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`; };
+const localTime = value => { const date = new Date(value); return `${localDate(date)}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`; };
+const offsetTime = value => { const date = new Date(value); const offset = -date.getTimezoneOffset(); const sign = offset < 0 ? '-' : '+'; const minutes = Math.abs(offset); return `${value}:00${sign}${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`; };
+const shownDate = value => value ? new Date(value.length === 10 ? `${value}T12:00:00` : value).toLocaleString(undefined, value.length === 10 ? { dateStyle: 'medium' } : { dateStyle: 'medium', timeStyle: 'short' }) : '';
+function renderApplications() {
+  const tracked = data.jobs.filter(job => job.application);
+  const activeJobs = tracked.filter(job => !job.applicationView?.closed);
+  const closedJobs = tracked.filter(job => job.applicationView?.closed);
+  $('#tabs').innerHTML = `<button data-tab="active" class="tab ${applicationFilter === 'active' ? 'active' : ''}" aria-pressed="${applicationFilter === 'active'}">Active <span>${activeJobs.length}</span></button><button data-tab="closed" class="tab ${applicationFilter === 'closed' ? 'active' : ''}" aria-pressed="${applicationFilter === 'closed'}">Closed <span>${closedJobs.length}</span></button>`;
+  const query = $('#search').value.toLowerCase();
+  const jobs = (applicationFilter === 'active' ? activeJobs : closedJobs).filter(job => `${job.reference} ${job.id} ${job.title} ${job.company}`.toLowerCase().includes(query))
+    .sort((a, b) => (a.applicationView.priority - b.applicationView.priority) || (a.applicationView.nextAt || '').localeCompare(b.applicationView.nextAt || '') || a.company.localeCompare(b.company));
+  if (!jobs.some(job => job.id === selected)) selected = jobs[0]?.id;
+  $('#count').textContent = `${jobs.length} ${applicationFilter === 'active' ? 'active applications' : 'closed applications'}`;
+  $('#clear-discovery').hidden = true;
+  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''}"><button class="job-open" data-open="${escape(job.id)}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="application-stage">${escape(stageLabels[job.applicationView.stage])}</span></span><span class="list-title"><h2>${escape(job.title)}</h2></span><span class="list-footer"><span class="muted">${escape(job.applicationView.nextAction || stageLabels[job.applicationView.stage])}${job.applicationView.nextAt ? ` · ${escape(shownDate(job.applicationView.nextAt))}` : ''}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || `<div class="empty"><h2>${applicationFilter === 'active' && !tracked.length ? 'No applications yet' : 'No applications here'}</h2><p>${applicationFilter === 'active' && !tracked.length ? 'Mark a job as applied from Opportunities to start tracking it.' : 'Try another filter or search.'}</p></div>`;
+  const job = data.jobs.find(item => item.id === selected);
+  $('#detail').innerHTML = job ? applicationDetail(job) : '<div class="empty">Select an application to see its progress.</div>';
+}
+function applicationDetail(job) {
+  const application = job.application, progress = job.applicationView;
+  const timeline = [application.submission, ...application.events].map(event => {
+    const label = event.type === 'submission' ? 'Application submitted' : event.type === 'interview' ? `${event.name} · ${event.state === 'needs-scheduling' ? 'Needs scheduling' : event.state === 'scheduled' ? 'Scheduled' : 'Completed'}` : event.type === 'reopen' ? 'Process reopened' : stageLabels[event.outcome];
+    const when = event.type === 'interview' ? event.scheduledAt || event.completedAt : event.date || event.at;
+    return `<li><span><strong>${escape(label)}</strong>${when ? `<small>${escape(shownDate(when))}</small>` : ''}${event.note ? `<p>${escape(event.note)}</p>` : ''}</span>${event.type === 'reopen' ? '' : `<button data-app-${event.type === 'submission' ? 'submission' : 'edit'}${event.id ? `="${escape(event.id)}"` : ''} aria-label="Edit ${escape(label)}">Edit</button>`}</li>`;
+  }).join('');
+  return `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2></div><p class="muted">${escape(job.company || 'Company not provided')} · ${escape(job.reference)}</p></div><div class="application-progress"><span class="application-stage">${escape(stageLabels[progress.stage])}</span><strong>${escape(progress.nextAction || stageLabels[progress.stage])}</strong>${progress.nextAt ? `<span>${escape(shownDate(progress.nextAt))}</span>` : ''}</div><div class="actions">${progress.closed ? '<button class="primary" data-app-reopen>Reopen process</button>' : '<button class="primary" data-app-update>Update progress</button>'}${application.events.length ? '' : '<button data-app-undo>Undo applied</button>'}</div><h3>Timeline</h3><ol class="application-timeline">${timeline}</ol>`;
+}
+function setApplicationFields() {
+  const action = $('#application-action').value;
+  const isSubmit = action === 'submit' || action === 'update-submission';
+  const isInterview = action === 'add-interview' || action === 'update-interview';
+  $('#application-action-label').hidden = $('#application-action').hidden = isSubmit || action.startsWith('update-');
+  $('#interview-fields').hidden = !isInterview;
+  $('#outcome-field').hidden = action !== 'outcome' && action !== 'update-outcome';
+  $('#application-date-field').hidden = isInterview && $('#interview-state').value !== 'completed';
+  $('#interview-time-field').hidden = !isInterview || $('#interview-state').value !== 'scheduled';
+  $('#application-note-field').hidden = isSubmit;
+  $('#interview-name').required = isInterview;
+  $('#interview-time').required = isInterview && $('#interview-state').value === 'scheduled';
+  $('#application-date').required = !$('#application-date-field').hidden;
+}
+function openApplicationDialog(action, eventId = null) {
+  const job = data.jobs.find(item => item.id === selected);
+  const event = eventId ? job.application?.events.find(item => item.id === eventId) : null;
+  editingEvent = event || null;
+  $('#application-form').reset();
+  $('#application-action').value = action === 'edit' ? (event.type === 'interview' ? 'update-interview' : 'update-outcome') : action;
+  $('#application-title').textContent = action === 'submit' ? 'Mark as applied' : action === 'submission' ? 'Edit application date' : action === 'edit' ? 'Edit update' : 'Update progress';
+  if (action === 'submission') $('#application-action').value = 'update-submission';
+  $('#application-save').textContent = action === 'submit' ? 'Save application' : 'Save update';
+  $('#application-date').value = action === 'submission' ? job.application.submission.date : event?.date || event?.completedAt || localDate();
+  $('#interview-name').value = event?.name || '';
+  $('#interview-state').value = event?.state || 'needs-scheduling';
+  $('#interview-time').value = event?.scheduledAt ? localTime(event.scheduledAt) : '';
+  $('#application-outcome').value = event?.outcome || 'rejected';
+  $('#application-note').value = event?.note || '';
+  $('#application-remove').hidden = !event;
+  $('#application-error').textContent = '';
+  setApplicationFields();
+  $('#application-dialog').showModal();
+}
+$('#application-action').onchange = setApplicationFields;
+$('#interview-state').onchange = setApplicationFields;
+$('#application-cancel').onclick = () => $('#application-dialog').close();
+$('#application-form').onsubmit = async event => {
+  event.preventDefault();
+  const action = $('#application-action').value;
+  const change = { type: action };
+  if (action === 'submit' || action === 'update-submission') change.date = $('#application-date').value;
+  if (action === 'add-interview' || action === 'update-interview') Object.assign(change, { name: $('#interview-name').value, state: $('#interview-state').value, note: $('#application-note').value, ...(editingEvent ? { eventId: editingEvent.id } : {}) });
+  if (change.state === 'scheduled') change.scheduledAt = offsetTime($('#interview-time').value);
+  if (change.state === 'completed') change.completedAt = $('#application-date').value;
+  if (action === 'outcome' || action === 'update-outcome') Object.assign(change, { outcome: $('#application-outcome').value, date: $('#application-date').value, note: $('#application-note').value, ...(editingEvent ? { eventId: editingEvent.id } : {}) });
+  try { await api('/api/application', { id: selected, change }); $('#application-dialog').close(); await refresh(); }
+  catch (err) { $('#application-error').textContent = err.message; }
+};
+$('#application-remove').onclick = async () => {
+  if (!editingEvent || !confirm('Remove this update?')) return;
+  try { await api('/api/application', { id: selected, change: { type: 'remove-event', eventId: editingEvent.id } }); $('#application-dialog').close(); await refresh(); }
+  catch (err) { $('#application-error').textContent = err.message; }
+};
+$('#views').onclick = event => { const button = event.target.closest('[data-view]'); if (button) { view = button.dataset.view; selected = null; $('#search').value = ''; render(); } };
+$('#tabs').onclick = event => { const tab = event.target.closest('[data-tab]'); if (tab) { if (view === 'applications') applicationFilter = tab.dataset.tab; else active = tab.dataset.tab; render(); } };
 $('#search').oninput = render;
 $('#jobs').onclick = event => { const item = event.target.closest('[data-open]'); if (item) { selected = item.dataset.open; render(); } };
 $('#detail').onclick = async event => {
@@ -47,6 +142,13 @@ $('#detail').onclick = async event => {
   if (source) { const quote = document.getElementById(`source-${source.dataset.source}`); quote.hidden = !quote.hidden; source.setAttribute('aria-expanded', String(!quote.hidden)); return; }
   const reject = event.target.closest('[data-reject]');
   if (reject) { rejecting = selected; const job = data.jobs.find(j => j.id === rejecting); $('#reject-title').textContent = job.title; $('#reason').value = job.reason; $('#reject-dialog').showModal(); return; }
+  if (event.target.closest('[data-app-start]')) { const job = data.jobs.find(j => j.id === selected); if (job.application) { view = 'applications'; applicationFilter = job.applicationView?.closed ? 'closed' : 'active'; render(); } else openApplicationDialog('submit'); return; }
+  if (event.target.closest('[data-app-update]')) { openApplicationDialog('add-interview'); return; }
+  if (event.target.closest('[data-app-reopen]')) { try { await api('/api/application', { id: selected, change: { type: 'reopen' } }); applicationFilter = 'active'; await refresh(); } catch (err) { error(err); } return; }
+  const edit = event.target.closest('[data-app-edit]');
+  if (edit) { openApplicationDialog('edit', edit.dataset.appEdit); return; }
+  if (event.target.closest('[data-app-undo]')) { try { await api('/api/application', { id: selected, change: { type: 'undo-submit' } }); await refresh(); } catch (err) { error(err); } return; }
+  if (event.target.closest('[data-app-submission]')) { openApplicationDialog('submission'); return; }
   const button = event.target.closest('[data-status]');
   if (button) { try { await api('/api/review', { id: selected, status: button.dataset.status }); await refresh(); } catch (err) { error(err); } }
   const availability = event.target.closest('[data-availability]');
@@ -56,7 +158,7 @@ $('#cancel').onclick = () => $('#reject-dialog').close();
 $('#reject-form').onsubmit = async event => { event.preventDefault(); try { await api('/api/review', { id: rejecting, status: 'dismissed', reason: $('#reason').value }); $('#reject-dialog').close(); await refresh(); } catch (err) { error(err); } };
 $('#scan').onclick = async () => { try { $('#error').textContent = ''; await api('/api/scan', {}); await refresh(); } catch (err) { error(err); } };
 $('#summarize').onclick = async () => { try { $('#error').textContent = ''; await api('/api/summarize', { id: selected }); await refresh(); } catch (err) { error(err); } };
-initSearches(api, refresh, search => { discoveryFilter = search; active = 'all'; $('#search').value = ''; render(); });
+initSearches(api, refresh, search => { discoveryFilter = search; view = 'opportunities'; active = 'all'; $('#search').value = ''; render(); });
 $('#clear-discovery').onclick = () => { discoveryFilter = null; render(); };
 refresh().catch(error);
 setInterval(() => { if (data.scan?.running || data.ai?.running || data.connection?.running) refresh().catch(error); }, 3000);

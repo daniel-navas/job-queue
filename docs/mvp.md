@@ -178,12 +178,19 @@ interview operations are later stages and are not part of this MVP.
 
 ## Post-MVP Direction
 
+The first manual application-tracker increment is implemented. It records
+submitted applications, interview rounds/scheduling, simple outcomes and a
+local timeline, without submitting applications or connecting to email or
+calendar. The remaining items below are possible later stages, not current
+behavior.
+
 After the LinkedIn discovery loop is proven useful, develop the broader job
 search workflow in this order:
 
-1. Application assistance and tracking: prepare tailored materials, help answer
-   application questions, record submissions, and manage follow-ups. Begin with
-   owner review and manual submission before considering automatic submission.
+1. Application assistance and tracking: manual submission/round tracking and
+   on-request writing assistance are available. Tailored materials and
+   follow-ups can grow from observed needs. Keep owner review and manual
+   submission before considering automatic submission.
 2. Interview operations: detect interview invitations, coordinate available
    times with the owner's calendar, create events with explicit approval where
    needed, send reminders, and prepare an interview brief.
@@ -194,9 +201,8 @@ search workflow in this order:
    as well as ratings and owner interest. Keep unique-opportunity counts,
    application denominators, sample size, and multiple-search attribution
    explicit; raw interview counts do not establish a probability of success.
-   Use this evidence to inform future search prioritization. Do not implement
-   interview tracking or an automatic search-success score in the current
-   search-management change.
+   Use this evidence to inform future search prioritization. Manual interview
+   tracking now exists; no automatic search-success score does.
 
 Each stage should be validated before expanding automation or adding external
 providers and integrations.

@@ -10,6 +10,7 @@ import { Summarizer, pendingJobs, currentSummary, processingStatus } from './sum
 import { evaluateJob } from './evaluate.mjs';
 import { monthlySalary, withCOP, exchangeRates } from './salary.mjs';
 import { inventoryUnmapped, loadUnmappedReview } from './unmapped-review.mjs';
+import { applicationView } from './application-tracker.mjs';
 
 const root = process.env.JOBQUEUE_ROOT || fileURLToPath(new URL('../', import.meta.url));
 const queue = new Queue(root);
@@ -50,7 +51,7 @@ const server = http.createServer(async (req, res) => {
       const exchange = salaries.some(salary => salary?.currency) ? await exchangeRates() : null;
       const profile = JSON.parse(await readFile(path.join(root, 'profile/matching.json'), 'utf8'));
       const config = await searches.read();
-      const jobs = currentJobs.map((job, index) => ({ ...evaluateJob(job, profile, preferencesConfig, scoringConfig, withCOP(salaries[index], exchange)), discoveries: discoveriesFor(job) }));
+      const jobs = currentJobs.map((job, index) => ({ ...evaluateJob(job, profile, preferencesConfig, scoringConfig, withCOP(salaries[index], exchange)), discoveries: discoveriesFor(job), applicationView: applicationView(job.application) }));
       const searchState = { ...config, stats: searchAnalytics(config.searches, jobs, queue.state.searchRuns) };
       if (req.url === '/api/searches') return json(200, searchState);
       let catalogReview;
@@ -75,6 +76,11 @@ const server = http.createServer(async (req, res) => {
       let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }
       const { id, status } = JSON.parse(body);
       await queue.setAvailability(id, status); return json(200, { ok: true });
+    }
+    if (req.method === 'POST' && req.url === '/api/application') {
+      let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }
+      const { id, change } = JSON.parse(body);
+      await queue.updateApplication(id, change); return json(200, { ok: true });
     }
     if (req.method === 'POST' && req.url === '/api/scan') {
       if (scan.running || connection.running) return json(409, { error: 'LinkedIn is busy; wait for the current operation' });

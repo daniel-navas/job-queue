@@ -5,9 +5,10 @@ Status: Local LinkedIn MVP
 ## Purpose
 
 Replace manual vacancy searching with a compact, ranked queue for one owner.
-The owner reviews useful facts, marks interest or dismisses with a reason, and
-applies manually. The app is exclusively personal and local: no deployment,
-marketing, accounts, multi-user infrastructure, or additional providers.
+The owner reviews useful facts, marks interest or dismisses with a reason,
+applies manually, and tracks application progress. The app is exclusively
+personal and local: no deployment, marketing, accounts, multi-user
+infrastructure, or additional providers.
 
 ## Product contract
 
@@ -27,6 +28,9 @@ marketing, accounts, multi-user infrastructure, or additional providers.
 6. Manage LinkedIn searches locally with per-offer historical criteria and
    measured capture results. Definitions and provenance identify their provider;
    review skills are provider-specific. Only LinkedIn is currently implemented.
+7. Track manually submitted applications, interviews, and outcomes separately
+   from review decisions and posting availability. Preserve progress through
+   rediscovery. No application is submitted by the tracker.
 
 Machine-readable preferences live in config/preferences.json; weights and
 recency bands in config/scoring.json; candidate facts in profile/matching.json.
@@ -80,11 +84,11 @@ reference. The repo-scoped `assist-job-application` skill uses the full saved
 offer, confirmed profile facts, owner-approved voice examples, and optional
 public company research. Only owner-approved final text and reusable feedback
 are saved under private `.local/`. The owner reviews and submits manually; this
-does not add application actions, status tracking, or AI-generated queue scores.
+does not itself update the tracker or generate queue scores.
 
 ## Later, not implemented
 
-Application tracking, then progressively approved submissions, then
-interviews/preparation/calendar. Future providers should feed the same source
-contract. No application, recruiter message, scheduling, or external submission
+Progressively approved submissions, then interview preparation/calendar
+integration. Future providers should feed the same source contract. No
+application, recruiter message, scheduling, or external submission
 is authorized merely by marking a vacancy Interested today.

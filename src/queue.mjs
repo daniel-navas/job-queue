@@ -2,6 +2,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { discoveriesFor } from './searches.mjs';
 import { beginWrite, commitWrite, openStorage, storageState, storeState } from './queue-storage.mjs';
+import { changeApplication } from './application-tracker.mjs';
 export { backupQueue, readStoredJobs } from './queue-storage.mjs';
 
 const text = value => (typeof value === 'string' ? value : value?.text)?.trim() || null;
@@ -139,6 +140,16 @@ export class Queue {
       const availability = { status, checkedAt: new Date().toISOString(), source: 'manual' };
       job.availability = availability;
       (job.availabilityHistory ??= []).push(availability);
+    });
+  }
+  updateApplication(id, change) {
+    return this.mutate(() => {
+      const job = this.state.jobs.find(job => job.id === id);
+      if (!job) throw new Error('Job not found');
+      const application = changeApplication(job.application, change);
+      if (application) job.application = application;
+      else delete job.application;
+      return job.application ?? null;
     });
   }
 }

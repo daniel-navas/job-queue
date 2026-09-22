@@ -18,3 +18,10 @@ header{height:46px}header button{padding:7px 10px}.toolbar{margin-top:5px;paddin
 body{min-width:1024px}
 .search-copy strong{overflow-wrap:anywhere}
 header{gap:18px}header>strong,header>.actions{flex:none}header #run-status{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:right;margin:0}#scan .spinner{border-color:#215c4944;border-top-color:#215c49}
+
+/* Application tracking reuses the existing two-pane workspace. */
+#views{display:flex;gap:3px;flex:none}#views button{border:0;background:transparent;padding:8px 10px;font-size:12px;color:#69766f}#views button[aria-pressed="true"]{background:#e6efe9;color:#236049;font-weight:600}
+.application-stage{font-size:10px;color:#28644e;background:#edf4f1;padding:4px 7px;border-radius:4px;white-space:nowrap}
+.application-progress{display:grid;justify-items:start;gap:9px;margin:24px 0;padding:17px;background:#f6f9f7;border:1px solid #e2ebe5;border-radius:7px}.application-progress strong{font-size:17px}.application-progress>span:last-child:not(.application-stage){font-size:12px;color:#68766c}
+.application-timeline{list-style:none;padding:0;margin:12px 0}.application-timeline li{display:flex;align-items:start;justify-content:space-between;gap:14px;padding:13px 0;border-top:1px solid #edf0ed}.application-timeline strong{font-size:12px}.application-timeline small{display:block;margin-top:4px;color:#89948e;font-size:11px}.application-timeline p{font-size:11px;white-space:pre-wrap;margin:6px 0 0}.application-timeline button{font-size:11px;padding:5px 8px}
+#application-dialog{width:min(460px,calc(100% - 30px));padding:24px;border:1px solid #dfe6e1;border-radius:9px}#application-dialog h2{margin:8px 0 18px}#application-form label{display:block;margin:13px 0 6px;font-size:12px;color:#566560}#application-form input,#application-form select,#application-form textarea{width:100%;min-width:0}#application-form .actions{justify-content:flex-end;margin-top:20px}#application-remove{margin-right:auto;color:#9b4640}#application-error{color:#b13b37;font-size:12px}

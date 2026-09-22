@@ -1,11 +1,10 @@
 # Minimal application tracker
 
-Status: ready for implementation handoff; not implemented.
+Status: first release implemented. Later possibilities remain unimplemented.
 
-This spec is for an implementer working in the same checkout. Read
-`AGENTS.md`, `docs/project.md`, `docs/ai-context.md`, and `docs/quality.md`
-before changing code. Implement only the first release below, not the later
-possibilities. Preserve unrelated local changes and private queue data.
+This spec defined the first release in the same checkout. It deliberately
+leaves later possibilities open. Preserve unrelated local changes and private
+queue data in any future extension.
 
 ## Intent
 
