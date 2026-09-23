@@ -55,6 +55,21 @@ context, not automatically positive signals.
   are non-differentiating. New extraction cannot select them. The compatibility
   adapter removes recognized legacy instances from display and coverage for
   every offer. Specialized measurable criteria remain eligible.
+- Generic HTTP/JSON fundamentals, software testing without a named specialty,
+  routine technical-debt management, and vague large-codebase experience are
+  also non-differentiating. Specific testing disciplines, production
+  specialties, technologies and domain experience remain eligible. The tag
+  model is for decision-relevant candidate differences, not a transcript of
+  every baseline expectation in a vacancy.
+- API development covers both general API design and implementation. API
+  integration remains separate because connecting external systems is a
+  distinct responsibility. REST APIs remains the narrower tag for explicitly
+  REST-specific requirements.
+- Server-side language is a technology family for requirements permitting an
+  equivalent backend language. For the rare wording “Node.js and another
+  server-side language”, the current intentionally simple approximation is
+  displayed and matched as `Node.js | Server-side language`; it does not enforce
+  that two distinct languages are known.
 - Catalog/label changes require a server restart. Profile/preferences/weights
   remain live on refresh. New extraction facts can require a deliberate schema
   version update; do not automatically spend AI tokens on the backlog.

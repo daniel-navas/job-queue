@@ -443,6 +443,24 @@
         "scala"
       ]
     },
+    "server-side-language": {
+      "label": "Server-side language",
+      "definition": "General server-side programming-language experience when the source permits equivalent languages.",
+      "members": [
+        "typescript",
+        "javascript",
+        "python",
+        "go",
+        "java",
+        "rust",
+        "c++",
+        "csharp",
+        "ruby",
+        "php",
+        "kotlin",
+        "scala"
+      ]
+    },
     "modern-frontend": {
       "label": "Modern frontend",
       "definition": "General modern frontend frameworks, not specific React proficiency.",
@@ -514,6 +532,10 @@
     "rest-api": {
       "label": "REST APIs",
       "definition": "RESTful API design or implementation."
+    },
+    "api-development": {
+      "label": "API development",
+      "definition": "Designing or implementing APIs; use REST APIs only when REST is explicit."
     },
     "microservices": {
       "label": "Microservices",
@@ -700,6 +722,10 @@
       "label": "Growth engineering",
       "definition": "Activation/onboarding/conversion engineering."
     },
+    "consumer-product-development": {
+      "label": "Consumer product development",
+      "definition": "Building or shipping software products used directly by consumers."
+    },
     "technical-leadership": {
       "label": "Technical leadership",
       "definition": "Leading technical projects; not inferred from senior title alone."
@@ -797,6 +823,26 @@
     "ownership": {
       "label": "Ownership",
       "definition": "Generic responsibility or ownership expectations.",
+      "differentiating": false
+    },
+    "http-json-fundamentals": {
+      "label": "HTTP and JSON fundamentals",
+      "definition": "Routine HTTP, status-code and JSON knowledge expected for experienced web/backend engineers.",
+      "differentiating": false
+    },
+    "generic-software-testing": {
+      "label": "Generic software testing",
+      "definition": "Routine software-testing expectations without a specific testing specialty.",
+      "differentiating": false
+    },
+    "technical-debt-management": {
+      "label": "Technical debt management",
+      "definition": "Routine technical-debt responsibility without explicit specialized ownership or scope.",
+      "differentiating": false
+    },
+    "large-codebase-experience": {
+      "label": "Large codebase experience",
+      "definition": "Vague large/distributed-codebase experience without a measurable specialty.",
       "differentiating": false
     }
   },

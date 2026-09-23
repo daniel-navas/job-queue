@@ -140,10 +140,11 @@ human-reviewed catalog addition. Never add candidate facts or preference scores.
 No recommendation, candidate information, or per-company exceptions.
 
 Before returning, silently compare the complete requirements section against
-the output clause by clause. Keep concrete general work such as managing
-technical debt, designing APIs, or operating cloud services as kind unknown
-when no precise catalog key exists; do not silently omit it or use a narrower
-adjacent tag. Check
+the output clause by clause. Exclude catalog concepts explicitly marked
+non-differentiating; they are routine expectations rather than useful matching
+signals. Keep other concrete work such as designing APIs or operating cloud
+services as kind unknown when no precise catalog key exists; do not silently
+omit it or use a narrower adjacent tag. Check
 required vs preferred, independent AND vs alternative OR, illustrative
 examples, and thresholds unsupported by explicit level wording.
 Check conflicting geography and visa/funding independently. Do not output

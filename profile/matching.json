@@ -292,6 +292,10 @@
       "confirmed": true,
       "evidence": "Professional REST API and API design experience."
     },
+    "api-development": {
+      "confirmed": true,
+      "evidence": "Professional REST API implementation and API design experience establishes general API development."
+    },
     "microservices": {
       "confirmed": true,
       "evidence": "Professional microservice operation experience."

@@ -48,9 +48,14 @@ test('recognized growth evidence normalizes OR criteria and assigned work withou
   assert.deepEqual(normalized.projectTags,[{key:'growth-work',evidence:'improve activation, retention and monetization'}]);
 });
 test('commodity expectations cannot enter a new extraction or legacy denominator', () => {
-  for (const key of ['team-problem-solving','engineering-process','agile','pair-programming','code-review','collaboration','generic-problem-solving','generic-debugging','generic-communication','clean-code','fast-paced','adaptability','ownership']) assert.equal(selectableKeys('capability').includes(key),false,key);
+  const commodityKeys = ['team-problem-solving','engineering-process','agile','pair-programming','code-review','collaboration','generic-problem-solving','generic-debugging','generic-communication','clean-code','fast-paced','adaptability','ownership','http-json-fundamentals','generic-software-testing','technical-debt-management','large-codebase-experience'];
+  for (const key of commodityKeys) {
+    assert.equal(catalog.capability[key]?.differentiating, false, key);
+    assert.equal(selectableKeys('capability').includes(key),false,key);
+  }
   assert.equal(selectableKeys('technology').includes('git'),false);
   assert.match(catalogInstructions(),/NON-DIFFERENTIATING/);
+  assert.match(catalogInstructions(),/HTTP and JSON fundamentals/);
   const legacy={...card(),requirements:[
     {...requirement({kind:'capability',alternatives:['team-technical-problem-solving']}),maxMonths:undefined},
     {...requirement({kind:'capability',alternatives:['degree']}),maxMonths:undefined},
@@ -58,6 +63,40 @@ test('commodity expectations cannot enter a new extraction or legacy denominator
   const upgraded=upgradeLegacyCard(legacy);
   assert.deepEqual(upgraded.requirements.map(item=>item.alternatives),[['degree']]);
   assert.deepEqual(upgraded.preferred,[]);
+});
+test('generic API work and consumer-product delivery remain differentiating capabilities', () => {
+  assert.equal(catalog.capability['api-development']?.label, 'API development');
+  assert.equal(catalog.capability['consumer-product-development']?.label, 'Consumer product development');
+  assert.ok(selectableKeys('capability').includes('api-development'));
+  assert.ok(selectableKeys('capability').includes('consumer-product-development'));
+});
+test('server-side language family offers concrete language alternatives', () => {
+  assert.deepEqual(catalog.technology['server-side-language']?.members, [
+    'typescript', 'javascript', 'python', 'go', 'java', 'rust', 'c++',
+    'csharp', 'ruby', 'php', 'kotlin', 'scala'
+  ]);
+  assert.equal(requirementLabel(requirement({alternatives:['nodejs', 'server-side-language']})), 'Node.js | Server-side language');
+});
+test('reviewed unmapped criteria normalize without another AI call', () => {
+  const unknown = (label, evidence = label) => requirement({kind:'unknown', alternatives:['unmapped'], label, evidence});
+  const normalized = normalizeKnownFacts({...card(), requirements:[
+    unknown('API design knowledge', 'Solid understanding of API design'),
+    unknown('API development', 'Skilled in building APIs'),
+    unknown('Consumer product shipping', 'experience shipping consumer-facing products'),
+    unknown('Customer growth and provisioning', 'Familiarity with customer growth, onboarding, provisioning, or operational excellence initiatives.'),
+    unknown('Other server-side language', 'experience in at least one other server-side language'),
+    unknown('JSON and HTTP fundamentals', 'Familiarity with JSON, HTTP protocols, status codes'),
+    unknown('Large or distributed codebases', 'Experience working with large-scale or distributed codebases.'),
+    unknown('Software testing', 'Background in software testing.'),
+    unknown('Technical debt management', 'Gestión de deuda técnica.')
+  ]});
+  assert.deepEqual(normalized.requirements.map(item => [item.kind, item.alternatives]), [
+    ['capability', ['api-development']],
+    ['capability', ['api-development']],
+    ['capability', ['consumer-product-development']],
+    ['capability', ['growth-engineering']],
+    ['technology', ['nodejs', 'server-side-language']]
+  ]);
 });
 test('schema enforces catalog keys and kinds, with a single explicit unmapped fallback', () => {
   const job={id:'1',title:'Engineer',description:'Docker. An unusual requirement.'};

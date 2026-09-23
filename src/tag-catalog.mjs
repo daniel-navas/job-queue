@@ -17,13 +17,19 @@ export function normalizeKnownFacts(card) {
     if (/\banalytics instrumentation\b|\bevent instrumentation\b|\bevent tracking\b|\btracking plans?\b/i.test(text)) alternatives.push('analytics-instrumentation');
     if (/\bproduct analytics\b|\bdata analysis tools?\b|\bfunnel analysis\b|\bcohort analysis\b|\bretention analysis\b/i.test(text)) alternatives.push('product-analytics');
     if (/\b(?:own(?:ing)?|operat(?:e|ing))\b.*\b(?:business[ -]critical|production)\b.*\b(?:system|service)s?\b|\bproduction operations?\b/i.test(text)) alternatives.push('production-operations');
-    return [...new Set(alternatives)];
+    if (/^API (?:design and management|design knowledge|design principles|development)$/i.test(item.label || '')) alternatives.push('api-development');
+    if (/^Consumer product shipping$/i.test(item.label || '')) alternatives.push('consumer-product-development');
+    if (/^Customer growth and provisioning$/i.test(item.label || '')) alternatives.push('growth-engineering');
+    if (/^Other server-side language$/i.test(item.label || '')) return { kind: 'technology', alternatives: ['nodejs', 'server-side-language'] };
+    return { kind: 'capability', alternatives: [...new Set(alternatives)] };
   };
-  for (const group of ['requirements','preferred','stack']) result[group] = result[group].map(item => {
-    const canonicalAlternatives = item.kind === 'unknown' ? recognized(item) : item.alternatives.map(canonical);
+  const reviewedCommodity = item => item.kind === 'unknown' && /^(?:JSON and HTTP fundamentals|Large or distributed codebases|Software testing|Testing knowledge|Technical debt management)$/i.test(item.label || '');
+  for (const group of ['requirements','preferred','stack']) result[group] = result[group].filter(item => !reviewedCommodity(item)).map(item => {
+    const recognition = item.kind === 'unknown' ? recognized(item) : { kind: item.kind, alternatives: item.alternatives.map(canonical) };
+    const canonicalAlternatives = recognition.alternatives;
     if (!canonicalAlternatives.length) return item;
     const conceptual = item.kind === 'unknown' && /\b(knowledge|understanding|familiar(?:ity)?)\b/i.test(`${item.label || ''} ${item.evidence || ''}`);
-    return { ...item, kind: item.kind === 'unknown' ? 'capability' : item.kind, alternatives: canonicalAlternatives, autonomy: conceptual ? null : item.autonomy, knowledgeLevel: conceptual ? 'basic' : item.knowledgeLevel };
+    return { ...item, kind: recognition.kind, alternatives: canonicalAlternatives, autonomy: conceptual ? null : item.autonomy, knowledgeLevel: conceptual && recognition.kind === 'capability' ? 'basic' : item.knowledgeLevel };
   });
   const work = `${result.work?.value || ''} ${result.work?.evidence || ''}`;
   if (/\bgrowth (?:engineering|team|product)\b|\bactivation\b|\bmarketing funnels?\b|\bonboarding\b|\bconversion optimization\b/i.test(work) && !result.projectTags.some(tag => tag.key === 'growth-work')) {
