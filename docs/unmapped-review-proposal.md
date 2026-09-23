@@ -1,78 +1,74 @@
 # Propuesta de revisión de tags pendientes
 
-Fecha: 2026-09-22. Alcance: los 56 tags sin mapear que están pendientes.
-Los números son estables para que puedas referirte a cualquiera en tus
-comentarios. Esto revisa el **catálogo**: decidir si algo ya existe, si hay que
-crearlo, si una frase contiene varios conceptos, o si no corresponde a un tag.
+Fecha: 2026-09-22. Alcance: los 56 tags sin mapear que están pendientes. Los
+números son estables para que puedas referirte a cualquiera en tus comentarios.
 
-**Cómo leer la tabla**
+**Cómo leerla**
 
 - **Tag inicial:** lo que extrajo el procesador de una oferta.
-- **Qué significa:** explicación corta y práctica del conocimiento o experiencia.
-- **Qué hacer:** decisión propuesta para el catálogo.
-- **Resultado:** tag canónico que quedaría. El texto entre paréntesis invertidos
-  es solo su identificador interno; el nombre legible es el que está antes.
-- **Separar:** una frase menciona dos o más cosas; cada una debe quedar como tag
-  independiente. No significa nada sobre `OR` o `AND` de la vacante.
+- **Qué significa:** explicación práctica de cada concepto en esa frase.
+- **Resultado propuesto:** identificador(es) canónico(s). Si hay varios, la
+  frase debe separarse en esos conceptos; no es una decisión de alternativas.
+- **Sin cambio:** no debe convertirse en un tag del catálogo actual.
 
-| # | Tag inicial | Qué significa | Qué hacer | Resultado propuesto |
-|---:|---|---|---|---|
-| 1 | Advanced automation | Automatizar procesos repetitivos de varios pasos. | Crear. | Workflow automation (`capability:workflow-automation`) |
-| 2 | AI or automation integration | Conectar IA o automatizaciones a un producto. | Separar. | AI integration + Workflow automation |
-| 3 | AI technology applications | Usar IA dentro de apps o procesos reales. | Usar existente. | AI integration (`capability:ai-integration`) |
-| 4 | AI-first solutions | Crear productos cuya función central depende de IA. | Usar existente. | AI integration (`capability:ai-integration`) |
-| 5 | AI, ML, or agent systems | Trabajar con IA, modelos de ML o agentes. | Separar. | AI integration + Machine learning + AI agents |
-| 6 | Airline industry experience | Conocer operación de aerolíneas, reservas o tarifas. | Crear. | Airline domain experience (`capability:airline-domain-experience`) |
-| 7 | API design and management | Diseñar APIs y manejar sus versiones y reglas. | Separar. | API design + API lifecycle management |
-| 8 | API design knowledge | Saber definir APIs claras, estables y escalables. | Crear. | API design (`capability:api-design`) |
-| 9 | API design principles | Aplicar reglas de compatibilidad, errores y paginación en APIs. | Unir al #8. | API design (`capability:api-design`) |
-| 10 | API development | Construir endpoints, validaciones y respuestas. | Crear. | API development (`capability:api-development`) |
-| 11 | API knowledge | Conocer APIs junto con sistemas distribuidos y cloud. | Separar. | Distributed systems + API design + Cloud native |
-| 12 | API orchestration | Combinar llamadas de varios servicios en un flujo. | Usar existente. | API integrations (`capability:api-integration`) |
-| 13 | Asynchronous workflows | Coordinar tareas, eventos o jobs que siguen fuera de la petición inicial. | Separar. | Asynchronous workflows + Distributed systems + Cloud infrastructure |
-| 14 | Azure networking | Configurar redes, rutas, firewalls y endpoints privados en Azure. | Separar. | Azure + Cloud networking |
-| 15 | BFF or middleware integration | Crear una capa intermedia entre frontend y servicios. | Usar existente. | API integrations (`capability:api-integration`) |
-| 16 | ClickHouse or Aurora | Usar ClickHouse para analítica o Aurora como base de datos administrada de AWS. | Separar. | ClickHouse + Amazon Aurora |
-| 17 | Cloud infrastructure | Diseñar o manejar cómputo, red y almacenamiento en la nube. | Crear. | Cloud infrastructure (`capability:cloud-infrastructure`) |
-| 18 | Cloud service operations and optimization | Operar servicios cloud y mejorar costo, capacidad o rendimiento. | Crear. | Cloud operations and optimization (`capability:cloud-operations`) |
-| 19 | Consumer product shipping | Lanzar productos usados directamente por clientes finales. | Crear. | Consumer product experience (`capability:consumer-product-experience`) |
-| 20 | Customer growth and provisioning | Mejorar activación de clientes o preparar sus recursos/servicios. | Separar; ignorar “operational excellence”. | Growth engineering + Service provisioning |
-| 21 | Data infrastructure knowledge | Conocer pipelines, almacenamiento y movimiento de datos. | Separar. | Data engineering + Distributed systems |
-| 22 | Data sourcing and integration | Traer datos de varias fuentes y combinarlos de forma confiable. | Crear. | Data integration (`capability:data-integration`) |
-| 23 | Data-driven applications or dashboards | Crear apps basadas en datos o tableros para verlos. | Separar. | Data applications + Data visualization |
-| 24 | Database engineering | Diseñar, operar y mejorar bases de datos como responsabilidad principal. | Crear. | Database engineering (`capability:database-engineering`) |
-| 25 | Database performance tradeoffs | Balancear integridad de datos con velocidad y costo de consultas. | Separar. | Data integrity + Query optimization |
-| 26 | Design systems experience | Crear componentes, estilos y reglas de interfaz reutilizables. | Crear. | Design systems (`capability:design-systems`) |
-| 27 | Developer platforms and tooling | Crear herramientas o plataformas internas para otros desarrolladores. | Crear. | Developer platforms (`capability:developer-platforms`) |
-| 28 | DevOps, CI/CD, or cloud infrastructure | Manejar despliegues, pipelines o infraestructura cloud. | Separar; ignorar “systems engineering”. | DevOps + CI/CD + Cloud infrastructure |
-| 29 | Energy sector experience | Conocer energía, utilities, redes, medición o mercados energéticos. | Crear. | Energy domain experience (`capability:energy-domain-experience`) |
-| 30 | FinOps and cloud cost optimization | Controlar y reducir gasto en la nube. | Crear. | FinOps (`capability:finops`) |
-| 31 | High-traffic reliable systems | Mantener sistemas estables bajo mucho tráfico. | Separar. | Large-scale systems + High availability |
-| 32 | Highly available production systems | Diseñar sistemas que sigan funcionando ante fallas. | Crear. | High availability (`capability:high-availability`) |
-| 33 | JSON and HTTP fundamentals | Entender peticiones web, respuestas, códigos HTTP y JSON. | Crear HTTP; JSON queda como contexto. | HTTP fundamentals (`capability:http-fundamentals`) |
-| 34 | Large or distributed codebases | Trabajar en código grande repartido entre módulos, repos o equipos. | Crear. | Large codebase experience (`capability:large-codebase-experience`) |
-| 35 | Large-scale consumer products | Trabajar en productos de consumo con muchos usuarios. | Separar. | Large-scale systems + Consumer product experience |
-| 36 | Lending or related domain | Conocer préstamos, banca, fintech o reglas financieras. | Usar existente. | Financial domain (`capability:financial`) |
-| 37 | MCP or agentic workflows | Conectar herramientas por MCP o coordinar agentes de IA. | Separar. | MCP + AI agents + Developer platforms |
-| 38 | Micro-frontends | Dividir un frontend en partes desplegables por separado. | Crear. | Micro-frontends (`capability:micro-frontends`) |
-| 39 | Modern web technologies | Usar tecnologías web actuales como JavaScript, TypeScript o React. | Separar. | JavaScript + TypeScript + React |
-| 40 | OOP and design patterns | Diseñar software con objetos y patrones reutilizables. | Crear. | Object-oriented design (`capability:object-oriented-design`) |
-| 41 | Other server-side language | Usar un lenguaje backend distinto al principal de esa oferta. | Diferir; depende del contexto de la oferta. | Sin cambio de catálogo |
-| 42 | Platform reliability improvements | Mejorar disponibilidad, tolerancia a fallas y recuperación. | Unir al #32. | High availability (`capability:high-availability`) |
-| 43 | Production systems exposure | Haber trabajado con sistemas en vivo, despliegues y monitoreo. | Usar existente. | Production operations (`capability:production-operations`) |
-| 44 | PST timezone overlap | Poder trabajar horas que coincidan con la costa oeste de EE. UU. | Diferir; es disponibilidad, no habilidad. | Futuro campo de horario/zona horaria |
-| 45 | Python or data engineering exposure | Usar Python o trabajar con pipelines y procesamiento de datos. | Separar. | Python + Data engineering |
-| 46 | Recommendation personalization or search | Recomendar, personalizar o buscar contenido para usuarios. | Separar. | Recommendation systems + Personalization + Search engineering |
-| 47 | SABRE knowledge | Usar Sabre, plataforma de reservas y distribución de viajes. | Crear. | Sabre (`technology:sabre`) |
-| 48 | Security standards | Aplicar manejo de secretos, protección de datos y prácticas seguras. | Usar existente. | Secure coding (`capability:secure-coding`) |
-| 49 | Self-healing systems | Detectar fallas y recuperarse automáticamente. | Crear. | Self-healing systems (`capability:self-healing-systems`) |
-| 50 | Self-service onboarding platforms | Permitir que usuarios activen o configuren servicios solos. | Separar. | Self-service platforms + Growth engineering + Workflow automation |
-| 51 | Software supply chain security | Proteger dependencias, builds, artefactos y releases. | Separar. | Secure coding + Software supply chain security |
-| 52 | Software testing | Probar software de forma manual o automatizada. | Crear. | Software testing (`capability:software-testing`) |
-| 53 | Technical debt management | Identificar y reducir deuda técnica sin frenar el producto. | Crear. | Technical debt management (`capability:technical-debt-management`) |
-| 54 | Testing knowledge | Saber elegir y estructurar pruebas para evitar regresiones. | Unir al #52; ignorar diseño/debugging genéricos. | Software testing (`capability:software-testing`) |
-| 55 | VBA or PowerShell automation | Automatizar Office con VBA o tareas de Windows con PowerShell. | Separar. | VBA + PowerShell |
-| 56 | Workflow automation solutions | Crear soluciones que automaticen procesos repetitivos. | Unir al #1. | Workflow automation (`capability:workflow-automation`) |
+| # | Tag inicial | Qué significa | Resultado propuesto |
+|---:|---|---|---|
+| 1 | Advanced automation | Crear automatizaciones que reemplazan procesos manuales de varios pasos. | capability:workflow-automation |
+| 2 | AI or automation integration | **AI integration:** conectar IA a una app para hacer trabajo real. **Workflow automation:** automatizar procesos repetitivos. | capability:ai-integration, capability:workflow-automation |
+| 3 | AI technology applications | Usar modelos, APIs o resultados de IA dentro de una app o proceso. | capability:ai-integration |
+| 4 | AI-first solutions | Crear productos cuya función principal depende de IA. | capability:ai-integration |
+| 5 | AI, ML, or agent systems | **AI integration:** usar IA en un producto. **Machine learning:** crear o usar sistemas que aprenden de datos. **AI agents:** agentes que usan herramientas para cumplir tareas. | capability:ai-integration, capability:machine-learning, capability:ai-agents |
+| 6 | Airline industry experience | Conocer reservas, tarifas, inventario u operación de aerolíneas. | capability:airline-domain-experience |
+| 7 | API design and management | **API design:** definir contratos claros de API. **API lifecycle management:** manejar versiones, compatibilidad y reglas de una API. | capability:api-design, capability:api-lifecycle-management |
+| 8 | API design knowledge | Saber definir APIs claras, estables y escalables. | capability:api-design |
+| 9 | API design principles | Aplicar reglas para errores, compatibilidad, paginación y cambios en APIs. | capability:api-design |
+| 10 | API development | Construir endpoints, validaciones, lógica de negocio y respuestas. | capability:api-development |
+| 11 | API knowledge | **Distributed systems:** servicios que colaboran por red. **API design:** contratos claros entre servicios. **Cloud native:** sistemas diseñados para correr en cloud. | capability:distributed, capability:api-design, capability:cloud-native |
+| 12 | API orchestration | Combinar llamadas de varios servicios en un solo flujo. | capability:api-integration |
+| 13 | Asynchronous workflows | **Asynchronous workflows:** tareas que continúan después de la petición inicial. **Distributed systems:** servicios coordinados por red. **Cloud infrastructure:** recursos cloud donde corren. | capability:asynchronous-workflows, capability:distributed, capability:cloud-infrastructure |
+| 14 | Azure networking | **Azure:** usar servicios de Microsoft Azure. **Cloud networking:** configurar redes, rutas, firewalls y endpoints en cloud. | technology:azure, capability:cloud-networking |
+| 15 | BFF or middleware integration | Crear una capa intermedia que adapta o combina servicios para un frontend. | capability:api-integration |
+| 16 | ClickHouse or Aurora | **ClickHouse:** base de datos para analítica. **Amazon Aurora:** base de datos administrada de AWS compatible con MySQL/PostgreSQL. | technology:clickhouse, technology:amazon-aurora |
+| 17 | Cloud infrastructure | Diseñar o manejar cómputo, red y almacenamiento en la nube. | capability:cloud-infrastructure |
+| 18 | Cloud service operations and optimization | Operar servicios cloud y mejorar su costo, capacidad o rendimiento. | capability:cloud-operations |
+| 19 | Consumer product shipping | Lanzar productos usados directamente por clientes finales. | capability:consumer-product-experience |
+| 20 | Customer growth and provisioning | **Growth engineering:** mejorar activación o conversión de clientes. **Service provisioning:** crear y preparar recursos o servicios para un cliente. | capability:growth-engineering, capability:service-provisioning |
+| 21 | Data infrastructure knowledge | **Data engineering:** construir pipelines y sistemas de datos. **Distributed systems:** mover y procesar datos entre servicios. | capability:data-engineering, capability:distributed |
+| 22 | Data sourcing and integration | Traer datos de varias fuentes y combinarlos de forma confiable. | capability:data-integration |
+| 23 | Data-driven applications or dashboards | **Data applications:** apps cuyo valor depende de datos. **Data visualization:** tableros o gráficas para entender datos. | capability:data-applications, capability:data-visualization |
+| 24 | Database engineering | Diseñar, operar y mejorar bases de datos como responsabilidad principal. | capability:database-engineering |
+| 25 | Database performance tradeoffs | **Data integrity:** proteger consistencia y corrección de datos. **Query optimization:** mejorar velocidad y costo de consultas. | capability:data-integrity, capability:query-optimization |
+| 26 | Design systems experience | Crear componentes, estilos y reglas de interfaz reutilizables. | capability:design-systems |
+| 27 | Developer platforms and tooling | Crear herramientas o plataformas internas para otros desarrolladores. | capability:developer-platforms |
+| 28 | DevOps, CI/CD, or cloud infrastructure | **DevOps:** operar y entregar software de forma confiable. **CI/CD:** automatizar pruebas y despliegues. **Cloud infrastructure:** manejar recursos cloud. | capability:devops, capability:ci-cd, capability:cloud-infrastructure |
+| 29 | Energy sector experience | Conocer generación, utilities, redes, medición o mercados de energía. | capability:energy-domain-experience |
+| 30 | FinOps and cloud cost optimization | Medir, controlar y reducir gasto en la nube. | capability:finops |
+| 31 | High-traffic reliable systems | **Large-scale systems:** sistemas que soportan mucho tráfico o datos. **High availability:** sistemas que siguen funcionando ante fallas. | capability:large-scale-systems, capability:high-availability |
+| 32 | Highly available production systems | Diseñar redundancia y recuperación para que un sistema en vivo siga funcionando. | capability:high-availability |
+| 33 | JSON and HTTP fundamentals | **HTTP fundamentals:** entender peticiones, respuestas, métodos y códigos HTTP. **JSON:** formato común de datos que queda como contexto, no como tag. | capability:http-fundamentals |
+| 34 | Large or distributed codebases | Trabajar en código grande repartido entre módulos, repositorios o equipos. | capability:large-codebase-experience |
+| 35 | Large-scale consumer products | **Large-scale systems:** soportar mucho tráfico o datos. **Consumer product experience:** construir productos para usuarios finales. | capability:large-scale-systems, capability:consumer-product-experience |
+| 36 | Lending or related domain | Conocer préstamos, banca, fintech o reglas financieras. | capability:financial |
+| 37 | MCP or agentic workflows | **MCP:** conectar modelos de IA con herramientas y datos. **AI agents:** agentes que usan herramientas para cumplir tareas. **Developer platforms:** herramientas internas para ingenieros. | technology:mcp, capability:ai-agents, capability:developer-platforms |
+| 38 | Micro-frontends | Dividir un frontend en partes desarrollables y desplegables por separado. | capability:micro-frontends |
+| 39 | Modern web technologies | **JavaScript:** lenguaje web. **TypeScript:** JavaScript con tipos. **React:** librería para interfaces web. | technology:javascript, technology:typescript, technology:react |
+| 40 | OOP and design patterns | Diseñar software con objetos y patrones reutilizables. | capability:object-oriented-design |
+| 41 | Other server-side language | Un lenguaje backend distinto al lenguaje principal de esa oferta; no identifica una tecnología concreta. | Sin cambio |
+| 42 | Platform reliability improvements | Mejorar disponibilidad, tolerancia a fallas y recuperación de una plataforma. | capability:high-availability |
+| 43 | Production systems exposure | Haber trabajado con sistemas en vivo, despliegues y monitoreo. | capability:production-operations |
+| 44 | PST timezone overlap | Poder trabajar horas que coincidan con la costa oeste de Estados Unidos; es disponibilidad, no habilidad. | Sin cambio |
+| 45 | Python or data engineering exposure | **Python:** lenguaje de programación. **Data engineering:** construir pipelines y sistemas de datos. | technology:python, capability:data-engineering |
+| 46 | Recommendation personalization or search | **Recommendation systems:** sugerir contenido o productos. **Personalization:** adaptar una experiencia a cada usuario. **Search engineering:** construir búsqueda de información. | capability:recommendation-systems, capability:personalization, capability:search-engineering |
+| 47 | SABRE knowledge | Usar Sabre, plataforma de reservas y distribución de viajes. | technology:sabre |
+| 48 | Security standards | Aplicar manejo de secretos, protección de datos y prácticas seguras al programar. | capability:secure-coding |
+| 49 | Self-healing systems | Detectar fallas y recuperarse automáticamente. | capability:self-healing-systems |
+| 50 | Self-service onboarding platforms | **Self-service platforms:** permitir que el usuario configure o active servicios solo. **Growth engineering:** mejorar activación. **Workflow automation:** automatizar pasos de ese proceso. | capability:self-service-platforms, capability:growth-engineering, capability:workflow-automation |
+| 51 | Software supply chain security | **Secure coding:** proteger la aplicación al programarla. **Software supply chain security:** proteger dependencias, builds, artefactos y releases. | capability:secure-coding, capability:software-supply-chain-security |
+| 52 | Software testing | Probar software manual o automáticamente para encontrar fallas. | capability:software-testing |
+| 53 | Technical debt management | Identificar y reducir deuda técnica sin frenar el producto. | capability:technical-debt-management |
+| 54 | Testing knowledge | Saber elegir y estructurar pruebas para evitar regresiones. | capability:software-testing |
+| 55 | VBA or PowerShell automation | **VBA:** automatizar tareas de Microsoft Office. **PowerShell:** automatizar tareas de Windows y administración de sistemas. | technology:vba, technology:powershell |
+| 56 | Workflow automation solutions | Crear soluciones que automaticen procesos repetitivos. | capability:workflow-automation |
 
 ## Resumen del lote
 
@@ -82,8 +78,6 @@ crearlo, si una frase contiene varios conceptos, o si no corresponde a un tag.
   combinado artificial.
 - 2 no pertenecen hoy al catálogo de habilidades: “other server-side language”
   depende de la oferta y el cruce con PST es disponibilidad.
-- En 20, 28 y 54 solo se ignoran fragmentos genéricos; no se pierde su parte
-  concreta.
 
 Esta es una propuesta: no cambia el catálogo, los matches ni los puntajes hasta
 que apruebes los cambios que quieras aplicar.
