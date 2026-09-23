@@ -39,7 +39,7 @@ export function catalogInstructions() {
 }
 
 export function requirementLabel(requirement) {
-  const name = requirement.kind === 'unknown' ? requirement.label : requirement.alternatives.map(key => catalog[requirement.kind]?.[canonical(key)]?.label || key).join(' / ');
+  const name = requirement.kind === 'unknown' ? requirement.label : requirement.alternatives.map(key => catalog[requirement.kind]?.[canonical(key)]?.label || key).join(' | ');
   const min = requirement.minMonths, max = requirement.maxMonths;
   const parts = [];
   if (Number.isFinite(min)) {

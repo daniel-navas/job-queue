@@ -39,7 +39,7 @@ five-year default is a conservative product policy informed by SFIA guidance
 that contemporary skill assessment should generally focus on skills used in
 the last five years, with variation by skill.
 
-Slash-separated display labels represent one OR criterion; independent AND
+Vertical-bar-separated display labels represent one OR criterion; independent AND
 requirements remain separate. Generic debugging is non-differentiating and is
 excluded, while incident response, distributed diagnosis, profiling, and other
 specialized debugging remain eligible.

@@ -114,6 +114,6 @@ tag for every experiment type:
 
 An OR criterion keeps these as alternatives. For example, "A/B testing,
 analytics instrumentation, or experimentation platforms" maps to Product
-experimentation / Analytics instrumentation. Source-backed stored cards are
+  experimentation | Analytics instrumentation. Source-backed stored cards are
 normalized locally, including Growth-focused work when their assigned-work
 evidence explicitly establishes it; no offer ID is consulted.

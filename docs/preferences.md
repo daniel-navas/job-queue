@@ -197,8 +197,8 @@ Agile ceremonies, clean code, adaptability, ownership, and fast-paced work.
 This is one catalog policy applied to every offer, never an offer-specific edit.
 Published experience ranges remain visible (e.g. 3–7 years); only the minimum
 is used for matching, not the upper end as a rejection ceiling.
-Requirement labels also show explicit autonomy and last-use thresholds. Slash-
-separated labels are one OR criterion: matching any listed alternative satisfies
+Requirement labels also show explicit autonomy and last-use thresholds. Labels
+separated by `|` are one alternative criterion: matching any listed option satisfies
 that denominator entry; independent AND requirements remain separate tags.
 Relative recency stays relative in cached facts: `current/currently` means used
 within one year, `recent/recently` means used within five years, and an explicit

@@ -90,6 +90,10 @@ test('requirement labels expose explicit autonomy and last-use thresholds', () =
   assert.equal(requirementLabel(requirement({kind:'capability',alternatives:['data-structures'],knowledgeLevel:'advanced'})),'Data structures · Advanced knowledge');
   assert.equal(requirementLabel(requirement({alternatives:['typescript'],maxYearsSinceUse:5})),'TypeScript · Recent · ≤5 years');
 });
+
+test('requirement labels show alternatives with a vertical bar', () => {
+  assert.equal(requirementLabel(requirement({alternatives:['go', 'nodejs']})), 'Go | Node.js');
+});
 test('a generic NoSQL profile fact matches only the generic family requirement', () => {
   const general=requirement({alternatives:['nosql'],autonomy:'basic',minMonths:12,lastUsedYear:2022});
   assert.equal(matchRequirement(general,profile).score,1);
