@@ -18,3 +18,9 @@
 4. **Complete the bounded AI-provider experiment only with owner approval.**
    Follow `docs/ai-provider-plan.md`; do not process queue records or enable
    paid API billing during it.
+5. **Add a local job-market tag insights screen.** Show which canonical tags
+   occur in the most processed jobs, with job counts and percentages separated
+   into requirements, nice-to-haves, and company stack. Count each tag at most
+   once per job, keep unmapped criteria visibly separate, and derive everything
+   from the saved queue without opening Chrome or calling AI. Include links or
+   a drill-down to the affected jobs so the owner can interpret each aggregate.
