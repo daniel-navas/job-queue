@@ -39,6 +39,13 @@ review, `Applications` are tracked processes after applying, `Role` is the job
 title, and `Offer` is reserved for an employment offer received from a company.
 Do not use Opportunity, Posting, or Listing as competing UI names.
 
+Owner-facing explanations must start with the practical behavior. Never use an
+internal field name, schema-version number, compatibility term, or abbreviation
+as if the owner already knows it. If one is relevant, define it immediately in
+plain Spanish and show the concrete change as `before → now`; otherwise omit it.
+Release summaries must describe what changes in the owner's workflow before
+mentioning implementation details.
+
 Machine-readable preferences live in config/preferences.json; weights and
 recency bands in config/scoring.json; candidate facts in profile/matching.json.
 Their interpretation and minimal UI rules live in docs/preferences.md.
