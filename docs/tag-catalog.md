@@ -28,7 +28,7 @@ general-experience key, and 20 project keys. It also keeps
 14 non-selectable commodity concepts solely so legacy output can be discarded
 deterministically. Adding an entry establishes
 neither candidate competence nor a preference score. Most new entries remain
-unmatched until the profile supplies specific evidence. Neutral domains are
+unmatched until the profile supplies specific fields. Neutral domains are
 context, not automatically positive signals.
 
 ## Rules

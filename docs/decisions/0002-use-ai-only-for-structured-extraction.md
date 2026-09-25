@@ -39,8 +39,8 @@ Use this pipeline:
    evidence stays neutral and remains visible.
 
 The machine-readable candidate record is `profile/matching.json`. Narrative
-source context remains in `profile/raw.md` and in evidence strings, but matching
-must use typed fields such as practical months, autonomy, last-used year, and
+candidate context remains in `profile/raw.md`; exact offer wording remains in
+offer evidence strings. Matching must use typed fields such as practical months, autonomy, last-used year, and
 professional-use status. Preference values live in
 `config/preferences.json`; weights and recency bands live in
 `config/scoring.json`.

@@ -61,8 +61,8 @@ test('capability assessments require only the profile dimensions named by the cr
     ...profile,
     capabilities: {
       ...profile.capabilities,
-      denied: { confirmed: false, evidence: 'Owner denied it.' },
-      conceptual: { confirmed: true, evidence: 'Owner confirmed familiarity.' },
+      denied: { confirmed: false },
+      conceptual: { confirmed: true },
     },
   };
 
@@ -190,7 +190,7 @@ test('typed capabilities respect duration, autonomy and last-use thresholds', ()
 test('relative recency and conceptual knowledge are matched independently', () => {
   assert.equal(matchRequirement(requirement('react',{maxYearsSinceUse:5}),profile,2026).score,1);
   assert.equal(matchRequirement(requirement('react',{maxYearsSinceUse:3}),profile,2026).score,0);
-  const conceptual={...profile,capabilities:{...profile.capabilities,'data-structures':{confirmed:true,knowledgeLevel:'intermediate',evidence:'Owner confirmed.'}}};
+  const conceptual={...profile,capabilities:{...profile.capabilities,'data-structures':{confirmed:true,knowledgeLevel:'intermediate'}}};
   assert.equal(matchRequirement(requirement('data-structures',{kind:'capability',knowledgeLevel:'basic'}),conceptual,2026).score,1);
   assert.equal(matchRequirement(requirement('data-structures',{kind:'capability',knowledgeLevel:'advanced'}),conceptual,2026).score,0);
   assert.equal(matchRequirement(requirement('secure-coding',{kind:'capability',knowledgeLevel:'basic'}),profile,2026).score,1);

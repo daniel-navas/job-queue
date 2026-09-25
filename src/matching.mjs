@@ -72,7 +72,7 @@ function assessTechnology(technology, requirement, currentYear, stack, label) {
 
 function assessCapability(capability, requirement, currentYear) {
   if (!capability || capability.confirmed === undefined) return { assessment: 'unknown', evidence: 'Capability is not recorded in the profile.' };
-  if (capability.confirmed === false) return { assessment: 'no-match', evidence: capability.evidence || 'The owner confirmed this capability is not present.' };
+  if (capability.confirmed === false) return { assessment: 'no-match', evidence: 'The owner confirmed this capability is not present.' };
   const cutoff = recencyCutoff(requirement, currentYear);
   const checks = [
     { needed: requirement.autonomy !== null, known: levels[capability.autonomy] !== undefined, passes: (levels[capability.autonomy] || 0) >= levels[requirement.autonomy], label: 'autonomy' },
@@ -84,7 +84,7 @@ function assessCapability(capability, requirement, currentYear) {
     ? ` ${capability.autonomy ?? 'unknown'} autonomy, ${capability.practicalMonths ?? 'unknown'} practical months, last used ${capability.lastUsedYear ?? 'unknown'}.`
     : '';
   const knowledge = capability.knowledgeLevel ? ` ${capability.knowledgeLevel} conceptual knowledge.` : '';
-  const detail = `${capability.evidence || 'Owner confirmed familiarity.'}${typed}${knowledge}`;
+  const detail = `Owner confirmed familiarity.${typed}${knowledge}`;
   const missing = checks.filter(check => !check.known).map(check => check.label);
   if (missing.length) return { assessment: 'unknown', evidence: `${detail} Missing ${missing.join(', ')} information.` };
   if (checks.some(check => !check.passes)) return { assessment: 'no-match', evidence: `${detail} Known values do not meet every threshold.` };

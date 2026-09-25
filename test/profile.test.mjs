@@ -22,7 +22,7 @@ test('editable profile and preferences contain valid deterministic inputs', () =
   for (const [key, entry] of Object.entries(profile.capabilities)) {
     assert.ok(catalog.capability[key], key);
     assert.equal(typeof entry.confirmed, 'boolean', key);
-    assert.ok(typeof entry.evidence === 'string' && entry.evidence.trim(), key);
+    assert.ok(!Object.hasOwn(entry, 'evidence'), `${key} must not duplicate owner confirmation as evidence`);
     if (entry.autonomy != null) assert.ok(['basic', 'independent', 'advanced', 'unknown'].includes(entry.autonomy), key);
     if (entry.knowledgeLevel != null) assert.ok(['basic', 'intermediate', 'advanced'].includes(entry.knowledgeLevel), key);
     if (entry.practicalMonths != null) assert.ok(Number.isFinite(entry.practicalMonths) && entry.practicalMonths >= 0, key);
