@@ -38,12 +38,7 @@ is used, so merely reaching the threshold consumes no Codex usage.
    to map an existing tag, create a canonical tag, split distinct meanings,
    exclude a non-differentiating criterion, or keep it unmapped until there is
    enough evidence. Do not interrupt the cycle for item-by-item approval.
-   When an unmapped source label is unconditionally the same meaning as an
-   existing canonical tag, record it as a reviewed alias. The compact catalog
-   supplied to the AI must include that alias so it can choose the canonical key
-   from the source context in future extractions. Do not add speculative aliases
-   merely because they might be useful, and do not automatically rewrite an
-   extraction merely because its raw text contains an alias.
+   Handle equivalent wording through the reviewed-alias flow below.
 4. Present one compact, stably numbered proposal covering every candidate. The
    owner can identify objections by number. During that objection window, an
    item the owner does not mention is approved; apply it with the rest of the
@@ -55,6 +50,26 @@ is used, so merely reaching the threshold consumes no Codex usage.
    An alias needs evidence of unconditional semantic equivalence; a narrower or
    context-dependent phrase remains a source example rather than an alias.
    Decisions must be generic and source-based, never per-offer exceptions.
+
+## Reviewed-alias flow
+
+An alias fixes a naming mismatch without creating a duplicate tag:
+
+1. An offer uses wording such as `NodeJS`.
+2. If the classifier cannot confidently connect it to the canonical `nodejs`
+   tag (`Node.js`), it returns the criterion as `unmapped`. It must not create a
+   new canonical tag by itself.
+3. Review confirms whether `NodeJS` always has the same meaning as `nodejs`. If
+   so, save `NodeJS` as a reviewed alias and explicitly map the already-reviewed
+   criterion to `nodejs`. If the meaning depends on context, do not make it an
+   alias.
+4. Future classifier payloads include the reviewed alias beside `nodejs`. This
+   helps the AI select the existing canonical tag from the full sentence.
+
+An alias is classifier guidance, not a raw-text rule: seeing `NodeJS` in text
+must not assign `nodejs` automatically. Do not create speculative aliases before
+an actual naming mismatch appears in review. Aliases do not modify the candidate
+profile.
 
 Decision states are `proposed`, `applied`, `deferred`, and `reopened`.
 Only `applied` fingerprints leave the pending inventory. `proposed`, `deferred`

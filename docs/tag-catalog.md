@@ -35,8 +35,13 @@ context, not automatically positive signals.
 
 - Tag, experience and project IDs are selected from enums. Technology and
   knowledge tags may appear together in one OR criterion.
-- Display labels come from the catalog. Aliases are for deterministic legacy
-  normalization, not extra AI-generated options.
+- Display labels come from the catalog. An alias is alternative source wording
+  approved during unmapped review because it always means the same thing as one
+  canonical tag. Reviewed aliases can normalize the specifically reviewed
+  stored criterion. Once the classifier-payload TODO is implemented, they will
+  also appear beside the canonical tag as classification guidance. They never
+  assign a tag merely because the raw text matches, and they are not speculative
+  AI-generated options. See `docs/unmapped-review.md`.
 - Families list explicit alternatives, not inferred mastery. PostgreSQL does
   not prove MySQL; generic AWS experience does not prove every AWS service.
 - A concrete out-of-catalog criterion uses kind `unknown`, key `unmapped`, a

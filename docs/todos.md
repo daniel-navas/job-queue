@@ -1,8 +1,14 @@
 # Current TODOs
 
-1. **Send reviewed aliases to the classifier.** Render only aliases confirmed by
-   review in the compact catalog payload. They guide the AI's classification;
-   they must not trigger raw-text auto-assignment.
+1. **Teach the classifier reviewed aliases.** If the classifier cannot connect
+   source wording such as `NodeJS` to the existing canonical tag `nodejs`
+   (`Node.js`), it leaves the criterion `unmapped`; it does not create a tag.
+   During review, record the wording as an alias only when it always means the
+   same thing as the canonical tag. Then include that reviewed alias beside the
+   canonical tag in the compact catalog sent to the classifier, so future
+   extractions can select `nodejs` from context. The alias is guidance for the
+   classifier: it must never cause an automatic raw-text match, and aliases
+   must not be invented in advance.
 2. **Run the dynamic classifier-payload spike.** Evaluate a smaller
    locally-retrieved catalog payload against the full-catalog baseline before
    any production change. See `docs/dynamic-classifier-payload-spike.md`.
