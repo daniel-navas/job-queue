@@ -1,377 +1,76 @@
 {
-  "schemaVersion": 1,
-  "source": "Sanitized professional profile",
-  "technologyInterests": [
-    "go"
-  ],
-  "candidate": {
-    "english": {
-      "dailyWork": true,
-      "interviews": true
-    }
-  },
-  "technologies": {
-    "docker": {
-      "label": "Docker",
-      "practicalMonths": 12,
-      "autonomy": "basic",
-      "lastUsedYear": 2023,
-      "professionalUse": true
-    },
-    "kubernetes": {
-      "label": "Kubernetes",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "react": {
-      "label": "React",
-      "practicalMonths": 36,
-      "autonomy": "independent",
-      "lastUsedYear": 2022,
-      "professionalUse": true
-    },
-    "react-native": {
-      "label": "React Native",
-      "practicalMonths": 6,
-      "autonomy": "basic",
-      "lastUsedYear": 2025,
-      "professionalUse": true
-    },
-    "angularjs": {
-      "label": "AngularJS",
-      "practicalMonths": 6,
-      "autonomy": "basic",
-      "lastUsedYear": 2020,
-      "professionalUse": true
-    },
-    "elasticsearch": {
-      "label": "Elasticsearch",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "gitlab": {
-      "label": "GitLab",
-      "practicalMonths": 24,
-      "autonomy": "independent",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "mysql": {
-      "label": "MySQL",
-      "practicalMonths": 24,
-      "autonomy": "basic",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "nodejs": {
-      "label": "Node.js",
-      "practicalMonths": 72,
-      "autonomy": "advanced",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "typescript": {
-      "label": "TypeScript",
-      "practicalMonths": 60,
-      "autonomy": "advanced",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "sql": {
-      "label": "SQL",
-      "practicalMonths": 36,
-      "autonomy": "basic",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "nosql": {
-      "label": "NoSQL",
-      "practicalMonths": 12,
-      "autonomy": "basic",
-      "lastUsedYear": 2022,
-      "professionalUse": true
-    },
-    "python": {
-      "label": "Python",
-      "practicalMonths": 12,
-      "autonomy": "independent",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "postgresql": {
-      "label": "PostgreSQL",
-      "practicalMonths": 36,
-      "autonomy": "basic",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "typeorm": {
-      "label": "TypeORM",
-      "practicalMonths": 12,
-      "autonomy": "independent",
-      "lastUsedYear": 2023,
-      "professionalUse": true
-    },
-    "nestjs": {
-      "label": "NestJS",
-      "practicalMonths": 36,
-      "autonomy": "independent",
-      "lastUsedYear": 2023,
-      "professionalUse": true
-    },
-    "aws": {
-      "label": "AWS",
-      "practicalMonths": 48,
-      "autonomy": "independent",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "java": {
-      "label": "Java",
-      "practicalMonths": 6,
-      "autonomy": "basic",
-      "lastUsedYear": 2019,
-      "professionalUse": true
-    },
-    "rust": {
-      "label": "Rust",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "c++": {
-      "label": "C++",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "csharp": {
-      "label": "C#",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "kotlin": {
-      "label": "Kotlin",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "mariadb": {
-      "label": "MariaDB",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "sql-server": {
-      "label": "SQL Server",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "terraform": {
-      "label": "Terraform",
-      "practicalMonths": 6,
-      "autonomy": "basic",
-      "lastUsedYear": 2022,
-      "professionalUse": true
-    },
-    "aws-cdk": {
-      "label": "AWS CDK",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "go": {
-      "label": "Go",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "scala": {
-      "label": "Scala",
-      "practicalMonths": 0,
-      "autonomy": "unknown",
-      "lastUsedYear": null,
-      "professionalUse": false
-    },
-    "llm-tools": {
-      "label": "LLM tools",
-      "practicalMonths": 12,
-      "autonomy": "independent",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    },
-    "gcp": {
-      "label": "GCP",
-      "practicalMonths": 12,
-      "autonomy": "independent",
-      "lastUsedYear": 2026,
-      "professionalUse": true
-    }
+  "schemaVersion": 2,
+  "interests": ["go"],
+  "tags": {
+    "docker": "basic",
+    "kubernetes": "none",
+    "react": "independent",
+    "react-native": "basic",
+    "angularjs": "basic",
+    "elasticsearch": "none",
+    "gitlab": "independent",
+    "mysql": "basic",
+    "nodejs": "advanced",
+    "typescript": "advanced",
+    "sql": "basic",
+    "nosql": "basic",
+    "python": "independent",
+    "postgresql": "basic",
+    "typeorm": "independent",
+    "nestjs": "independent",
+    "aws": "independent",
+    "java": "basic",
+    "rust": "none",
+    "c++": "none",
+    "csharp": "none",
+    "kotlin": "none",
+    "mariadb": "none",
+    "sql-server": "none",
+    "terraform": "basic",
+    "aws-cdk": "none",
+    "go": "none",
+    "scala": "none",
+    "llm-tools": "independent",
+    "gcp": "independent",
+    "backend": "basic",
+    "financial": "present",
+    "ai-assisted": "basic",
+    "degree": "present",
+    "full-stack": "independent",
+    "automated-testing": "basic",
+    "rest-api": "basic",
+    "api-development": "basic",
+    "microservices": "basic",
+    "ci-cd": "basic",
+    "containerization": "basic",
+    "iac": "basic",
+    "performance-optimization": "basic",
+    "secure-coding": "basic",
+    "data-structures": "independent",
+    "algorithms": "basic",
+    "system-design": "independent",
+    "product-experimentation": "independent",
+    "analytics-instrumentation": "independent",
+    "product-analytics": "independent",
+    "growth-engineering": "independent",
+    "devops": "basic",
+    "unit-testing": "independent",
+    "integration-testing": "basic",
+    "distributed": "independent",
+    "event-driven": "basic",
+    "data-integrity": "independent",
+    "production-operations": "independent",
+    "english": "basic"
   },
   "employmentPeriods": [
-    [
-      "2017-02",
-      "2017-07"
-    ],
-    [
-      "2017-10",
-      "2018-02"
-    ],
-    [
-      "2018-02",
-      "2019-05"
-    ],
-    [
-      "2019-06",
-      "2020-01"
-    ],
-    [
-      "2020-02",
-      "2020-09"
-    ],
-    [
-      "2020-11",
-      "2022-03"
-    ],
-    [
-      "2022-03",
-      "2023-07"
-    ],
-    [
-      "2024-06",
-      "2025-01"
-    ],
-    [
-      "2025-11",
-      "2026-03"
-    ]
-  ],
-  "capabilities": {
-    "backend": {
-      "confirmed": true
-    },
-    "financial": {
-      "confirmed": true
-    },
-    "ai-assisted": {
-      "confirmed": true
-    },
-    "degree": {
-      "confirmed": true
-    },
-    "full-stack": {
-      "confirmed": true,
-      "practicalMonths": 36,
-      "autonomy": "independent",
-      "lastUsedYear": 2026
-    },
-    "automated-testing": {
-      "confirmed": true
-    },
-    "rest-api": {
-      "confirmed": true
-    },
-    "api-development": {
-      "confirmed": true
-    },
-    "microservices": {
-      "confirmed": true
-    },
-    "ci-cd": {
-      "confirmed": true
-    },
-    "containerization": {
-      "confirmed": true
-    },
-    "iac": {
-      "confirmed": true,
-      "practicalMonths": 6,
-      "autonomy": "basic",
-      "lastUsedYear": 2022
-    },
-    "performance-optimization": {
-      "confirmed": true
-    },
-    "secure-coding": {
-      "confirmed": true,
-      "knowledgeLevel": "basic"
-    },
-    "data-structures": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "algorithms": {
-      "confirmed": true,
-      "knowledgeLevel": "basic"
-    },
-    "system-design": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "product-experimentation": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "analytics-instrumentation": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "product-analytics": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "growth-engineering": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "devops": {
-      "confirmed": true,
-      "knowledgeLevel": "basic"
-    },
-    "unit-testing": {
-      "confirmed": true,
-      "practicalMonths": 24,
-      "autonomy": "independent",
-      "lastUsedYear": 2026
-    },
-    "integration-testing": {
-      "confirmed": true,
-      "practicalMonths": 6,
-      "autonomy": "basic",
-      "lastUsedYear": 2026
-    },
-    "distributed": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "event-driven": {
-      "confirmed": true,
-      "knowledgeLevel": "basic"
-    },
-    "data-integrity": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "production-operations": {
-      "confirmed": true,
-      "knowledgeLevel": "intermediate"
-    },
-    "english": {
-      "confirmed": true
-    }
-  }
+    ["2017-02", "2017-07"],
+    ["2017-10", "2018-02"],
+    ["2018-02", "2019-05"],
+    ["2019-06", "2020-01"],
+    ["2020-02", "2020-09"],
+    ["2020-11", "2022-03"],
+    ["2022-03", "2023-07"],
+    ["2024-06", "2025-01"],
+    ["2025-11", "2026-03"]
+  ]
 }

@@ -21,10 +21,9 @@ try {
   // Fixed scoring inputs keep UI expectations independent of owner calibration.
   const { preferences, scoring } = evaluationConfig();
   const scenarioProfile = matchingProfile();
-  const noExperience = label => ({ label, practicalMonths: 0, autonomy: 'unknown', lastUsedYear: null, professionalUse: false });
-  Object.assign(scenarioProfile.technologies, {
-    go: noExperience('Go'), rust: noExperience('Rust'), 'c++': noExperience('C++'),
-    csharp: noExperience('C#'), kotlin: noExperience('Kotlin'), scala: noExperience('Scala'),
+  Object.assign(scenarioProfile.tags, {
+    go: 'none', rust: 'none', 'c++': 'none',
+    csharp: 'none', kotlin: 'none', scala: 'none',
   });
   await writeFile(path.join(root, 'profile/matching.json'), JSON.stringify(scenarioProfile));
   await writeFile(path.join(root, 'config/preferences.json'), JSON.stringify(preferences));
@@ -41,8 +40,8 @@ try {
     requirements: [
       requirement('node.js', { evidence: 'Node.js.' }),
       requirement('kubernetes', { evidence: 'Kubernetes.' }),
-      requirement('compiled-language', { label: 'Compiled statically typed languages', evidence: 'Go or a similar compiled statically typed language.' }),
-      requirement('relational-db', { evidence: 'Intermediate relational database knowledge.' }),
+      requirement('compiled-language', { label: 'Compiled statically typed languages', level: 'independent', evidence: 'Independent work in Go or a similar compiled statically typed language.' }),
+      requirement('relational-db', { level: 'independent', evidence: 'Intermediate relational database knowledge.' }),
       requirement('unmapped', { kind: 'unknown', label: 'Unusual platform certification', evidence: 'Unusual platform certification.' }),
     ],
     preferred: [
@@ -95,25 +94,25 @@ try {
   await page.getByText('1 tag pending review', { exact: true }).waitFor();
   assert.equal(await page.locator('#run-status a, #run-status button').count(), 0);
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
-  await page.getByText(/3–7 years · Software engineering/).waitFor();
+  await page.getByText(/Software engineering · 3–7 years/).waitFor();
   assert.ok(await page.getByText('Complete', { exact: true }).count());
   assert.ok(await page.getByText('Pending analysis', { exact: true }).count());
   assert.ok(await page.getByText('Needs info · 6/8', { exact: true }).count());
   await page.getByRole('button', { name: /Mixed evaluation job/ }).click();
   assert.equal(await page.locator('#detail .evaluation-summary').count(), 0);
   await page.getByText(/Compiled languages · Independent/).waitFor();
-  const compiledTooltip = await page.getByLabel(/Compiled languages: Required non-match/).getAttribute('title');
-  assert.equal(compiledTooltip, 'Java · Basic · 6 months · last used 2019\nNone: Go, Rust, C++, C#, Kotlin, Scala');
+  const compiledTooltip = await page.locator('.assessment-no-match-required').filter({ hasText: 'Compiled languages' }).getAttribute('title');
+  assert.equal(compiledTooltip, 'Java · Basic\nNone: Go, Rust, C++, C#, Kotlin, Scala');
   assert.doesNotMatch(compiledTooltip, /Requires|Assessment:|Offer:/);
   await page.getByText(/Relational databases · Independent/).waitFor();
-  assert.doesNotMatch(await page.getByLabel(/Relational databases: Required non-match/).getAttribute('title'), /Requires|Assessment:|Offer:/);
-  for (const [className, accessibleName] of [
-    ['assessment-match', 'Node.js: Match'],
-    ['assessment-no-match-required', 'Kubernetes: Required non-match'],
-    ['assessment-no-match-optional', 'Kubernetes: Optional non-match'],
-    ['assessment-unknown', 'Angular: Profile information needed'],
-    ['assessment-unmapped', 'Unusual platform certification: Unmapped'],
-  ]) assert.equal(await page.locator(`.${className}[aria-label^="${accessibleName}"]`).count(), 1);
+  assert.doesNotMatch(await page.locator('.assessment-no-match-required').filter({ hasText: 'Relational databases' }).getAttribute('title'), /Requires|Assessment:|Offer:/);
+  for (const [className, text] of [
+    ['assessment-match', 'Node.js'],
+    ['assessment-no-match-required', 'Kubernetes'],
+    ['assessment-no-match-optional', 'Kubernetes'],
+    ['assessment-unknown', 'Angular'],
+    ['assessment-unmapped', 'Unusual platform certification'],
+  ]) assert.equal(await page.locator(`.${className}`).filter({ hasText: text }).count(), 1);
   await mkdir('.local', { recursive: true });
   await page.screenshot({ path: '.local/evaluation-desktop.png' });
   await page.getByRole('button', { name: /Backend Engineer/ }).click();

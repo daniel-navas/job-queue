@@ -6,18 +6,15 @@ const nullable = value => ({ anyOf: [{ type: 'null' }, value] });
 const object = properties => ({ type: 'object', additionalProperties: false, required: Object.keys(properties), properties });
 const fact = values => nullable(object({ value: values ? { ...string, enum: values } : string, evidence }));
 const array = (items, maxItems = 30) => ({ type: 'array', maxItems, items });
-export const capabilityKeys = Object.keys(catalog.capability);
+export const tagKeys = Object.keys(catalog.tags);
 export const projectKeys = Object.keys(catalog.project);
-export const requirementSchema = { anyOf: ['technology', 'capability', 'experience', 'unknown'].map(kind => object({
+export const requirementSchema = { anyOf: ['tag', 'experience', 'unknown'].map(kind => object({
   label: string,
   kind: { type: 'string', enum: [kind] },
   alternatives: { ...array({ ...string, enum: kind === 'unknown' ? ['unmapped'] : selectableKeys(kind) }), minItems: 1 },
+  level: nullable({ type: 'string', enum: ['basic', 'independent', 'advanced'] }),
   minMonths: nullable({ type: 'number', minimum: 0, maximum: 1200 }),
   maxMonths: nullable({ type: 'number', minimum: 0, maximum: 1200 }),
-  autonomy: nullable({ type: 'string', enum: ['basic', 'independent', 'advanced'] }),
-  knowledgeLevel: nullable({ type: 'string', enum: ['basic', 'intermediate', 'advanced'] }),
-  lastUsedYear: nullable({ type: 'integer', minimum: 1970, maximum: 2100 }),
-  maxYearsSinceUse: nullable({ type: 'integer', minimum: 0, maximum: 50 }),
   evidence,
 })) };
 export const properties = {
@@ -59,8 +56,8 @@ export function validateShape(value, rule, location = 'cards') {
 export function displayFields(card) {
   const list = values => values.length ? { value: values.map(requirementLabel).join(', '), evidence: [...new Set(values.map(v => v.evidence))].join('\n') } : null;
   return { ...card,
-    requiredTechnologies: list(card.requirements.filter(v => v.kind !== 'experience')),
-    preferredTechnologies: list(card.preferred),
+    requirements: list(card.requirements.filter(v => v.kind !== 'experience')),
+    preferred: list(card.preferred),
     experience: list(card.requirements.filter(v => v.kind === 'experience')),
     project: card.software || card.work ? { value: `Software: ${card.software?.value || 'Not stated'} Work: ${card.work?.value || 'Not stated'}`, evidence: [card.software?.evidence, card.work?.evidence].filter(Boolean).join('\n') } : null,
   };

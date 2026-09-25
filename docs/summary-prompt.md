@@ -97,32 +97,20 @@ established by generic automated-testing. Use an unknown key if needed.
 Generic troubleshooting does not establish incident response. Do not add a
 broader adjacent capability just because a related word appears in the source.
 
-Each criterion has a label, kind, alternatives (catalog keys), minMonths, maxMonths,
-autonomy, knowledgeLevel, lastUsedYear, maxYearsSinceUse, evidence. Null thresholds unless EXPLICIT:
+Each criterion has a label, kind, alternatives (catalog keys), level, minMonths,
+maxMonths and evidence. Kinds are tag, experience and unknown. Technology and
+knowledge tags share the tag kind, so alternatives may freely combine them.
+Null thresholds unless EXPLICIT:
 - minMonths: minimum practical duration, years multiplied by 12. For a range
   use its minimum; do not invent a maximum hiring ceiling.
 - maxMonths: preserve the upper end of an explicitly published range for
   display (3–7 years means 36 and 84 months). Null for a minimum-only statement.
   The upper end is not a rejection rule. Do not put all numerical data only
   in the label: display text is derived from these typed values.
-- autonomy: for hands-on use or execution, basic for explicitly basic use,
-  independent for working proficiency, and advanced for explicit advanced or
-  expert execution. Do not infer technology expertise from a senior title or
-  set autonomy from conceptual knowledge wording alone.
-  Bare "experience with", "knowledge of", "production systems", or years of
-  experience do NOT state a proficiency level: leave autonomy null. Working
-  proficiency must actually be stated, not inferred from having used a tool.
-- knowledgeLevel: only for conceptual capability requirements rather than
-  hands-on technology autonomy. Map basic/familiarity/unqualified understanding
-  to basic; intermediate/working/solid knowledge to intermediate; and
-  strong/deep/advanced/expert knowledge to advanced. Otherwise null. Examples
-  include data structures, algorithms, system design and security concepts.
-  For kind technology, knowledgeLevel is always null, including database
-  families. "Knowledge of PostgreSQL" alone sets neither threshold.
-- lastUsedYear: only an explicit absolute year cutoff.
-- maxYearsSinceUse: a relative recency cutoff. Use the explicit number for
-  "within the last N years". Map current/currently to 1 and recent/recently to
-  5. Otherwise null. Never set both lastUsedYear and maxYearsSinceUse.
+- level: basic for explicit basic/familiarity wording; independent for explicit
+  intermediate, working, solid or independent ability; advanced for explicit
+  strong, deep, advanced or expert ability. Leave null when no level is stated.
+  Do not derive level from years; local matching performs that conversion.
 
 The appended TAG CATALOG is the authoritative vocabulary. The schema enforces
 the keys available for each kind. Do not invent keys, spellings or synonyms.

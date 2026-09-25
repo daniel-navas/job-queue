@@ -25,8 +25,8 @@ export const cases = [
     id: '4456384983',
     checks: {
       'Required cloud architecture is retained independently of preferred AWS': card => card.requirements.some(item => /cloud architecture/i.test(item.evidence)) && has(card, 'preferred', 'aws') && !has(card, 'requirements', 'aws'),
-      'Experience alone does not invent Spring Boot proficiency': card => has(card, 'requirements', 'spring-boot', item => item.autonomy === null),
-      'Technology knowledge is not conceptual capability level': card => [...card.requirements, ...card.preferred].every(item => item.kind !== 'technology' || item.knowledgeLevel === null),
+      'Experience alone does not invent Spring Boot proficiency': card => has(card, 'requirements', 'spring-boot', item => item.level === null),
+      'Requirements use the unified tag contract': card => [...card.requirements, ...card.preferred].every(item => item.kind === 'tag' && !('autonomy' in item) && !('knowledgeLevel' in item)),
       'Attitude toward security is not a measurable requirement': card => !card.requirements.some(item => /appreciation and consideration for security/i.test(item.evidence)),
       'Both database families required separately': card => ['relational-db', 'nosql'].every(key => has(card, 'requirements', key, item => item.alternatives.length === 1)),
       'Kotlin remains optional': card => has(card, 'preferred', 'kotlin') && !has(card, 'requirements', 'kotlin'),
@@ -38,10 +38,10 @@ export const cases = [
     id: 'eval-alternatives',
     source: { id: 'eval-alternatives', title: 'Backend Engineer', company: 'Example', location: 'Spain', description: 'Requirements: Experience with Python or TypeScript. Docker and PostgreSQL are required. Familiarity with algorithms. Our company also uses React; this role does not require React. Remote within Spain. We sponsor work visas but do not pay moving expenses.' },
     checks: {
-      'OR languages stay one criterion without invented proficiency': card => card.requirements.some(item => item.alternatives.length === 2 && ['python', 'typescript'].every(key => item.alternatives.includes(key)) && item.autonomy === null),
+      'OR languages stay one criterion without invented proficiency': card => card.requirements.some(item => item.alternatives.length === 2 && ['python', 'typescript'].every(key => item.alternatives.includes(key)) && item.level === null),
       'AND technologies stay separate': card => ['docker', 'postgresql'].every(key => has(card, 'requirements', key, item => item.alternatives.length === 1)),
       'Company stack does not become a requirement': card => !has(card, 'requirements', 'react'),
-      'Conceptual familiarity is basic knowledge': card => has(card, 'requirements', 'algorithms', item => item.knowledgeLevel === 'basic' && item.autonomy === null),
+      'Conceptual familiarity uses the unified basic level': card => has(card, 'requirements', 'algorithms', item => item.level === 'basic'),
       'Visa and moving expenses are independent': card => fact(card, 'visaSupport', 'supported') && fact(card, 'relocationFunding', 'not-available'),
     },
   },

@@ -5,7 +5,7 @@ export function evaluationProgress(job, tags) {
   if (job.processingStatus !== 'processed' || !tags) {
     return { status: 'pending-analysis', resolved: 0, total: 0, profileGaps: 0, unmapped: 0 };
   }
-  const criteria = ['requiredTechnologies', 'preferredTechnologies', 'experience', 'stack']
+  const criteria = ['requirements', 'preferred', 'experience', 'stack']
     .flatMap(key => tags[key] || []);
   const resolved = criteria.filter(tag => tag.assessment === 'match' || tag.assessment === 'no-match').length;
   const profileGaps = criteria.filter(tag => tag.assessment === 'unknown').length;
@@ -24,7 +24,7 @@ export function evaluateJob(job, profile, preferences, scoring, monthlySalary, n
   const tags = matchTags(job, profile, new Date(now).getUTCFullYear()), rating = rateJob(job, preferences);
   const project = projectTags(job, preferences.projectTags);
   if (rating.total !== null) {
-    for (const key of ['requiredTechnologies', 'preferredTechnologies', 'experience']) {
+    for (const key of ['requirements', 'preferred', 'experience']) {
       const values = tags?.[key] || [];
       rating.fields[key] = { score: coverageScore(values), reason: `${values.filter(t => t.score === 1).length}/${values.length} confirmed matches; unknown or insufficient evidence receives no match credit.` };
     }

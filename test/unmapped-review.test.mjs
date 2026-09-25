@@ -60,7 +60,7 @@ test('only applied decisions leave the review queue; deferred decisions remain p
     id: `decision-${index + 1}`,
     status: ['applied', 'deferred', 'proposed', 'reopened'][index],
     action: index === 0 ? 'map-existing' : 'keep-unmapped',
-    target: index === 0 ? { kind: 'capability', key: 'backend' } : null,
+    target: index === 0 ? { kind: 'tag', key: 'backend' } : null,
     fingerprints: [candidateFingerprint('requirements', criterion)],
     rationale: 'Reviewed.',
     reviewedAt: '2026-09-21',

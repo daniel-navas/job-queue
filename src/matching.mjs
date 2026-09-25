@@ -1,24 +1,15 @@
-import { catalog, canonical, members, requirementLabel } from './tag-catalog.mjs';
-export { canonical } from './tag-catalog.mjs';
+import { catalog, canonical, effectiveLevel, members, requirementLabel } from './tag-catalog.mjs';
+export { canonical, effectiveLevel } from './tag-catalog.mjs';
+
+const levels = { none: 0, basic: 1, independent: 2, advanced: 3 };
+const titleCase = value => value[0].toUpperCase() + value.slice(1);
+
 export function experienceMonths(periods) {
   const month = value => Number(value.slice(0, 4)) * 12 + Number(value.slice(5)) - 1;
   const covered = new Set();
   for (const [start, end] of periods) for (let i = month(start); i <= month(end); i++) covered.add(i);
   return covered.size;
 }
-const levels = { basic: 1, independent: 2, advanced: 3 };
-const knowledgeLevels = { basic: 1, intermediate: 2, advanced: 3 };
-const titleCase = value => value[0].toUpperCase() + value.slice(1);
-const durationText = months => months % 12 === 0 ? `${months / 12}+ year${months === 12 ? '' : 's'}` : `${months}+ months`;
-
-const recencyCutoff = (requirement, currentYear) => Number.isInteger(requirement.lastUsedYear)
-  ? requirement.lastUsedYear
-  : Number.isInteger(requirement.maxYearsSinceUse) ? currentYear - requirement.maxYearsSinceUse : null;
-
-const explicitNoTechnology = technology => technology?.practicalMonths === 0
-  && technology.autonomy === 'unknown'
-  && technology.lastUsedYear === null
-  && technology.professionalUse === false;
 
 function profileSummary(results) {
   const facts = [...new Map(results.filter(result => result.profileFact).map(result => [result.profileFact.label, result.profileFact])).values()];
@@ -38,71 +29,28 @@ function aggregateAlternatives(results) {
   return { ...selected, profileSummary: profileSummary(results) };
 }
 
-function assessTechnology(technology, requirement, currentYear, stack, label) {
-  if (!technology) return { assessment: 'unknown', evidence: 'Technology is not recorded in the profile.', profileFact: { label, status: 'missing' } };
-  const detail = `${technology.label}: ${technology.autonomy ?? 'unknown'}, ${technology.practicalMonths ?? 'unknown'} practical months, last used ${technology.lastUsedYear ?? 'unknown'}.`;
-  const summaryParts = [technology.label];
-  if (levels[technology.autonomy] !== undefined) summaryParts.push(titleCase(technology.autonomy));
-  if (Number.isFinite(technology.practicalMonths) && technology.practicalMonths > 0) summaryParts.push(durationText(technology.practicalMonths).replace('+', ''));
-  if (Number.isInteger(technology.lastUsedYear)) summaryParts.push(`last used ${technology.lastUsedYear}`);
-  const profileFact = { label: technology.label, status: 'known', line: summaryParts.join(' · ') };
-  if (explicitNoTechnology(technology)) return { assessment: 'no-match', evidence: `${detail} The owner confirmed no practical experience.`, profileFact: { label: technology.label, status: 'none' } };
-  if (stack) {
-    if (Number.isFinite(technology.practicalMonths) && technology.practicalMonths > 0) return { assessment: 'match', evidence: detail, profileFact };
-    return { assessment: 'unknown', evidence: `${detail} Practical exposure is not confirmed.`, profileFact };
+function assessTag(key, value, requirement, stack) {
+  const definition = catalog.tags[key], label = definition?.label || key;
+  if (value === undefined) return { assessment: 'unknown', evidence: 'Tag is not recorded in the profile.', profileFact: { label, status: 'missing' } };
+  if (value === 'none') return { assessment: 'no-match', evidence: 'The owner confirmed this tag is not present.', profileFact: { label, status: 'none' } };
+  if (definition?.profileMode === 'presence') {
+    const assessment = value === 'present' ? 'match' : 'unknown';
+    return { assessment, evidence: assessment === 'match' ? 'Confirmed in the profile.' : 'Presence is not established.', profileFact: { label, status: assessment === 'match' ? 'known' : 'missing', line: label } };
   }
-  const cutoff = recencyCutoff(requirement, currentYear);
-  const checks = [
-    { needed: true, known: levels[technology.autonomy] !== undefined, passes: (levels[technology.autonomy] || 0) >= levels[requirement.autonomy || 'independent'], label: 'autonomy', shortfall: () => ({
-      hint: titleCase(requirement.autonomy || 'independent'),
-    }) },
-    { needed: requirement.minMonths !== null, known: Number.isFinite(technology.practicalMonths), passes: technology.practicalMonths >= requirement.minMonths, label: 'duration', shortfall: () => ({
-      hint: durationText(requirement.minMonths),
-    }) },
-    { needed: cutoff !== null, known: Number.isInteger(technology.lastUsedYear), passes: technology.lastUsedYear >= cutoff, label: 'recency', shortfall: () => ({
-      hint: `${cutoff}+`,
-    }) },
-  ].filter(check => check.needed);
-  const missing = checks.filter(check => !check.known).map(check => check.label);
-  if (missing.length) return { assessment: 'unknown', evidence: `${detail} Missing ${missing.join(', ')} information.`, profileFact };
-  const failed = checks.find(check => !check.passes);
-  if (failed) return { assessment: 'no-match', evidence: `${detail} Known values do not meet every threshold.`, shortfall: failed.shortfall(), profileFact };
-  return { assessment: 'match', evidence: detail, profileFact };
+  if (!(value in levels) || value === 'none') return { assessment: 'unknown', evidence: 'Skill level is not established.', profileFact: { label, status: 'missing' } };
+  const required = stack ? 'basic' : effectiveLevel(requirement), passes = levels[value] >= levels[required];
+  return { assessment: passes ? 'match' : 'no-match', evidence: `${label}: ${value}; required ${required}.`, ...(passes ? {} : { shortfall: { hint: titleCase(required) } }), profileFact: { label, status: 'known', line: `${label} · ${titleCase(value)}` } };
 }
 
-function assessCapability(capability, requirement, currentYear) {
-  if (!capability || capability.confirmed === undefined) return { assessment: 'unknown', evidence: 'Capability is not recorded in the profile.' };
-  if (capability.confirmed === false) return { assessment: 'no-match', evidence: 'The owner confirmed this capability is not present.' };
-  const cutoff = recencyCutoff(requirement, currentYear);
-  const checks = [
-    { needed: requirement.autonomy !== null, known: levels[capability.autonomy] !== undefined, passes: (levels[capability.autonomy] || 0) >= levels[requirement.autonomy], label: 'autonomy' },
-    { needed: requirement.knowledgeLevel !== null && requirement.knowledgeLevel !== 'basic', known: knowledgeLevels[capability.knowledgeLevel] !== undefined, passes: (knowledgeLevels[capability.knowledgeLevel] || 0) >= knowledgeLevels[requirement.knowledgeLevel], label: 'knowledge level' },
-    { needed: requirement.minMonths !== null, known: Number.isFinite(capability.practicalMonths), passes: capability.practicalMonths >= requirement.minMonths, label: 'duration' },
-    { needed: cutoff !== null, known: Number.isInteger(capability.lastUsedYear), passes: capability.lastUsedYear >= cutoff, label: 'recency' },
-  ].filter(check => check.needed);
-  const typed = capability.autonomy || Number.isFinite(capability.practicalMonths) || Number.isInteger(capability.lastUsedYear)
-    ? ` ${capability.autonomy ?? 'unknown'} autonomy, ${capability.practicalMonths ?? 'unknown'} practical months, last used ${capability.lastUsedYear ?? 'unknown'}.`
-    : '';
-  const knowledge = capability.knowledgeLevel ? ` ${capability.knowledgeLevel} conceptual knowledge.` : '';
-  const detail = `Owner confirmed familiarity.${typed}${knowledge}`;
-  const missing = checks.filter(check => !check.known).map(check => check.label);
-  if (missing.length) return { assessment: 'unknown', evidence: `${detail} Missing ${missing.join(', ')} information.` };
-  if (checks.some(check => !check.passes)) return { assessment: 'no-match', evidence: `${detail} Known values do not meet every threshold.` };
-  return { assessment: 'match', evidence: detail };
-}
-
-export function matchRequirement(requirement, profile, currentYear = new Date().getUTCFullYear(), options = {}) {
+export function matchRequirement(requirement, profile, _currentYear = new Date().getUTCFullYear(), options = {}) {
   let result;
-  if (requirement.kind === 'unknown') {
-    result = { assessment: 'unmapped', evidence: 'No approved catalog mapping exists for this criterion.' };
-  } else if (requirement.kind === 'technology') {
+  if (requirement.kind === 'unknown') result = { assessment: 'unmapped', evidence: 'No approved catalog mapping exists for this criterion.' };
+  else if (requirement.kind === 'tag') {
     const results = [];
     for (const alternative of requirement.alternatives) {
       const key = canonical(alternative);
-      const capability = catalog.technology[key]?.capability;
-      if (capability) results.push(assessCapability(profile.capabilities?.[capability], requirement, currentYear));
-      const profileKeys = profile.technologies?.[key] ? [key, ...members(key)] : members(key);
-      for (const member of [...new Set(profileKeys)]) results.push(assessTechnology(profile.technologies?.[member], requirement, currentYear, options.stack === true, catalog.technology[member]?.label || member));
+      const profileKeys = profile.tags?.[key] !== undefined ? [key, ...members(key)] : members(key);
+      for (const member of [...new Set(profileKeys)]) results.push(assessTag(member, profile.tags?.[member], requirement, options.stack === true));
     }
     result = aggregateAlternatives(results);
   } else if (requirement.kind === 'experience') {
@@ -114,24 +62,21 @@ export function matchRequirement(requirement, profile, currentYear = new Date().
       const months = experienceMonths(periods);
       result = { assessment: months >= requirement.minMonths ? 'match' : 'no-match', evidence: `${months} distinct CV calendar months; minimum ${requirement.minMonths}. Approximate, with overlapping boundaries counted once.` };
     }
-  } else if (requirement.kind === 'capability') {
-    result = aggregateAlternatives(requirement.alternatives.map(key => assessCapability(profile.capabilities?.[key], requirement, currentYear)));
-  } else {
-    result = { assessment: 'unmapped', evidence: 'No approved catalog mapping exists for this criterion.' };
-  }
+  } else result = { assessment: 'unmapped', evidence: 'No approved catalog mapping exists for this criterion.' };
   return { label: requirementLabel(requirement), score: result.assessment === 'match' ? 1 : 0, assessment: result.assessment, evidence: result.evidence, source: requirement.evidence, ...(result.shortfall ? { shortfall: result.shortfall } : {}), ...(result.profileSummary?.length ? { profileSummary: result.profileSummary } : {}) };
 }
 
 export function matchTags(job, profile, currentYear = new Date().getUTCFullYear()) {
   const facts = job.summary?.facts;
   if (!facts) return null;
-  const map = values => [...new Map(values.map(value => [JSON.stringify([value.kind, value.alternatives.map(canonical).sort(), value.kind === 'unknown' ? [value.label, value.evidence] : null, value.minMonths, value.maxMonths, value.autonomy, value.knowledgeLevel, value.lastUsedYear, value.maxYearsSinceUse]), value])).values()].map(value => matchRequirement(value, profile, currentYear));
+  const identity = value => JSON.stringify([value.kind, value.alternatives.map(canonical).sort(), value.kind === 'unknown' ? [value.label, value.evidence] : null, value.level, value.minMonths, value.maxMonths]);
+  const map = values => [...new Map(values.map(value => [identity(value), value])).values()].map(value => matchRequirement(value, profile, currentYear));
   const used = new Set([...facts.requirements, ...facts.preferred].flatMap(r => r.alternatives.flatMap(members)));
   return {
-    requiredTechnologies: map(facts.requirements.filter(r => r.kind !== 'experience')),
-    preferredTechnologies: map(facts.preferred),
+    requirements: map(facts.requirements.filter(r => r.kind !== 'experience')),
+    preferred: map(facts.preferred),
     experience: map(facts.requirements.filter(r => r.kind === 'experience')),
-    stack: [...new Map(facts.stack.filter(r => !r.alternatives.every(key => used.has(canonical(key)))).map(value => [JSON.stringify([value.kind, value.alternatives.map(canonical).sort(), value.minMonths, value.maxMonths, value.autonomy, value.knowledgeLevel, value.lastUsedYear, value.maxYearsSinceUse]), value])).values()].map(value => matchRequirement(value, profile, currentYear, { stack: true })),
+    stack: [...new Map(facts.stack.filter(r => !r.alternatives.every(key => used.has(canonical(key)))).map(value => [identity(value), value])).values()].map(value => matchRequirement(value, profile, currentYear, { stack: true })),
   };
 }
 

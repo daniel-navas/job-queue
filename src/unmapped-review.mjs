@@ -7,16 +7,13 @@ import { currentSummary } from './summarize.mjs';
 const groups = ['requirements', 'preferred', 'stack'];
 const statuses = new Set(['proposed', 'applied', 'deferred', 'reopened']);
 const actions = new Set(['map-existing', 'create-canonical', 'split', 'exclude', 'keep-unmapped']);
-const kinds = new Set(['technology', 'capability', 'experience']);
+const kinds = new Set(['tag', 'experience']);
 const compact = value => value.replace(/\s+/g, ' ').trim();
 const normalized = value => compact(value).toLowerCase();
 const thresholds = criterion => ({
+  level: criterion.level ?? null,
   minMonths: criterion.minMonths ?? null,
   maxMonths: criterion.maxMonths ?? null,
-  autonomy: criterion.autonomy ?? null,
-  knowledgeLevel: criterion.knowledgeLevel ?? null,
-  lastUsedYear: criterion.lastUsedYear ?? null,
-  maxYearsSinceUse: criterion.maxYearsSinceUse ?? null,
 });
 
 export function candidateFingerprint(group, criterion) {
@@ -41,7 +38,8 @@ export function validateUnmappedReview(value) {
     const needsTarget = ['map-existing', 'create-canonical'].includes(decision.action);
     if (needsTarget && (!decision.target || !kinds.has(decision.target.kind) || typeof decision.target.key !== 'string' || !decision.target.key.trim())) throw new Error('Invalid unmapped review target');
     if (!needsTarget && decision.target !== null) throw new Error('Unexpected unmapped review target');
-    if (decision.status === 'applied' && decision.action === 'map-existing' && !catalog[decision.target.kind]?.[decision.target.key]) throw new Error('Unknown applied unmapped review target');
+    const targetCatalog = decision.target?.kind === 'tag' ? catalog.tags : catalog[decision.target?.kind];
+    if (decision.status === 'applied' && decision.action === 'map-existing' && !targetCatalog?.[decision.target.key]) throw new Error('Unknown applied unmapped review target');
   }
   return value;
 }

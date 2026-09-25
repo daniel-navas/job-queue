@@ -11,12 +11,12 @@ import path from 'node:path';
 
 const wire = overrides => ({ cards: [emptyCard({
   workplace: { value: 'Remote', e: 'Remote' },
-  requirements: [{ l: 'Java experience', k: 'technology', a: ['java'], e: 'Java', t: [], ...overrides }],
+  requirements: [{ l: 'Java experience', k: 'tag', a: ['java'], e: 'Java', t: [], ...overrides }],
   projectTags: [{ key: 'b2b', e: 'Business customers' }],
 })] });
 
 test('compact extraction restores nulls, typed thresholds and exact evidence without changing facts', () => {
-  const input = wire({ t: [{ p: 'minMonths', v: 36 }, { p: 'maxMonths', v: 84 }, { p: 'autonomy', v: 'advanced' }, { p: 'lastUsedYear', v: 2024 }] });
+  const input = wire({ t: [{ p: 'minMonths', v: 36 }, { p: 'maxMonths', v: 84 }, { p: 'level', v: 'advanced' }] });
   const expandRefs = rule => {
     if (Array.isArray(rule)) return rule.map(expandRefs);
     if (!rule || typeof rule !== 'object') return rule;
@@ -26,14 +26,13 @@ test('compact extraction restores nulls, typed thresholds and exact evidence wit
   validateShape(input, expandRefs(wireSchema));
   assert.deepEqual(decodeExtraction(input), { cards: [emptyCard({
     workplace: { value: 'Remote', evidence: 'Remote' },
-    requirements: [requirement('java', { label: 'Java experience', evidence: 'Java', minMonths: 36, maxMonths: 84, autonomy: 'advanced', lastUsedYear: 2024 })],
+    requirements: [requirement('java', { label: 'Java experience', evidence: 'Java', minMonths: 36, maxMonths: 84, level: 'advanced' })],
     projectTags: [{ key: 'b2b', evidence: 'Business customers' }],
   })] });
-  assert.equal(input.cards[0].requirements[0].t.length, 4, 'Decoding does not mutate provider input');
-  const conceptual = wire({ k: 'capability', a: ['system-design'], t: [{ p: 'knowledgeLevel', v: 'basic' }, { p: 'maxYearsSinceUse', v: 0 }] });
+  assert.equal(input.cards[0].requirements[0].t.length, 3, 'Decoding does not mutate provider input');
+  const conceptual = wire({ k: 'tag', a: ['system-design'], t: [{ p: 'level', v: 'basic' }] });
   const decoded = decodeExtraction(conceptual).cards[0].requirements[0];
-  assert.equal(decoded.knowledgeLevel, 'basic');
-  assert.equal(decoded.maxYearsSinceUse, 0);
+  assert.equal(decoded.level, 'basic');
   assert.equal(decoded.minMonths, null);
 });
 
@@ -42,7 +41,7 @@ test('compact decoding rejects duplicate, unknown and malformed data instead of 
     { t: [{ p: 'minMonths', v: 12 }, { p: 'minMonths', v: 24 }] },
     { t: [{ p: 'minMonths', v: '12' }] },
     { t: [{ p: 'minMonths', v: -1 }] },
-    { t: [{ p: 'autonomy', v: 'expert' }] },
+    { t: [{ p: 'level', v: 'expert' }] },
     { t: [{ p: 'invented', v: 5 }] },
     { t: [{ p: 'minMonths', v: null }] },
     { t: undefined }, { invented: true }, { a: ['made-up-tag'] },

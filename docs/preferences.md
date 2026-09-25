@@ -128,9 +128,9 @@ together so the owner is not questioned repeatedly about the same family.
 Never ask again for a value already recorded in `profile/matching.json` unless
 the question explicitly audits whether that recorded value is wrong.
 
-For each technology or measurable capability, collect only current autonomy,
-total practical experience, and last-used year. Do not collect unrelated
-inventory speculatively. A criterion stored as `unknown` / `unmapped` is not a
+For each tag, collect only none, basic, independent, or advanced. Binary
+qualifications use none or present. Do not ask for duration or recency and do
+not collect unrelated inventory speculatively. A criterion stored as `unknown` / `unmapped` is not a
 canonical profile tag and must never be presented as though it were one. Handle
 those candidates in the separate batched process in
 `docs/unmapped-review.md`; ask the owner about their profile only after the
@@ -187,35 +187,29 @@ AND criteria. Identical canonical criteria do not count twice. Exclude generic
 employer values/personality rhetoric from criteria; concrete unsupported
 qualifications remain unknown and visible. Numeric score compatibility remains
 1 for match and 0 otherwise, but the explicit assessment—not the score—drives
-completeness and presentation. A confirmed zero-experience technology record
-(`practicalMonths: 0`, unknown autonomy, no last-used year, and
-`professionalUse: false`) is a resolved non-match. Tooltips show profile and
-source evidence. No per-tag numbers are shown.
+completeness and presentation. A profile value of `none` is a resolved
+non-match. Tooltips show the profile value and listing source. No per-tag
+numbers are shown.
 Generic professional hygiene is deliberately outside both numerator and
 denominator: teamwork/problem solving/communication, generic debugging, code review, Git basics,
 Agile ceremonies, clean code, adaptability, ownership, and fast-paced work.
 This is one catalog policy applied to every offer, never an offer-specific edit.
 Published experience ranges remain visible (e.g. 3–7 years); only the minimum
 is used for matching, not the upper end as a rejection ceiling.
-Requirement labels also show explicit autonomy and last-use thresholds. Labels
-separated by `|` are one alternative criterion: matching any listed option satisfies
-that denominator entry; independent AND requirements remain separate tags.
-Relative recency stays relative in cached facts: `current/currently` means used
-within one year, `recent/recently` means used within five years, and an explicit
-"within N years" uses N. The matcher converts that window to a year cutoff at
-evaluation time. Explicit calendar-year cutoffs remain absolute. Never store a
-relative phrase as a fixed extraction-year cutoff.
-Experience and technology groups contribute their matched fraction. Requirements
+Requirement labels show the effective level and any published minimum duration.
+Labels separated by `|` are one alternative criterion: matching any listed
+option satisfies that denominator entry; independent AND requirements remain
+separate tags.
+Experience and tag groups contribute their matched fraction. Requirements
 and nice-to-haves show a matched/total count. Never add raw counts to the score,
 which would favor verbose ads. Tag numbers are hidden. Match uses green `✓`;
 required/experience non-match uses red `×`; optional non-match uses blue `–`;
 missing profile information uses amber `?`; and unmapped uses gray `◇`.
 Tooltips retain compact profile facts, so color is never the only signal; the
-row's Source control retains the listing evidence. For a technology family,
-show recorded experience on separate lines and group confirmed no-experience
-members as `None: …`. When a known autonomy, duration, or recency threshold
-causes a required non-match, append only that effective threshold to the red
-tag (for example, `Independent`), without `Requires`. Do not add threshold
+row's Source control retains the listing evidence. For a tag family, show known
+levels on separate lines and group confirmed negatives as `None: …`. When a
+known level causes a required non-match, append only that effective level to
+the red tag (for example, `Independent`), without `Requires`. Do not add level
 suffixes to matching or optional tags.
 Company stack is deduplicated against required/preferred tags and contributes
 at most +0.5 for confirmed familiarity. AI
@@ -228,29 +222,13 @@ growth-focused work each contribute independently.
 The editable machine-readable subset in `profile/matching.json` derives from
 `profile/raw.md`; update both when a relevant candidate fact changes.
 
-Candidate technology levels are outcome-based (`basic`, `independent`,
-`advanced`, `unknown`) and defined authoritatively in `profile/raw.md`. Years,
-last use, and autonomy remain separate matching inputs.
-
-Conceptual capabilities use a separate knowledge scale: `basic` recognizes and
-applies common concepts with support; `intermediate` selects suitable concepts
-and explains normal tradeoffs; `advanced` analyzes complex cases and can guide
-others. Concept knowledge is not measured by time unless a listing explicitly
-requires duration. Generic debugging is excluded, while specialized production,
-distributed, performance, or incident diagnosis remains differentiating.
-When asking the owner to calibrate conceptual knowledge, include one concise,
-practical example for each level rather than asking only for an abstract label.
-
-The default technology match requires independent or advanced autonomy.
-Explicit basic/familiarity requirements may match basic autonomy. Explicit
-minimum duration and last-used-year cutoffs must also be satisfied; missing
-profile values cannot establish them. Do not invent decay by age or infer
-technology years from total career duration. Interest in a technology never
-counts as experience. A missing requirement threshold does not invent one.
-CV-backed capability booleans establish general experience/basic familiarity,
-not expert level, exact duration, or a narrower specialty. General career
-experience uses the union of employment months, including boundary months,
-without counting overlaps twice. It cannot establish technology/domain years.
+All skill tags use one scale: `none`, `basic`, `independent`, `advanced`.
+An explicit listing level wins; otherwise its minimum duration maps through the
+configured bands, and an unqualified requirement defaults to `basic`. Genuine
+binary tags use `none` or `present`. Interest never counts as competence.
+General career experience uses the union of employment months, including
+boundary months, without counting overlaps twice; it cannot establish a tag's
+level.
 
 All profile/config changes apply on refresh without AI. Existing factual tags
 can be reweighted immediately; a newly requested extraction category requires

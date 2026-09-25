@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted
+Superseded by decision 0007
 
 ## Context
 

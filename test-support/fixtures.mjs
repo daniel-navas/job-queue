@@ -2,9 +2,8 @@
 import { fields } from '../src/facts.mjs';
 
 export const requirement = (key = 'docker', overrides = {}) => ({
-  label: key, kind: 'technology', alternatives: [key], minMonths: null,
-  maxMonths: null, autonomy: null, knowledgeLevel: null, lastUsedYear: null,
-  maxYearsSinceUse: null, evidence: key, ...overrides,
+  label: key, kind: 'tag', alternatives: [key], level: null,
+  minMonths: null, maxMonths: null, evidence: key, ...overrides,
 });
 
 export const emptyCard = (overrides = {}) => ({
@@ -15,30 +14,15 @@ export const emptyCard = (overrides = {}) => ({
 });
 
 export function matchingProfile() {
-  const technology = (label, practicalMonths, autonomy, lastUsedYear) =>
-    ({ label, practicalMonths, autonomy, lastUsedYear });
   return {
+    schemaVersion: 2,
     employmentPeriods: [['2010-01', '2015-12']],
-    technologies: {
-      react: technology('React', 36, 'independent', 2022),
-      nestjs: technology('NestJS', 36, 'independent', 2023),
-      nodejs: technology('Node.js', 48, 'independent', 2026),
-      java: technology('Java', 6, 'basic', 2019),
-      typeorm: technology('TypeORM', 12, 'independent', 2023),
-      sql: technology('SQL', 36, 'basic', 2026),
-      postgresql: technology('PostgreSQL', 24, 'basic', 2025),
-      mysql: technology('MySQL', 24, 'basic', 2026),
-      mariadb: { ...technology('MariaDB', 0, 'unknown', null), professionalUse: false },
-      'sql-server': { ...technology('SQL Server', 0, 'unknown', null), professionalUse: false },
-      docker: technology('Docker', 12, 'basic', 2023),
-      gcp: technology('GCP', 12, 'independent', 2026),
-      nosql: technology('NoSQL', 12, 'basic', 2022),
-      kubernetes: { ...technology('Kubernetes', 0, 'unknown', null), professionalUse: false },
-    },
-    capabilities: {
-      financial: { confirmed: true, evidence: 'Synthetic financial systems experience.' },
-      'full-stack': { confirmed: true, practicalMonths: 36, autonomy: 'independent', lastUsedYear: 2026, evidence: 'Synthetic full-stack experience.' },
-      'secure-coding': { confirmed: true, knowledgeLevel: 'basic', evidence: 'Synthetic security knowledge.' },
+    tags: {
+      react: 'independent', nestjs: 'independent', nodejs: 'independent', java: 'basic',
+      typeorm: 'independent', sql: 'basic', postgresql: 'basic', mysql: 'basic',
+      mariadb: 'none', 'sql-server': 'none', docker: 'basic', gcp: 'independent',
+      nosql: 'basic', kubernetes: 'none', financial: 'present',
+      'full-stack': 'independent', 'secure-coding': 'basic',
     },
   };
 }
@@ -53,7 +37,7 @@ export function evaluationConfig() {
       projectTags: { 'hr-platform': -1, 'mixed-audience': 1, 'crypto-trading': 1, 'growth-work': 1 },
     },
     scoring: {
-      weights: { roleFocus: 1, workplace: 1, project: 1, experience: 1, requiredTechnologies: 2, preferredTechnologies: 0.5, stack: 0.5 },
+      weights: { roleFocus: 1, workplace: 1, project: 1, experience: 1, requirements: 2, preferred: 0.5, stack: 0.5 },
       recencyBands: [],
     },
   };

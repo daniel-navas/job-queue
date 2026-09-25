@@ -23,8 +23,8 @@ Representative sources for the initial groups:
 | Product audience | Corporate treasury; consumer purchases; internal operations | 005, 007–011, 020, 023, 051, 053 |
 | Product domains | HR, education, utilities, property valuation, developer tooling | 002, 006, 018, 041, 054, 060, 063 |
 
-The catalog contains 113 technology/tool/family keys, 76 capability keys, one
-general-experience key, and 20 project keys. It also keeps
+The catalog exposes one namespace for technology and knowledge tags, one
+general-experience key, and a separate project-tag namespace. It also keeps
 14 non-selectable commodity concepts solely so legacy output can be discarded
 deterministically. Adding an entry establishes
 neither candidate competence nor a preference score. Most new entries remain
@@ -33,8 +33,8 @@ context, not automatically positive signals.
 
 ## Rules
 
-- Technology, capability, experience and project IDs are selected from enums.
-  The validator rejects unknown IDs or IDs assigned to the wrong kind.
+- Tag, experience and project IDs are selected from enums. Technology and
+  knowledge tags may appear together in one OR criterion.
 - Display labels come from the catalog. Aliases are for deterministic legacy
   normalization, not extra AI-generated options.
 - Families list explicit alternatives, not inferred mastery. PostgreSQL does
@@ -103,14 +103,10 @@ aliases are resolved, unmapped criteria retained, and an explicit quoted range
 is recovered only when its lower bound agrees with the stored minimum.
 Original extraction data and reviews remain unchanged; no AI call is needed.
 
-Version 5 adds relative last-use windows and conceptual knowledge levels.
-`current/currently` maps to one year, `recent/recently` to five years, and an
-explicit relative number remains exact. These windows are evaluated against the
-current year so cached facts do not become frozen absolute dates. Conceptual
-capabilities use basic/intermediate/advanced knowledge independently from
-hands-on autonomy and duration. Version-3 and version-4 cards receive compatible
-defaults locally; generic debugging is removed from their denominator without
-an AI rerun.
+Version 7 unifies technology and knowledge tags and uses a qualitative profile.
+Explicit listing levels win; otherwise up to one year maps to basic, up to four
+years to independent, and longer requirements to advanced. Saved version 3–6
+cards receive compatible values locally without an AI rerun.
 
 ## Growth-product capability boundary
 

@@ -133,8 +133,8 @@ test('long qualification lists are not truncated to thirty criteria', () => {
   assert.equal(validateCards({ cards: [emptyCard({ requirements })] }, [source])[0].requirements.length, 40);
 });
 
-test('technology criteria cannot assign conceptual knowledge levels', () => {
+test('removed threshold fields are rejected by the qualitative schema', () => {
   const source = { ...job, description: 'Knowledge of Java.' };
   const bad = emptyCard({ requirements: [requirement('java', { evidence: source.description, knowledgeLevel: 'basic' })] });
-  assert.throws(() => validateCards({ cards: [bad] }, [source]), /knowledge/i);
+  assert.throws(() => validateCards({ cards: [bad] }, [source]), /extraction/i);
 });

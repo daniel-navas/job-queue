@@ -12,7 +12,7 @@ export function rateJob(job, preferences = defaults) {
   const fields = {};
   const facts = job.summary?.fields;
   if (!facts) return { total: null, fields };
-  for (const key of ['salary', 'companyType', 'requiredTechnologies', 'preferredTechnologies', 'experience', 'language', 'workplace', 'project', 'culture']) fields[key] = { score: 0, reason: 'No preference defined; neutral.' };
+  for (const key of ['salary', 'companyType', 'requirements', 'preferred', 'experience', 'language', 'workplace', 'project', 'culture']) fields[key] = { score: 0, reason: 'No preference defined; neutral.' };
   const type = facts.companyType?.value?.toLowerCase().trim();
   const role = roleFocus(job, preferences);
   fields.roleFocus = { score: role.score, reason: role.reason };

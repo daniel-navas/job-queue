@@ -9,14 +9,14 @@ import { catalogInstructions, normalizeKnownFacts, upgradeLegacyCard } from './t
 import { decodeExtraction, wireSchema, wireInstructions } from './extraction-wire.mjs';
 export { fields, schema } from './facts.mjs';
 
-export const summaryVersion = 6;
+export const summaryVersion = 7;
 export const inputFor = job => ({ id: job.id, title: job.title, company: job.company ?? '', location: job.location ?? '', description: job.description ?? '' });
 export const fingerprint = job => createHash('sha256').update(JSON.stringify(inputFor(job))).digest('hex');
-const usable = job => job.summary?.inputHash === fingerprint(job) && [3, 4, 5, summaryVersion].includes(job.summary?.version);
+const usable = job => job.summary?.inputHash === fingerprint(job) && [3, 4, 5, 6, summaryVersion].includes(job.summary?.version);
 const upgradeV4Card = card => {
   const result = structuredClone(card);
   const knowledge = item => {
-    if (item.kind !== 'capability') return null;
+    if (!['capability', 'tag'].includes(item.kind)) return null;
     const text = `${item.label} ${item.evidence}`;
     if (!/\b(knowledge|understanding|familiar(?:ity)?)\b/i.test(text)) return null;
     if (/\b(strong|deep|advanced|expert)\b/i.test(text)) return 'advanced';
@@ -82,9 +82,7 @@ export function validateCards(result, jobs) {
     if (audiences.length > 1) throw new Error('Choose one supported project audience, not conflicting audience tags');
     if (new Set(card.projectTags.map(t => t.key)).size !== card.projectTags.length) throw new Error('Duplicate project tag');
     for (const item of [...card.requirements, ...card.preferred, ...card.stack]) {
-      if (item.kind === 'technology' && item.knowledgeLevel !== null) throw new Error('Technology criteria cannot assign conceptual knowledge levels');
       if (item.maxMonths !== null && (item.minMonths === null || item.maxMonths < item.minMonths)) throw new Error('Invalid experience range');
-      if (item.lastUsedYear !== null && item.maxYearsSinceUse !== null) throw new Error('Choose an absolute or relative last-use threshold, not both');
       if (new Set(item.alternatives).size !== item.alternatives.length) throw new Error('Duplicate requirement alternative');
     }
     if (Object.keys(card).some(key => !['id', ...fields].includes(key))) throw new Error('Unexpected summary field');

@@ -6,8 +6,8 @@
     "workplace": 1,
     "project": 1,
     "experience": 1,
-    "requiredTechnologies": 2,
-    "preferredTechnologies": 0.5,
+    "requirements": 2,
+    "preferred": 0.5,
     "stack": 0.5,
     "publishedRecency": 1
   },

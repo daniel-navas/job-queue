@@ -66,11 +66,8 @@ The extraction/matching boundary is recorded in decision 0002.
   quality; test settings on a bounded sample before changing them.
 - Ask up to two focused profile questions per response, ordered by processed
   job score from highest to lowest. Prioritize incomplete matches and audit
-  apparent matches for false positives. Collect only practical duration,
-  current autonomy, and last-used year for a technology or measurable capability.
-- For conceptual-knowledge questions, do not ask for artificial years of use.
-  Give concise, practical examples of basic, intermediate, and advanced so the
-  owner can calibrate the level consistently.
+  apparent matches for false positives. Record skills only as none, basic,
+  independent, or advanced; do not ask for duration or recency.
 - Source quotations prove provenance, not perfect AI interpretation. Extraction
   errors must be fixed generically, not with hidden per-job score exceptions.
 - Keep the verified GitHub remote (`origin/main`) synchronized after coherent
