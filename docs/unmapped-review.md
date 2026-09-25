@@ -78,6 +78,7 @@ is not implemented yet, not that it has been resolved. Stored decisions make
 later cycles incremental, which is the main usage optimization: the model sees
 new or unresolved candidates, not the entire historical backlog.
 
-Routine profile-completion questions stay separate. Once a reviewed criterion
-has a canonical tag, it can enter the normal highest-rated-offer question flow.
-Questions must name that exact tag ID and catalog label.
+Routine profile completion stays separate. Once review maps a criterion to a
+canonical tag that is absent from the profile, it enters the local Profile
+Needs info queue. Unmapped criteria remain visibly separate and cannot be
+answered in Profile.

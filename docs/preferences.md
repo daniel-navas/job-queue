@@ -119,16 +119,18 @@ unconvertible salary stays neutral.
 
 ## Interaction
 
-Until the core profile is complete, end each response with up to two focused
-profile questions. Order them by processed-offer score from highest to lowest,
-prioritize incomplete or questionable tag matches, and audit possible false
-positives as well as false negatives. Every question must name the exact
-canonical tag ID and its human-readable catalog label before asking for
-evidence. For a family tag, inspect its complete configured member list first,
-state which members are already known, and ask about all remaining members
-together so the owner is not questioned repeatedly about the same family.
-Never ask again for a value already recorded in `profile/matching.json` unless
-the question explicitly audits whether that recorded value is wrong.
+Profile is the standard completion workflow. Its Needs info queue contains each
+missing canonical fact once, ordered by the number of distinct active jobs it
+affects, the best score among those jobs, and then label. Active means processed,
+open, not applied, and currently New or Interested. Family requirements group
+their missing members; overlapping families merge so a fact appears once.
+All facts contains confirmed answers plus facts currently requested by active
+jobs and supports searching and changing an existing value.
+
+Routine chat responses must not append profile questions. Chat may assist with
+or audit a profile answer only when the owner explicitly requests it. Never ask
+again for a recorded value unless the request is explicitly auditing whether it
+is wrong.
 
 For each tag, collect only none, basic, independent, or advanced. Binary
 qualifications use none or present. Do not ask for duration or recency and do
@@ -221,8 +223,10 @@ visible and neutral until reviewed. Configured project/work tags contribute
 algebraically. Mutually exclusive audience tags cannot coexist, while
 orthogonal preferences such as audience, consumer credit, crypto trading, and
 growth-focused work each contribute independently.
-The editable machine-readable subset in `profile/matching.json` derives from
-`profile/raw.md`; update both when a relevant candidate fact changes.
+The editable machine-readable subset lives in `profile/matching.json`. Profile
+updates it directly and preserves interests, employment periods, schema version,
+and unrelated tags. Profile does not read or rewrite `profile/raw.md`; narrative
+profile maintenance remains a separate owner-requested task.
 
 All skill tags use one scale: `none`, `basic`, `independent`, `advanced`.
 An explicit listing level wins; otherwise its minimum duration maps through the
@@ -232,7 +236,8 @@ General career experience uses the union of employment months, including
 boundary months, without counting overlaps twice; it cannot establish a tag's
 level.
 
-All profile/config changes apply on refresh without AI. Existing factual tags
+All profile/config changes apply on refresh without AI. Saving in Profile
+refreshes immediately. Existing factual tags
 can be reweighted immediately; a newly requested extraction category requires
 a deliberate contract update/reprocessing, not an invented retrospective tag.
 

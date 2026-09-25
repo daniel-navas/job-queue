@@ -44,13 +44,16 @@ version. Pending legacy cards must be processed once with the current schema.
 
 ## Change preferences or profile
 
-- profile/matching.json: typed candidate facts.
+- Use **Profile** in the app to answer missing facts or search and edit existing
+  answers. It writes `profile/matching.json` locally and recalculates processed
+  jobs without AI or Chrome.
 - config/preferences.json: preference values.
 - config/scoring.json: weights and recency bands.
 - config/tag-catalog.json: allowed tags, definitions, aliases and display labels.
 
-Refresh Chrome after profile/preference/weight edits. All processed cards
-recalculate without AI or a server restart. Technology levels are defined in profile/raw.md. Evidence and
+Refresh Chrome after direct preference/weight edits. Profile saves refresh the
+app automatically. All processed cards recalculate without AI or a server
+restart. Technology levels are defined in profile/raw.md. Evidence and
 scoring details are in docs/preferences.md.
 
 Catalog changes require a restart; they do not establish candidate skills or

@@ -35,6 +35,11 @@ infrastructure, or additional providers.
    rediscovery. Applying records a local date and implies `Interested`;
    correcting an accidental application before later milestones restores the
    exact prior review decision. No application is submitted by the tracker.
+8. Complete missing profile facts through the local `Profile` workspace. Its
+   pending queue is derived only from processed, open New or Interested jobs;
+   dismissed, closed, and applied jobs do not create tasks. Answers update the
+   global profile atomically and immediately rerank every processed job without
+   AI, Chrome, or access to the original CV.
 
 The owner-facing vocabulary is intentionally small: `Jobs` are vacancies under
 review, `Applications` are tracked processes after applying, `Role` is the job
@@ -73,10 +78,10 @@ The extraction/matching boundary is recorded in decision 0002.
   billing or add a new paid service without explicit authorization. Prefer the
   least intensive already-paid option that meets source-reviewed extraction
   quality; test settings on a bounded sample before changing them.
-- Ask up to two focused profile questions per response, ordered by processed
-  job score from highest to lowest. Prioritize incomplete matches and audit
-  apparent matches for false positives. Record skills only as none, basic,
-  independent, or advanced; do not ask for duration or recency.
+- Routine profile completion belongs in Profile, not chat. Chat may help answer
+  or audit profile facts only when the owner explicitly requests it. Record
+  skills only as none, basic, independent, or advanced; do not collect duration
+  or recency for a skill tag.
 - Source quotations prove provenance, not perfect AI interpretation. Extraction
   errors must be fixed generically, not with hidden per-job score exceptions.
 - Keep the verified GitHub remote (`origin/main`) synchronized after coherent
