@@ -1,9 +1,9 @@
 # Propuesta de revisión de tags pendientes
 
 Fecha: 2026-09-22. Alcance: los 56 tags del lote original. Los números son
-estables para que puedas referirte a cualquiera en tus comentarios. Las
-decisiones ya implementadas dejan 44 pendientes, pero permanecen aquí para
-conservar el contexto completo del review.
+estables para que puedas referirte a cualquiera en tus comentarios. El lote ya
+está revisado: 53 decisiones se aplicaron y 3 quedaron diferidas, con un TODO
+explícito, porque requieren una categoría de requisito que hoy no existe.
 
 **Cómo leerla**
 
@@ -81,6 +81,7 @@ conservar el contexto completo del review.
 - El cruce con PST queda pendiente de un modelo para requisitos no técnicos.
 - El conteo final por tipo se recalculará cuando termine la revisión completa.
 
-Las decisiones aprobadas de los puntos 7–10, 19–20, 33–34, 41 y 52–54 ya están
-implementadas. Los demás resultados siguen siendo propuestas y no cambian el
-catálogo, los matches ni los puntajes hasta su aprobación.
+Las decisiones aprobadas están implementadas. Los puntos 37, 44 y 45 están
+diferidos: requieren alternativas entre tipos distintos o una categoría de
+elegibilidad no técnica. No reaparecen como tags pendientes; permanecen
+visibles en las ofertas hasta que se implemente ese modelo.

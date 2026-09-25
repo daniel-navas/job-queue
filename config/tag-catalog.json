@@ -389,6 +389,21 @@
     "mcp": {
       "label": "MCP"
     },
+    "clickhouse": {
+      "label": "ClickHouse"
+    },
+    "amazon-aurora": {
+      "label": "Amazon Aurora"
+    },
+    "sabre": {
+      "label": "Sabre"
+    },
+    "vba": {
+      "label": "VBA"
+    },
+    "powershell": {
+      "label": "PowerShell"
+    },
     "claude": {
       "label": "Claude"
     },
@@ -537,6 +552,34 @@
       "label": "API development",
       "definition": "Designing or implementing APIs; use REST APIs only when REST is explicit."
     },
+    "workflow-automation": {
+      "label": "Workflow automation",
+      "definition": "Designing or implementing automated business or operational workflows."
+    },
+    "machine-learning": {
+      "label": "Machine learning",
+      "definition": "Building, training or operating machine-learning systems."
+    },
+    "airline-domain-experience": {
+      "label": "Airline domain experience",
+      "definition": "Experience with airline operations, reservations, fares or inventory."
+    },
+    "asynchronous-workflows": {
+      "label": "Asynchronous workflows",
+      "definition": "Coordinating jobs, events or work that continues beyond an initial request."
+    },
+    "cloud-networking": {
+      "label": "Cloud networking",
+      "definition": "Cloud networks, routing, firewalls and private endpoints."
+    },
+    "cloud-infrastructure": {
+      "label": "Cloud infrastructure",
+      "definition": "Cloud compute, storage, networking and platform resources."
+    },
+    "cloud-operations": {
+      "label": "Cloud operations and optimization",
+      "definition": "Operating cloud services and improving their reliability, capacity, performance or cost."
+    },
     "microservices": {
       "label": "Microservices",
       "definition": "Microservice architecture or implementation."
@@ -658,6 +701,18 @@
       "label": "Data engineering",
       "definition": "Data processing/pipeline engineering; not all backend work."
     },
+    "data-integration": {
+      "label": "Data integration",
+      "definition": "Acquiring, combining and reliably synchronizing data across systems."
+    },
+    "data-applications": {
+      "label": "Data applications",
+      "definition": "Applications whose user-facing value relies directly on data processing or exploration."
+    },
+    "database-engineering": {
+      "label": "Database engineering",
+      "definition": "Designing, operating and improving databases as a primary responsibility."
+    },
     "etl": {
       "label": "ETL/ELT pipelines",
       "definition": "Extracting, transforming and loading data."
@@ -725,6 +780,58 @@
     "consumer-product-development": {
       "label": "Consumer product development",
       "definition": "Building or shipping software products used directly by consumers."
+    },
+    "design-systems": {
+      "label": "Design systems",
+      "definition": "Shared UI components, styles, tokens and interaction patterns."
+    },
+    "developer-platforms": {
+      "label": "Developer platforms",
+      "definition": "Internal platforms and tooling that improve engineering productivity."
+    },
+    "energy-domain-experience": {
+      "label": "Energy domain experience",
+      "definition": "Experience with energy generation, utilities, grids, metering or energy markets."
+    },
+    "finops": {
+      "label": "FinOps",
+      "definition": "Cloud cost management, accountability and optimization."
+    },
+    "large-scale-systems": {
+      "label": "Large-scale systems",
+      "definition": "Designing or operating systems under high traffic, large data volumes or substantial scale."
+    },
+    "high-availability": {
+      "label": "High availability",
+      "definition": "Redundancy, fault tolerance and recovery that keep production services available."
+    },
+    "recommendation-systems": {
+      "label": "Recommendation systems",
+      "definition": "Ranking, recommending or personalizing content and products for users."
+    },
+    "search-engineering": {
+      "label": "Search engineering",
+      "definition": "Building or operating information-retrieval and search infrastructure."
+    },
+    "self-healing-systems": {
+      "label": "Self-healing systems",
+      "definition": "Automatically detecting failures and restoring unhealthy components."
+    },
+    "self-service-platforms": {
+      "label": "Self-service platforms",
+      "definition": "Platforms that let users configure, provision or activate services themselves."
+    },
+    "software-supply-chain-security": {
+      "label": "Software supply-chain security",
+      "definition": "Protecting dependencies, builds, artifacts and release pipelines."
+    },
+    "micro-frontends": {
+      "label": "Micro-frontends",
+      "definition": "Frontend sections developed and deployed independently."
+    },
+    "object-oriented-design": {
+      "label": "Object-oriented design",
+      "definition": "Object-oriented programming principles and reusable design patterns."
     },
     "technical-leadership": {
       "label": "Technical leadership",

@@ -1,5 +1,29 @@
 {
   "schemaVersion": 1,
   "reviewThreshold": 20,
-  "decisions": []
+  "decisions": [
+    {
+      "id": "2026-09-nontechnical-eligibility",
+      "status": "deferred",
+      "action": "keep-unmapped",
+      "target": null,
+      "fingerprints": [
+        "089f54793ef5aa9b8d77152ea34997a4150c037617de89eac51e0b49c0521024"
+      ],
+      "rationale": "Timezone overlap is an eligibility constraint, not a technology or capability tag.",
+      "reviewedAt": "2026-09-24"
+    },
+    {
+      "id": "2026-09-cross-kind-alternatives",
+      "status": "deferred",
+      "action": "keep-unmapped",
+      "target": null,
+      "fingerprints": [
+        "35de4e02d66950e86eb6444b522fb177906ac36bd41fb47eee40b9cd87d6cc1a",
+        "4bc49e75493f8ba8cb0ec6bb572b1a70634e80c495b15ae05df73b370be1af11"
+      ],
+      "rationale": "These sources use alternatives across technology and capability kinds; preserve them until requirement alternatives support that structure.",
+      "reviewedAt": "2026-09-24"
+    }
+  ]
 }

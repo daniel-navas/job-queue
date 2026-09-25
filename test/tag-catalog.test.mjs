@@ -70,6 +70,19 @@ test('generic API work and consumer-product delivery remain differentiating capa
   assert.ok(selectableKeys('capability').includes('api-development'));
   assert.ok(selectableKeys('capability').includes('consumer-product-development'));
 });
+test('approved specialized catalog gaps are available to new extractions', () => {
+  for (const key of [
+    'workflow-automation', 'machine-learning', 'airline-domain-experience',
+    'asynchronous-workflows', 'cloud-networking', 'cloud-infrastructure',
+    'cloud-operations', 'data-integration', 'data-applications',
+    'database-engineering', 'design-systems', 'developer-platforms',
+    'energy-domain-experience', 'finops', 'large-scale-systems',
+    'high-availability', 'recommendation-systems', 'search-engineering',
+    'self-healing-systems', 'self-service-platforms',
+    'software-supply-chain-security', 'micro-frontends', 'object-oriented-design'
+  ]) assert.ok(selectableKeys('capability').includes(key), key);
+  for (const key of ['clickhouse', 'amazon-aurora', 'sabre', 'vba', 'powershell']) assert.ok(selectableKeys('technology').includes(key), key);
+});
 test('server-side language family offers concrete language alternatives', () => {
   assert.deepEqual(catalog.technology['server-side-language']?.members, [
     'typescript', 'javascript', 'python', 'go', 'java', 'rust', 'c++',

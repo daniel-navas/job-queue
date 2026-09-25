@@ -45,8 +45,9 @@ is used, so merely reaching the threshold consumes no Codex usage.
    merely because they might be useful, and do not automatically rewrite an
    extraction merely because its raw text contains an alias.
 4. Present one compact, stably numbered proposal covering every candidate. The
-   owner can identify objections by number. Do not apply semantic catalog or
-   profile decisions until that batch-level objection window is complete.
+   owner can identify objections by number. During that objection window, an
+   item the owner does not mention is approved; apply it with the rest of the
+   batch. Do not require one-by-one confirmation.
 5. Record approved decisions in `config/unmapped-review.json`, update the
    catalog/extraction prompt/profile as appropriate, and add boundary regression
    tests. Apply an approved mapping to the reviewed stored criterion explicitly;

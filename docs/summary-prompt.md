@@ -131,6 +131,13 @@ only when equivalents are explicitly allowed. General experience uses
 experience/professional; technology duration belongs to that technology.
 Specific domain tenure cannot be credited using general career tenure.
 
+When a source combines a named technology with a general technology family and
+the schema cannot express a distinct-member constraint, emit one alternative
+criterion containing the named technology and the family. This is a deliberate
+lossy approximation, applied generically rather than by source label. For
+example, Node.js plus another server-side language becomes Node.js | Server-side
+language, not two requirements that Node.js could satisfy twice.
+
 If a concrete requirement is outside the catalog, choose kind unknown with
 alternatives [unmapped], keeping its short label, thresholds and exact quote.
 Never substitute a vaguely similar known tag just to make it fit the catalog.

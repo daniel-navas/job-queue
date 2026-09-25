@@ -8,6 +8,63 @@ export const members = key => catalog.technology[canonical(key)]?.members || [ca
 export const isDifferentiating = ({ kind, key }) => catalog[kind]?.[key]?.differentiating !== false;
 export const selectableKeys = kind => Object.entries(catalog[kind]).filter(([, item]) => item.differentiating !== false).map(([key]) => key);
 
+// These are approved mappings for the already-processed 2026-09 review batch.
+// They repair historic records only. New extraction uses the catalog and prompt.
+const reviewedLegacyMappings = new Map([
+  ['advanced automation', [['capability', ['workflow-automation']]]],
+  ['ai or automation integration', [['capability', ['ai-integration', 'workflow-automation']]]],
+  ['ai technology applications', [['capability', ['ai-integration']]]],
+  ['ai-first solutions', [['capability', ['ai-integration']]]],
+  ['ai, ml, or agent systems', [['capability', ['ai-integration', 'machine-learning', 'ai-agents']]]],
+  ['airline industry experience', [['capability', ['airline-domain-experience']]]],
+  ['api design and management', [['capability', ['api-development']]]],
+  ['api design knowledge', [['capability', ['api-development']]]],
+  ['api design principles', [['capability', ['api-development']]]],
+  ['api development', [['capability', ['api-development']]]],
+  ['api knowledge', [['capability', ['distributed']], ['capability', ['api-development']], ['capability', ['cloud-native']]]],
+  ['api orchestration', [['capability', ['api-integration']]]],
+  ['asynchronous workflows', [['capability', ['asynchronous-workflows']], ['capability', ['distributed']], ['capability', ['cloud-infrastructure']]]],
+  ['azure networking', [['technology', ['azure']], ['capability', ['cloud-networking']]]],
+  ['bff or middleware integration', [['capability', ['api-integration']]]],
+  ['clickhouse or aurora', [['technology', ['clickhouse', 'amazon-aurora']]]],
+  ['cloud infrastructure', [['capability', ['cloud-infrastructure']]]],
+  ['cloud service operations and optimization', [['capability', ['cloud-operations']]]],
+  ['consumer product shipping', [['capability', ['consumer-product-development']]]],
+  ['customer growth and provisioning', [['capability', ['growth-engineering']]]],
+  ['data infrastructure knowledge', [['capability', ['data-engineering']], ['capability', ['distributed']]]],
+  ['data sourcing and integration', [['capability', ['data-integration']]]],
+  ['data-driven applications or dashboards', [['capability', ['data-applications', 'data-visualization']]]],
+  ['database engineering', [['capability', ['database-engineering']]]],
+  ['database performance tradeoffs', [['capability', ['data-integrity']], ['capability', ['query-optimization']]]],
+  ['design systems experience', [['capability', ['design-systems']]]],
+  ['developer platforms and tooling', [['capability', ['developer-platforms']]]],
+  ['devops, ci/cd, or cloud infrastructure', [['capability', ['devops', 'ci-cd', 'cloud-infrastructure']]]],
+  ['energy sector experience', [['capability', ['energy-domain-experience']]]],
+  ['finops and cloud cost optimization', [['capability', ['finops']]]],
+  ['high-traffic reliable systems', [['capability', ['large-scale-systems']], ['capability', ['high-availability']]]],
+  ['highly available production systems', [['capability', ['high-availability']]]],
+  ['large-scale consumer products', [['capability', ['large-scale-systems']], ['capability', ['consumer-product-development']]]],
+  ['lending or related domain', [['capability', ['financial']]]],
+  ['micro-frontends', [['capability', ['micro-frontends']]]],
+  ['modern web technologies', [['technology', ['javascript', 'typescript', 'react']]]],
+  ['oop and design patterns', [['capability', ['object-oriented-design']]]],
+  ['other server-side language', [['technology', ['nodejs', 'server-side-language']]]],
+  ['platform reliability improvements', [['capability', ['high-availability']]]],
+  ['production systems exposure', [['capability', ['production-operations']]]],
+  ['recommendation personalization or search', [['capability', ['recommendation-systems', 'search-engineering']]]],
+  ['sabre knowledge', [['technology', ['sabre']]]],
+  ['security standards', [['capability', ['secure-coding']]]],
+  ['self-healing systems', [['capability', ['self-healing-systems']]]],
+  ['self-service onboarding platforms', [['capability', ['self-service-platforms', 'growth-engineering', 'workflow-automation']]]],
+  ['software supply chain security', [['capability', ['secure-coding']], ['capability', ['software-supply-chain-security']]]],
+  ['vba or powershell automation', [['technology', ['vba', 'powershell']]]],
+  ['workflow automation solutions', [['capability', ['workflow-automation']]]],
+]);
+const reviewedCommodityLabels = new Set([
+  'json and http fundamentals', 'large or distributed codebases', 'software testing',
+  'testing knowledge', 'technical debt management',
+]);
+
 export function normalizeKnownFacts(card) {
   const result = structuredClone(card);
   const recognized = item => {
@@ -17,14 +74,14 @@ export function normalizeKnownFacts(card) {
     if (/\banalytics instrumentation\b|\bevent instrumentation\b|\bevent tracking\b|\btracking plans?\b/i.test(text)) alternatives.push('analytics-instrumentation');
     if (/\bproduct analytics\b|\bdata analysis tools?\b|\bfunnel analysis\b|\bcohort analysis\b|\bretention analysis\b/i.test(text)) alternatives.push('product-analytics');
     if (/\b(?:own(?:ing)?|operat(?:e|ing))\b.*\b(?:business[ -]critical|production)\b.*\b(?:system|service)s?\b|\bproduction operations?\b/i.test(text)) alternatives.push('production-operations');
-    if (/^API (?:design and management|design knowledge|design principles|development)$/i.test(item.label || '')) alternatives.push('api-development');
-    if (/^Consumer product shipping$/i.test(item.label || '')) alternatives.push('consumer-product-development');
-    if (/^Customer growth and provisioning$/i.test(item.label || '')) alternatives.push('growth-engineering');
-    if (/^Other server-side language$/i.test(item.label || '')) return { kind: 'technology', alternatives: ['nodejs', 'server-side-language'] };
     return { kind: 'capability', alternatives: [...new Set(alternatives)] };
   };
-  const reviewedCommodity = item => item.kind === 'unknown' && /^(?:JSON and HTTP fundamentals|Large or distributed codebases|Software testing|Testing knowledge|Technical debt management)$/i.test(item.label || '');
-  for (const group of ['requirements','preferred','stack']) result[group] = result[group].filter(item => !reviewedCommodity(item)).map(item => {
+  for (const group of ['requirements','preferred','stack']) result[group] = result[group].filter(item => !(item.kind === 'unknown' && reviewedCommodityLabels.has((item.label || '').toLowerCase()))).flatMap(item => {
+    const mapped = item.kind === 'unknown' ? reviewedLegacyMappings.get((item.label || '').toLowerCase()) : null;
+    if (mapped) {
+      const conceptual = /\b(knowledge|understanding|familiar(?:ity)?)\b/i.test(`${item.label || ''} ${item.evidence || ''}`);
+      return mapped.map(([kind, alternatives]) => ({ ...item, kind, alternatives, autonomy: conceptual ? null : item.autonomy, knowledgeLevel: conceptual && kind === 'capability' ? 'basic' : item.knowledgeLevel }));
+    }
     const recognition = item.kind === 'unknown' ? recognized(item) : { kind: item.kind, alternatives: item.alternatives.map(canonical) };
     const canonicalAlternatives = recognition.alternatives;
     if (!canonicalAlternatives.length) return item;
