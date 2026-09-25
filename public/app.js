@@ -4,21 +4,28 @@ const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 let data = { jobs: [] }, active = 'new', selected, rejecting, view = 'opportunities', applicationFilter = 'active', editingEvent = null;
 let discoveryFilter = null;
+let profileFilter = 'pending', profileSelected = null, profileShowAll = false;
+const profileSelections = {};
 const labels = { new: 'New', interesting: 'Interesting', dismissed: 'Dismissed', all: 'All jobs' };
 async function api(url, body) { const response = await fetch(url, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}); const result = await response.json(); if (!response.ok) throw new Error(result.error); return result; }
 function error(err) { $('#error').textContent = err.message; }
 async function refresh() { data = await api('/api/jobs'); render(); }
 function render() {
   const tracking = view === 'applications';
+  const profiling = view === 'profile';
+  const review = data.profileReview || { pendingCount: 0, activeUnmappedJobs: 0, items: [], allFacts: [] };
   for (const button of document.querySelectorAll('#views [data-view]')) button.setAttribute('aria-pressed', String(button.dataset.view === view));
-  for (const id of ['searches-open', 'scan', 'summarize']) $(`#${id}`).hidden = tracking;
-  $('#run-status').hidden = tracking;
-  $('#ai-status').hidden = tracking;
-  $('#jobs').setAttribute('aria-label', tracking ? 'Applications' : 'Jobs');
-  $('#detail').setAttribute('aria-label', tracking ? 'Application details' : 'Job details');
-  $('#search').placeholder = tracking ? 'Search applications or ID…' : 'Search jobs or ID…';
-  $('#search').setAttribute('aria-label', tracking ? 'Search applications' : 'Search jobs');
-  $('#tabs').setAttribute('aria-label', tracking ? 'Application status' : 'Job status');
+  $('#views [data-view="profile"]').textContent = review.pendingCount ? `Profile ${review.pendingCount}` : 'Profile';
+  for (const id of ['searches-open', 'scan', 'summarize']) $(`#${id}`).hidden = tracking || profiling;
+  $('#run-status').hidden = tracking || profiling;
+  $('#ai-status').hidden = tracking || profiling;
+  $('#view-heading').hidden = !profiling;
+  $('#jobs').setAttribute('aria-label', profiling ? 'Profile facts' : tracking ? 'Applications' : 'Jobs');
+  $('#detail').setAttribute('aria-label', profiling ? 'Profile fact details' : tracking ? 'Application details' : 'Job details');
+  $('#search').placeholder = profiling ? 'Search profile facts…' : tracking ? 'Search applications or ID…' : 'Search jobs or ID…';
+  $('#search').setAttribute('aria-label', profiling ? 'Search profile facts' : tracking ? 'Search applications' : 'Search jobs');
+  $('#tabs').setAttribute('aria-label', profiling ? 'Profile facts' : tracking ? 'Application status' : 'Job status');
+  if (profiling) { renderProfile(review); return; }
   if (tracking) { renderApplications(); return; }
   const reviewable = job => job.availability?.status !== 'closed' && !job.application;
   $('#tabs').innerHTML = Object.entries(labels).map(([key, label]) => `<button data-tab="${key}" class="tab ${active === key ? 'active' : ''}" aria-pressed="${active === key}">${label} <span>${data.jobs.filter(j => key === 'all' || (j.status === key && reviewable(j))).length}</span></button>`).join('');
@@ -47,6 +54,48 @@ function render() {
   $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''} ${job.availability?.status === 'closed' ? 'job-closed' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="list-states">${evaluationBadge(job.evaluation)}${active === 'all' && job.application ? `<span class="application-stage">${escape(stageLabels[job.applicationView?.stage] || 'Applied')}</span>` : ''}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</span></span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Weighted priority score')}</span><span class="list-footer"><span class="muted">${escape(job.location || 'Location not provided')}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more jobs.</p></div>';
   const job = data.jobs.find(j => j.id === selected);
   $('#detail').innerHTML = job ? `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, 'Weighted priority score')}${job.application ? `<span class="application-stage">${escape(stageLabels[job.applicationView?.stage] || 'Applied')}</span>` : ''}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</div><div class="detail-meta"><span>${escape(job.company || 'Company not provided')}</span>${publishedHTML(job)}<button class="detail-id" data-copy-id="${escape(job.reference)}" title="Copy job ID">${escape(job.reference)}</button></div>${jobActions(job)}</div>${job.reason ? `<div class="feedback"><strong>Your feedback</strong><p>${escape(job.reason)}</p></div>` : ''}<hr>${summaryHTML(job)}<details class="original"><summary>Full description</summary><div class="description">${escape(job.description || 'Description not captured. Open LinkedIn for details.')}</div></details>` : '<div class="empty">Select a job to see the details.</div>';
+}
+
+const levelChoices = [
+  ['none', 'None', 'no practical experience.'],
+  ['basic', 'Basic', 'can perform bounded tasks with support.'],
+  ['independent', 'Independent', 'can use it in real work without regular supervision.'],
+  ['advanced', 'Advanced', 'can solve complex cases and guide others.']
+];
+const presenceChoices = [['none', 'No', 'not present.'], ['present', 'Yes', 'present.']];
+function profileFactControls(fact, editable) {
+  if (!editable) return `<div class="profile-known"><span>${escape(fact.label)}</span><strong>${escape(fact.value)}</strong></div>`;
+  const choices = fact.mode === 'presence' ? presenceChoices : levelChoices;
+  const selectedValue = Object.hasOwn(profileSelections, fact.key) ? profileSelections[fact.key] : fact.value;
+  return `<fieldset class="profile-fact"><legend>${escape(fact.label)}</legend><div class="profile-choices">${choices.map(([value, label, description]) => `<button type="button" data-profile-key="${escape(fact.key)}" data-profile-value="${value}" aria-pressed="${selectedValue === value}" aria-label="${label}: ${description}"><strong>${label}</strong><small>${description}</small></button>`).join('')}</div></fieldset>`;
+}
+function renderProfile(review) {
+  const pending = profileFilter === 'pending';
+  $('#view-heading h1').textContent = pending ? 'Complete your profile' : 'Your profile';
+  $('#view-heading p').textContent = pending ? 'Answer facts that active jobs need to evaluate.' : 'Review and change facts already in your profile.';
+  $('#tabs').innerHTML = `<button data-tab="pending" class="tab ${pending ? 'active' : ''}" aria-pressed="${pending}">Needs info <span>${review.pendingCount}</span></button><button data-tab="all" class="tab ${!pending ? 'active' : ''}" aria-pressed="${!pending}">All facts <span>${review.allFacts.length}</span></button>`;
+  const items = pending ? review.items : review.allFacts.map(fact => {
+    const source = review.items.find(item => item.facts.some(candidate => candidate.key === fact.key));
+    return { id: `all:${fact.key}`, label: fact.label, activeJobCount: source?.activeJobCount || 0, facts: [fact], jobs: source?.jobs || [] };
+  });
+  const query = $('#search').value.trim().toLowerCase();
+  const filtered = items.filter(item => `${item.label} ${item.facts.map(fact => fact.label).join(' ')}`.toLowerCase().includes(query));
+  if (!filtered.some(item => item.id === profileSelected)) profileSelected = filtered[0]?.id || null;
+  $('#count').textContent = pending ? `${review.pendingCount} facts need info` : `${filtered.length} profile facts`;
+  $('#clear-discovery').hidden = true;
+  if (pending && !items.length) {
+    $('#jobs').innerHTML = `<div class="empty"><h2>Your profile is complete</h2><p>${review.activeUnmappedJobs ? '<span>Some active jobs still need tag review.</span> Those criteria cannot be answered in Profile.' : 'No active job is waiting for profile information.'}</p></div>`;
+    $('#detail').innerHTML = '<div class="empty">New questions can appear after processing a job or reviewing its tags.</div>';
+    return;
+  }
+  $('#jobs').innerHTML = filtered.map(item => `<article class="job profile-item ${item.id === profileSelected ? 'selected' : ''}"><button class="job-open" data-profile-item="${escape(item.id)}"><span class="job-copy"><span class="list-top"><span class="company">${item.facts.length} ${item.facts.length === 1 ? 'fact' : 'facts'}</span>${item.activeJobCount ? `<span class="profile-impact">${item.activeJobCount} active ${item.activeJobCount === 1 ? 'job' : 'jobs'}</span>` : ''}</span><span class="list-title"><h2>${escape(item.label)}</h2></span></span></button></article>`).join('') || '<div class="empty"><h2>No matching facts</h2><p>Try a different search.</p></div>';
+  const item = items.find(candidate => candidate.id === profileSelected);
+  if (!item) { $('#detail').innerHTML = '<div class="empty">Select a fact to see its details.</div>'; return; }
+  const editableFacts = pending ? item.facts.filter(fact => fact.pending) : item.facts;
+  const knownFacts = pending ? item.facts.filter(fact => !fact.pending) : [];
+  const jobs = profileShowAll ? item.jobs : item.jobs.slice(0, 3);
+  const jobContext = item.jobs.length ? `<section class="profile-jobs"><h3>Affected jobs</h3>${jobs.map(job => `<button data-profile-job="${escape(job.id)}"><span><strong>${escape(job.title)}</strong><small>${escape(job.company)} · ${escape(job.reference)}</small></span>${ratingBadge(job.score, 'Weighted priority score')}${job.quotes?.length ? `<q>${escape(job.quotes.join(' · '))}</q>` : ''}</button>`).join('')}${item.jobs.length > 3 && !profileShowAll ? '<button class="profile-show-all" data-profile-show-all>Show all</button>' : ''}</section>` : '';
+  $('#detail').innerHTML = `<div class="profile-detail"><h2>${escape(item.label)}</h2><p class="muted">${pending ? 'Choose an answer for every missing fact.' : 'Change the saved value for this fact.'}</p>${editableFacts.map(fact => profileFactControls(fact, true)).join('')}${knownFacts.length ? `<section class="profile-known-list"><h3>Already known</h3>${knownFacts.map(fact => profileFactControls(fact, false)).join('')}</section>` : ''}${jobContext}<p id="profile-error" role="alert"></p><button class="primary profile-save" data-profile-save>${pending ? 'Save and continue' : 'Save change'}</button></div>`;
 }
 function jobActions(job) {
   const closed = job.availability?.status === 'closed';
@@ -144,10 +193,38 @@ $('#application-remove').onclick = async () => {
   catch (err) { $('#application-error').textContent = err.message; }
 };
 $('#views').onclick = event => { const button = event.target.closest('[data-view]'); if (button) { view = button.dataset.view; selected = null; $('#search').value = ''; render(); } };
-$('#tabs').onclick = event => { const tab = event.target.closest('[data-tab]'); if (tab) { if (view === 'applications') applicationFilter = tab.dataset.tab; else active = tab.dataset.tab; render(); } };
+$('#tabs').onclick = event => { const tab = event.target.closest('[data-tab]'); if (tab) { if (view === 'applications') applicationFilter = tab.dataset.tab; else if (view === 'profile') { profileFilter = tab.dataset.tab; profileSelected = null; } else active = tab.dataset.tab; render(); } };
 $('#search').oninput = render;
-$('#jobs').onclick = event => { const item = event.target.closest('[data-open]'); if (item) { selected = item.dataset.open; render(); } };
+$('#jobs').onclick = event => {
+  const profileItem = event.target.closest('[data-profile-item]');
+  if (profileItem) { profileSelected = profileItem.dataset.profileItem; profileShowAll = false; render(); return; }
+  const item = event.target.closest('[data-open]');
+  if (item) { selected = item.dataset.open; render(); }
+};
 $('#detail').onclick = async event => {
+  if (view === 'profile') {
+    const choice = event.target.closest('[data-profile-value]');
+    if (choice) { profileSelections[choice.dataset.profileKey] = choice.dataset.profileValue; render(); return; }
+    if (event.target.closest('[data-profile-show-all]')) { profileShowAll = true; render(); return; }
+    const job = event.target.closest('[data-profile-job]');
+    if (job) { view = 'opportunities'; active = 'all'; selected = job.dataset.profileJob; $('#search').value = ''; render(); return; }
+    if (event.target.closest('[data-profile-save]')) {
+      const review = data.profileReview;
+      const allFact = review.allFacts.find(fact => `all:${fact.key}` === profileSelected);
+      const item = profileFilter === 'pending' ? review.items.find(candidate => candidate.id === profileSelected) : allFact && { facts: [allFact] };
+      const editable = profileFilter === 'pending' ? item?.facts.filter(fact => fact.pending) || [] : item?.facts || [];
+      const changes = editable.map(fact => ({ key: fact.key, value: profileSelections[fact.key] ?? fact.value })).filter(change => change.value != null);
+      if (changes.length !== editable.length) { $('#profile-error').textContent = 'Choose an answer for every fact before saving.'; return; }
+      try {
+        await api('/api/profile', { changes });
+        for (const fact of editable) delete profileSelections[fact.key];
+        profileSelected = null;
+        profileShowAll = false;
+        await refresh();
+      } catch (err) { $('#profile-error').textContent = err.message; }
+    }
+    return;
+  }
   const copy = event.target.closest('[data-copy-id]');
   if (copy) { try { await navigator.clipboard.writeText(copy.dataset.copyId); copy.textContent = 'Copied'; setTimeout(() => { copy.textContent = copy.dataset.copyId; }, 900); } catch { error(new Error('Could not copy the job ID.')); } return; }
   const source = event.target.closest('[data-source]');

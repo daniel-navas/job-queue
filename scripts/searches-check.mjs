@@ -22,9 +22,10 @@ try {
   const { preferences, scoring } = evaluationConfig();
   const scenarioProfile = matchingProfile();
   Object.assign(scenarioProfile.tags, {
-    go: 'none', rust: 'none', 'c++': 'none',
-    csharp: 'none', kotlin: 'none', scala: 'none',
+    'c++': 'none', csharp: 'none', kotlin: 'none', scala: 'none',
   });
+  delete scenarioProfile.tags.go;
+  delete scenarioProfile.tags.rust;
   await writeFile(path.join(root, 'profile/matching.json'), JSON.stringify(scenarioProfile));
   await writeFile(path.join(root, 'config/preferences.json'), JSON.stringify(preferences));
   await writeFile(path.join(root, 'config/scoring.json'), JSON.stringify(scoring));
@@ -73,14 +74,14 @@ try {
   assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 2);
   const jobsResponse = await (await fetch(`${base}/api/jobs`)).json();
   assert.deepEqual(jobsResponse.catalogReview, { pending: 1, threshold: 1, recommended: true });
-  assert.equal(jobsResponse.profileReview.pendingCount, 1);
+  assert.equal(jobsResponse.profileReview.pendingCount, 3);
   assert.equal(jobsResponse.profileReview.items[0].label, 'Angular');
   const invalidProfile = await fetch(`${base}/api/profile`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ changes: [{ key: 'angular', value: 'basic' }, { key: 'financial', value: 'advanced' }] }) });
   assert.equal(invalidProfile.status, 400);
   assert.equal(JSON.parse(await readFile(path.join(root, 'profile/matching.json'))).tags.angular, undefined);
   const savedProfile = await fetch(`${base}/api/profile`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ changes: [{ key: 'angular', value: 'basic' }] }) });
   assert.equal(savedProfile.status, 200);
-  assert.equal((await (await fetch(`${base}/api/jobs`)).json()).profileReview.pendingCount, 0);
+  assert.equal((await (await fetch(`${base}/api/jobs`)).json()).profileReview.pendingCount, 2);
   await writeFile(path.join(root, 'profile/matching.json'), JSON.stringify(scenarioProfile));
   await writeFile(path.join(root, 'config/unmapped-review.json'), '{"schemaVersion":1,"reviewThreshold":0,"decisions":[]}');
   const malformedReviewResponse = await (await fetch(`${base}/api/jobs`)).json();
@@ -102,13 +103,45 @@ try {
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto(base); await page.locator('.job').first().waitFor();
   await page.getByRole('button', { name: 'Jobs', exact: true }).waitFor();
+  assert.equal(await page.getByRole('button', { name: 'Profile 3', exact: true }).count(), 1);
+  await page.getByRole('button', { name: 'Profile 3', exact: true }).click();
+  await page.getByRole('heading', { name: 'Complete your profile', exact: true }).waitFor();
+  assert.equal(await page.locator('[data-profile-item]', { hasText: 'Angular' }).count(), 1);
+  assert.equal(await page.locator('[data-profile-item]', { hasText: 'Compiled languages' }).count(), 1);
+  await page.getByRole('button', { name: 'Basic: can perform bounded tasks with support.', exact: true }).click();
+  await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
+  await page.getByRole('button', { name: 'Profile 2', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'None: no practical experience.', exact: true }).nth(0).click();
+  await page.getByRole('button', { name: 'None: no practical experience.', exact: true }).nth(1).click();
+  await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
+  await page.getByText('Your profile is complete', { exact: true }).waitFor();
+  await page.getByText('Some active jobs still need tag review.', { exact: true }).waitFor();
+  const storedProfile = JSON.parse(await readFile(path.join(root, 'profile/matching.json')));
+  assert.equal(storedProfile.tags.angular, 'basic');
+  assert.equal(storedProfile.tags.go, 'none');
+  assert.equal(storedProfile.tags.rust, 'none');
+  await page.getByRole('button', { name: /^All facts/ }).click();
+  await page.getByRole('heading', { name: 'Your profile', exact: true }).waitFor();
+  await page.locator('#search').fill('Angular');
+  await page.locator('[data-profile-item]', { hasText: 'Angular' }).click();
+  await page.getByRole('button', { name: 'Independent: can use it in real work without regular supervision.', exact: true }).click();
+  await page.getByRole('button', { name: 'Save change', exact: true }).click();
+  await page.waitForFunction(async () => (await (await fetch('/api/jobs')).json()).profileReview.allFacts.some(fact => fact.key === 'angular' && fact.value === 'independent'));
+  assert.equal(JSON.parse(await readFile(path.join(root, 'profile/matching.json'))).tags.angular, 'independent');
+  await mkdir('.local', { recursive: true });
+  await page.screenshot({ path: '.local/profile-desktop.png' });
+  await page.setViewportSize({ width: 1024, height: 900 });
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 1024);
+  await page.screenshot({ path: '.local/profile-compact-desktop.png' });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.getByRole('button', { name: 'Jobs', exact: true }).click();
   await page.getByText('1 tag pending review', { exact: true }).waitFor();
   assert.equal(await page.locator('#run-status a, #run-status button').count(), 0);
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   await page.getByText(/Software engineering · 3–7 years/).waitFor();
   assert.ok(await page.getByText('Complete', { exact: true }).count());
   assert.ok(await page.getByText('Pending analysis', { exact: true }).count());
-  assert.ok(await page.getByText('Needs info · 6/8', { exact: true }).count());
+  assert.ok(await page.getByText('Needs info · 7/8', { exact: true }).count());
   await page.getByRole('button', { name: /Mixed evaluation job/ }).click();
   assert.deepEqual(await page.locator('.fact-group>h3').allTextContents(), ['Role fit', 'Opportunity', 'Work conditions']);
   assert.equal(await page.locator('.fact-group').last().getByText('Time overlap', { exact: true }).count(), 1);
@@ -125,10 +158,9 @@ try {
     ['assessment-match', 'Node.js'],
     ['assessment-no-match-required', 'Kubernetes'],
     ['assessment-no-match-optional', 'Kubernetes'],
-    ['assessment-unknown', 'Angular'],
+    ['assessment-match', 'Angular'],
     ['assessment-unmapped', 'Unusual platform certification'],
   ]) assert.equal(await page.locator(`.${className}`).filter({ hasText: text }).count(), 1);
-  await mkdir('.local', { recursive: true });
   await page.screenshot({ path: '.local/evaluation-desktop.png' });
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   assert.equal(await page.locator('#detail .evaluation-summary').count(), 0);
