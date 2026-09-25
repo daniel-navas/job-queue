@@ -53,7 +53,7 @@ test('fingerprints preserve criterion group, evidence and typed thresholds', () 
   assert.match(values[0], /^[a-f0-9]{64}$/);
 });
 
-test('applied and deferred decisions are cached while proposed and reopened remain pending', () => {
+test('only applied decisions leave the review queue; deferred decisions remain pending', () => {
   const criteria = ['Applied', 'Deferred', 'Proposed', 'Reopened'].map(label => unknown(label, `${label} evidence.`));
   const job = summarized('1', emptyCard({ requirements: criteria }));
   const decisions = criteria.map((criterion, index) => ({
@@ -68,8 +68,8 @@ test('applied and deferred decisions are cached while proposed and reopened rema
 
   const result = inventoryUnmapped([job], { schemaVersion: 1, reviewThreshold: 2, decisions });
 
-  assert.deepEqual(result.candidates.map(candidate => candidate.label), ['Proposed', 'Reopened']);
-  assert.equal(result.pending, 2);
+  assert.deepEqual(result.candidates.map(candidate => candidate.label), ['Deferred', 'Proposed', 'Reopened']);
+  assert.equal(result.pending, 3);
   assert.equal(result.recommended, true);
 });
 

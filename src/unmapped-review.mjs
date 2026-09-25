@@ -69,7 +69,7 @@ export function inventoryUnmapped(jobs, review) {
       candidate.offers.push({ id: job.id, reference: `JQ-${String(index + 1).padStart(3, '0')}`, title: job.title, company: job.company });
     }
   });
-  const suppressed = new Set(review.decisions.filter(decision => ['applied', 'deferred'].includes(decision.status)).flatMap(decision => decision.fingerprints));
+  const suppressed = new Set(review.decisions.filter(decision => decision.status === 'applied').flatMap(decision => decision.fingerprints));
   const candidates = [...byFingerprint.values()].filter(candidate => !suppressed.has(candidate.fingerprint)).sort((a, b) => a.label.localeCompare(b.label) || a.fingerprint.localeCompare(b.fingerprint));
   return { candidates, pending: candidates.length, threshold: review.reviewThreshold, recommended: candidates.length >= review.reviewThreshold };
 }

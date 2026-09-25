@@ -57,10 +57,11 @@ is used, so merely reaching the threshold consumes no Codex usage.
    Decisions must be generic and source-based, never per-offer exceptions.
 
 Decision states are `proposed`, `applied`, `deferred`, and `reopened`.
-`applied` and `deferred` fingerprints leave the pending inventory; `proposed`
-and `reopened` remain pending. Stored decisions make later cycles incremental,
-which is the main usage optimization: the model sees new or reopened candidates,
-not the entire historical backlog.
+Only `applied` fingerprints leave the pending inventory. `proposed`, `deferred`
+and `reopened` remain pending: a deferred item means its correct representation
+is not implemented yet, not that it has been resolved. Stored decisions make
+later cycles incremental, which is the main usage optimization: the model sees
+new or unresolved candidates, not the entire historical backlog.
 
 Routine profile-completion questions stay separate. Once a reviewed criterion
 has a canonical tag, it can enter the normal highest-rated-offer question flow.

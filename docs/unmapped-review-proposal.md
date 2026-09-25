@@ -82,6 +82,6 @@ explícito, porque requieren una categoría de requisito que hoy no existe.
 - El conteo final por tipo se recalculará cuando termine la revisión completa.
 
 Las decisiones aprobadas están implementadas. Los puntos 37, 44 y 45 están
-diferidos: requieren alternativas entre tipos distintos o una categoría de
-elegibilidad no técnica. No reaparecen como tags pendientes; permanecen
-visibles en las ofertas hasta que se implemente ese modelo.
+pendientes en el review: requieren alternativas entre tipos distintos o una
+categoría de elegibilidad no técnica. Permanecen visibles y sin resolver hasta
+que se implemente ese modelo.
