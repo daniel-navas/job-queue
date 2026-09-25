@@ -22,6 +22,8 @@ infrastructure, or additional providers.
    stack technology is explicitly assessed as match, non-match, missing profile
    information, or unmapped. The queue shows whether that evaluation is pending,
    needs information, or complete.
+   Offer details visually group facts into Role fit, Opportunity, and Work
+   conditions, with Work conditions last; grouping never merges their scores.
 5. Preserve reviews, reasons, availability history, source records, stable IDs
    and original CVs. Manually closed jobs leave active review tabs but remain
    recoverable in All jobs.

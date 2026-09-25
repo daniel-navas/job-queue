@@ -76,6 +76,14 @@ const reviewedCommodityLabels = new Set([
 
 export function normalizeKnownFacts(card) {
   const result = structuredClone(card);
+  const timezoneRequirement = result.requirements?.find(item => item.kind === 'unknown' && (
+    /time\s*zone overlap/i.test(item.label || '') || /\bhours?\s+overlap\s+with\b/i.test(item.evidence || '')
+  ));
+  if (!result.timezoneOverlap && timezoneRequirement) result.timezoneOverlap = {
+    value: timezoneRequirement.evidence,
+    evidence: timezoneRequirement.evidence,
+  };
+  if (timezoneRequirement) result.requirements = result.requirements.filter(item => item !== timezoneRequirement);
   const normalizedCriterion = (item, kind = item.kind, alternatives = item.alternatives) => {
     const legacyLevel = item.autonomy || ({ basic: 'basic', intermediate: 'independent', advanced: 'advanced' })[item.knowledgeLevel] || null;
     return {

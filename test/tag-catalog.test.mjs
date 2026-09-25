@@ -112,6 +112,17 @@ test('reviewed unmapped criteria normalize without another AI call', () => {
     ['tag', ['nodejs', 'server-side-language']]
   ]);
 });
+test('a stored timezone-overlap requirement becomes a work condition without AI', () => {
+  const normalized = normalizeKnownFacts({ ...card(), requirements: [{
+    label: 'PST timezone overlap', kind: 'unknown', alternatives: ['unmapped'],
+    level: null, minMonths: null, maxMonths: null,
+    evidence: '6-8 hours overlap with PST',
+  }] });
+  assert.deepEqual(normalized.timezoneOverlap, {
+    value: '6-8 hours overlap with PST', evidence: '6-8 hours overlap with PST',
+  });
+  assert.deepEqual(normalized.requirements, []);
+});
 test('schema enforces catalog keys and kinds, with a single explicit unmapped fallback', () => {
   const job={id:'1',title:'Engineer',description:'Docker. An unusual requirement.'};
   const valid={...card(),requirements:[requirement()]};

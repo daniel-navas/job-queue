@@ -9,10 +9,10 @@ import { catalogInstructions, normalizeKnownFacts, upgradeLegacyCard } from './t
 import { decodeExtraction, wireSchema, wireInstructions } from './extraction-wire.mjs';
 export { fields, schema } from './facts.mjs';
 
-export const summaryVersion = 7;
+export const summaryVersion = 8;
 export const inputFor = job => ({ id: job.id, title: job.title, company: job.company ?? '', location: job.location ?? '', description: job.description ?? '' });
 export const fingerprint = job => createHash('sha256').update(JSON.stringify(inputFor(job))).digest('hex');
-const usable = job => job.summary?.inputHash === fingerprint(job) && [3, 4, 5, 6, summaryVersion].includes(job.summary?.version);
+const usable = job => job.summary?.inputHash === fingerprint(job) && [3, 4, 5, 6, 7, summaryVersion].includes(job.summary?.version);
 const upgradeV4Card = card => {
   const result = structuredClone(card);
   const knowledge = item => {
@@ -37,7 +37,7 @@ export const pendingJobs = jobs => jobs.filter(job => job.description?.trim() &&
 export const currentSummary = job => {
   if (!usable(job)) return null;
   const facts = job.summary.version === 3 ? upgradeV4Card(upgradeLegacyCard(job.summary.fields)) : job.summary.version === 4 ? upgradeV4Card(job.summary.fields) : job.summary.fields;
-  const normalized = normalizeKnownFacts({ workCountry: null, visaSupport: null, relocationFunding: null, ...facts });
+  const normalized = normalizeKnownFacts({ workCountry: null, timezoneOverlap: null, visaSupport: null, relocationFunding: null, ...facts });
   return { ...job.summary, facts: normalized, fields: displayFields(normalized) };
 };
 export const processingStatus = job => !job.description?.trim() ? 'no-description' : currentSummary(job) ? 'processed' : 'pending';

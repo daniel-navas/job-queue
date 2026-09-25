@@ -33,11 +33,12 @@ export function evaluationConfig() {
       unknownScore: 0, missingProjectScore: -1,
       roleFocus: { backend: 1, fullstack: 0, frontend: -1 },
       workplace: { remote: 1, hybrid: 0, onsite: -1 },
+      timezoneOverlap: { requiredScore: -1 },
       companyType: { product: 1 },
       projectTags: { 'hr-platform': -1, 'mixed-audience': 1, 'crypto-trading': 1, 'growth-work': 1 },
     },
     scoring: {
-      weights: { roleFocus: 1, workplace: 1, project: 1, experience: 1, requirements: 2, preferred: 0.5, stack: 0.5 },
+      weights: { roleFocus: 1, workplace: 1, timezoneOverlap: 1, project: 1, experience: 1, requirements: 2, preferred: 0.5, stack: 0.5 },
       recencyBands: [],
     },
   };

@@ -12,6 +12,9 @@
     "hybrid": 0,
     "onsite": -1
   },
+  "timezoneOverlap": {
+    "requiredScore": -1
+  },
   "relocation": {
     "priorityCountries": ["ES", "DE"],
     "countries": ["ES", "DE", "AT", "BE", "BG", "HR", "CY", "CZ", "DK", "EE", "FI", "FR", "GR", "HU", "IE", "IT", "LV", "LT", "LU", "MT", "NL", "PL", "PT", "RO", "SK", "SI", "SE"],

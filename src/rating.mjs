@@ -4,6 +4,7 @@ const defaults = {
   missingProjectScore: -1,
   roleFocus: { backend: 1, fullstack: 0, frontend: -1 },
   workplace: { remote: 1, hybrid: 0, onsite: -1 },
+  timezoneOverlap: { requiredScore: -1 },
   companyType: { product: 1, outsourcing: 0, 'recruiting-intermediary': 0, unknown: 0 },
   salaryMonthlyUsd: { preferredMin: 3000, preferredMax: 4000, acceptableMin: 2500, acceptableMax: 4500, preferredScore: 1, outsideScore: -1 }
 };
@@ -12,12 +13,16 @@ export function rateJob(job, preferences = defaults) {
   const fields = {};
   const facts = job.summary?.fields;
   if (!facts) return { total: null, fields };
-  for (const key of ['salary', 'companyType', 'requirements', 'preferred', 'experience', 'language', 'workplace', 'project', 'culture']) fields[key] = { score: 0, reason: 'No preference defined; neutral.' };
+  for (const key of ['salary', 'companyType', 'requirements', 'preferred', 'experience', 'language', 'workplace', 'workCountry', 'timezoneOverlap', 'visaSupport', 'relocationFunding', 'project', 'culture']) fields[key] = { score: 0, reason: 'No preference defined; neutral.' };
   const type = facts.companyType?.value?.toLowerCase().trim();
   const role = roleFocus(job, preferences);
   fields.roleFocus = { score: role.score, reason: role.reason };
   const mode = workplaceMode(job, preferences);
   fields.workplace = { score: mode.score, reason: mode.reason };
+  if (facts.timezoneOverlap) fields.timezoneOverlap = {
+    score: preferences.timezoneOverlap?.requiredScore ?? -1,
+    reason: `${facts.timezoneOverlap.value}: configured work-condition score ${preferences.timezoneOverlap?.requiredScore ?? -1}.`,
+  };
   const typeKey = type?.replace(/\s+/g, '-') || 'unknown';
   const companyScore = preferences.companyType?.[typeKey] ?? preferences.unknownScore ?? 0;
   if (companyScore) fields.companyType = { score: companyScore, reason: `Company type ${typeKey}: configured preference ${companyScore}.` };

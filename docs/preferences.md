@@ -233,3 +233,11 @@ level.
 All profile/config changes apply on refresh without AI. Existing factual tags
 can be reweighted immediately; a newly requested extraction category requires
 a deliberate contract update/reprocessing, not an invented retrospective tag.
+
+The offer detail groups facts visually into Role fit, Opportunity, and Work
+conditions, in that order. This grouping never combines their scores: every
+row keeps its own configured contribution. Work conditions contains work mode,
+country, explicit working-hours overlap, visa support, and moving expenses.
+An explicit timezone-overlap requirement has its own configurable penalty and
+is not a skill tag. Recognized saved PST-overlap wording moves into this row
+locally without another AI call.

@@ -74,3 +74,21 @@ test('rating values can be changed through structured preferences', () => {
   assert.equal(rating.fields.project.score, -2);
   assert.equal(salaryPreference({currency:'USD',min:3500,max:3500}, preferences.salaryMonthlyUsd).score, 5);
 });
+
+test('an explicit timezone-overlap condition has its own configurable score', () => {
+  const job = { summary: { fields: {
+    companyType: null, project: { value: 'Platform' },
+    timezoneOverlap: { value: '6-8 hours overlap with PST', evidence: '6-8 hours overlap with PST' },
+  } } };
+  const rating = rateJob(job, { ...evaluationPreferences(), timezoneOverlap: { requiredScore: -2 } });
+  assert.equal(rating.fields.timezoneOverlap.score, -2);
+  assert.match(rating.fields.timezoneOverlap.reason, /6-8 hours overlap with PST/);
+});
+
+function evaluationPreferences() {
+  return {
+    unknownScore: 0, missingProjectScore: -1,
+    roleFocus: {}, workplace: {}, companyType: {},
+    timezoneOverlap: { requiredScore: -1 },
+  };
+}

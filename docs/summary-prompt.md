@@ -32,9 +32,12 @@ do not become B2B just because employees use them. Domain tags may coexist.
 companyType: product, outsourcing, recruiting-intermediary, unknown. Distinguish
 hiring firm from client; client is contextual. roleFocus: backend, fullstack,
 frontend, unknown; use title and actual duties. workplaceMode: remote, hybrid,
-onsite, unknown; conflicting modes remain unknown. Preserve geography/timezone
+onsite, unknown; conflicting modes remain unknown. Preserve geography
 restrictions in workplace. salary: original amount/currency/period/gross-net,
 no conversions. culture: concrete conditions only, not slogans/routine duties.
+
+timezoneOverlap: the exact stated working-hours overlap requirement, such as
+"6-8 hours overlap with PST". Use null when no overlap requirement is explicit.
 
 workCountry: a single ISO 3166-1 alpha-2 country code for where this role is
 performed, supported by explicit job geography (for example Spain -> ES,

@@ -24,6 +24,7 @@ export const properties = {
   roleFocus: fact(['backend', 'fullstack', 'frontend', 'unknown']),
   workplaceMode: fact(['remote', 'hybrid', 'onsite', 'unknown']),
   workCountry: fact(),
+  timezoneOverlap: fact(),
   visaSupport: fact(['supported', 'not-supported', 'unknown']),
   relocationFunding: fact(['available', 'not-available', 'unknown']),
   software: fact(), work: fact(),

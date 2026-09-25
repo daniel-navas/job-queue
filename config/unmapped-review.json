@@ -1,17 +1,5 @@
 {
   "schemaVersion": 1,
   "reviewThreshold": 20,
-  "decisions": [
-    {
-      "id": "2026-09-nontechnical-eligibility",
-      "status": "deferred",
-      "action": "keep-unmapped",
-      "target": null,
-      "fingerprints": [
-        "089f54793ef5aa9b8d77152ea34997a4150c037617de89eac51e0b49c0521024"
-      ],
-      "rationale": "Timezone overlap is an eligibility constraint, not a skill tag.",
-      "reviewedAt": "2026-09-24"
-    }
-  ]
+  "decisions": []
 }

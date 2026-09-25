@@ -4,6 +4,7 @@
     "salary": 1,
     "companyType": 1,
     "workplace": 1,
+    "timezoneOverlap": 1,
     "project": 1,
     "experience": 1,
     "requirements": 2,

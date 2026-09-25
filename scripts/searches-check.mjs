@@ -35,8 +35,10 @@ try {
   const card = emptyCard({ id: source.id, roleFocus: { value: 'backend', evidence: 'Backend.' }, workplaceMode: { value: 'remote', evidence: 'Remote in Colombia.' }, requirements: [
     requirement('professional', { kind: 'experience', minMonths: 36, maxMonths: 84, evidence: '3-7 years.' }),
   ] });
-  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation job', discoveries: [], description: 'Node.js. Kubernetes. Unusual platform certification. Go. React.' };
+  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation job', discoveries: [], description: 'Node.js. Kubernetes. Unusual platform certification. Go. React. 6-8 hours overlap with PST.' };
   const mixedCard = emptyCard({ id: mixedSource.id,
+    workplace: { value: 'Remote; 6-8 hours overlap with PST', evidence: '6-8 hours overlap with PST.' },
+    timezoneOverlap: { value: '6-8 hours overlap with PST', evidence: '6-8 hours overlap with PST.' },
     requirements: [
       requirement('node.js', { evidence: 'Node.js.' }),
       requirement('kubernetes', { evidence: 'Kubernetes.' }),
@@ -99,6 +101,10 @@ try {
   assert.ok(await page.getByText('Pending analysis', { exact: true }).count());
   assert.ok(await page.getByText('Needs info · 6/8', { exact: true }).count());
   await page.getByRole('button', { name: /Mixed evaluation job/ }).click();
+  assert.deepEqual(await page.locator('.fact-group>h3').allTextContents(), ['Role fit', 'Opportunity', 'Work conditions']);
+  assert.equal(await page.locator('.fact-group').last().getByText('Time overlap', { exact: true }).count(), 1);
+  assert.equal(await page.locator('.fact-group').last().getByText('6-8 hours overlap with PST', { exact: true }).count(), 1);
+  assert.equal((await page.locator('.fact-group').last().innerText()).match(/6-8 hours overlap with PST/g)?.length, 1);
   assert.equal(await page.locator('#detail .evaluation-summary').count(), 0);
   await page.getByText(/Compiled languages · Independent/).waitFor();
   const compiledTooltip = await page.locator('.assessment-no-match-required').filter({ hasText: 'Compiled languages' }).getAttribute('title');
