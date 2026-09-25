@@ -16,9 +16,11 @@ without changing the implementation:
 - Confirmed company-stack familiarity contributes its backed fraction with a
   weight of 0.5. It is an optional advantage capped at +0.5; non-matches never
   subtract points and unresolved stack facts receive no credit.
-- Publication recency contributes at most one point: 1 through day 1, 0.8
-  through day 3, 0.5 through day 7, 0.2 through day 14, then 0. This is a
-  review-priority heuristic, not a claimed acceptance probability.
+- Publication recency contributes from +2 to -2: +2 through day 1, +1.5
+  through day 3, +1 through day 7, +0.5 through day 14, 0 through day 30,
+  -1 through day 60, then -2. A missing or invalid publication date remains
+  neutral. This is a review-priority heuristic, not a claimed acceptance
+  probability.
 - Own product is a provisional +1 signal, not proof of personal interest.
 - B2B is an owner-confirmed negative project preference (-1), for software
   primarily serving business/professional workflows. Merchant participation in

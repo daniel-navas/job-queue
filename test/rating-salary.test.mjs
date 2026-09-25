@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { rateJob, compareJobs, workplaceMode, roleFocus, salaryPreference, coverageScore, publishedRecency, weightedTotal } from '../src/rating.mjs';
 import { monthlySalary, withCOP } from '../src/salary.mjs';
 test('ratings are discrete, missing salary neutral, client is contextual only', () => {
@@ -56,6 +57,16 @@ test('weighted priority includes fractional coverage and publication recency', (
   assert.equal(publishedRecency(Date.parse('2026-09-10T12:00:00Z'), bands, now).score, .8);
   assert.equal(publishedRecency(Date.parse('2026-08-01T12:00:00Z'), bands, now).score, 0);
   assert.equal(weightedTotal({ roleFocus:{score:1}, requirements:{score:5/6}, publishedRecency:{score:.8} }, {roleFocus:1,requirements:2,publishedRecency:1}), 3.47);
+});
+test('configured publication age strongly raises fresh jobs and lowers old jobs', async () => {
+  const scoring = JSON.parse(await readFile(new URL('../config/scoring.json', import.meta.url), 'utf8'));
+  const now = Date.parse('2026-09-25T12:00:00Z');
+  const contribution = publishedAt => publishedRecency(publishedAt, scoring.recencyBands, now).score * scoring.weights.publishedRecency;
+
+  assert.equal(contribution(Date.parse('2026-09-25T00:00:00Z')), 2);
+  assert.equal(contribution(Date.parse('2026-08-25T12:00:00Z')), -1);
+  assert.equal(contribution(Date.parse('2026-07-25T11:59:59Z')), -2);
+  assert.equal(contribution(null), 0);
 });
 test('rating values can be changed through structured preferences', () => {
   const preferences = {

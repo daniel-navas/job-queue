@@ -77,12 +77,13 @@ export function coverageScore(tags) {
 
 export function publishedRecency(publishedAt, bands, now = Date.now()) {
   const timestamp = Number(publishedAt);
-  if (!publishedAt || !Number.isFinite(timestamp) || timestamp > now || !bands?.length) return { score: 0, reason: 'Publication date unavailable or in the future; no recency bonus.' };
+  if (!publishedAt || !Number.isFinite(timestamp) || timestamp > now || !bands?.length) return { score: 0, reason: 'Publication date unavailable or in the future; no recency adjustment.' };
   const ageDays = Math.max(0, (now - timestamp) / 86400000);
-  const band = bands.find(item => ageDays <= item.maxAgeDays);
+  const band = bands.find(item => item.maxAgeDays === undefined || ageDays <= item.maxAgeDays);
   const score = band?.score ?? 0;
   const age = ageDays < 1 ? 'less than one day' : `${Math.floor(ageDays)} day${Math.floor(ageDays) === 1 ? '' : 's'}`;
-  return { score, reason: score ? `Published ${age} ago; recency bonus before weighting.` : `Published ${age} ago; outside the 14-day recency window.` };
+  const effect = score > 0 ? 'recency bonus' : score < 0 ? 'age penalty' : 'neutral recency';
+  return { score, reason: `Published ${age} ago; ${effect} before weighting.` };
 }
 
 export function weightedTotal(fields, weights) {

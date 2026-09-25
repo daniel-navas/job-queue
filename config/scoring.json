@@ -10,12 +10,15 @@
     "requirements": 2,
     "preferred": 0.5,
     "stack": 0.5,
-    "publishedRecency": 1
+    "publishedRecency": 2
   },
   "recencyBands": [
     { "maxAgeDays": 1, "score": 1 },
-    { "maxAgeDays": 3, "score": 0.8 },
+    { "maxAgeDays": 3, "score": 0.75 },
     { "maxAgeDays": 7, "score": 0.5 },
-    { "maxAgeDays": 14, "score": 0.2 }
+    { "maxAgeDays": 14, "score": 0.25 },
+    { "maxAgeDays": 30, "score": 0 },
+    { "maxAgeDays": 60, "score": -0.5 },
+    { "score": -1 }
   ]
 }
