@@ -66,6 +66,7 @@ const levelChoices = [
   ['advanced', 'Advanced']
 ];
 const presenceChoices = [['none', 'No'], ['present', 'Yes']];
+const profileValueLabel = fact => fact.mode === 'presence' ? (fact.value === 'present' ? 'Yes' : 'No') : fact.value[0].toUpperCase() + fact.value.slice(1);
 function profileFactControls(fact, editable) {
   if (!editable) return `<div class="profile-known"><span>${escape(fact.label)}</span><strong>${escape(fact.value)}</strong></div>`;
   const choices = fact.mode === 'presence' ? presenceChoices : levelChoices;
@@ -97,7 +98,8 @@ function renderProfile(review) {
   $('#jobs').innerHTML = filtered.map(item => {
     const missingCount = item.facts.filter(fact => fact.pending).length;
     const meta = [pending && missingCount > 1 ? `${missingCount} missing` : '', item.activeJobCount ? `${item.activeJobCount} active ${item.activeJobCount === 1 ? 'job' : 'jobs'}` : ''].filter(Boolean);
-    return `<article class="job profile-item ${item.id === profileSelected ? 'selected' : ''}"><button class="job-open" data-profile-item="${escape(item.id)}"><span class="job-copy">${meta.length ? `<span class="list-top"><span class="profile-impact">${meta.join(' · ')}</span></span>` : ''}<span class="list-title"><h2>${escape(item.label)}</h2></span></span></button></article>`;
+    const savedValue = !pending && item.facts.length === 1 ? profileValueLabel(item.facts[0]) : '';
+    return `<article class="job profile-item ${item.id === profileSelected ? 'selected' : ''}"><button class="job-open" data-profile-item="${escape(item.id)}"><span class="job-copy">${meta.length ? `<span class="list-top"><span class="profile-impact">${meta.join(' · ')}</span></span>` : ''}<span class="list-title"><h2>${escape(item.label)}</h2>${savedValue ? `<span class="profile-value">${escape(savedValue)}</span>` : ''}</span></span></button></article>`;
   }).join('') || '<div class="empty"><h2>No matches</h2></div>';
   const item = items.find(candidate => candidate.id === profileSelected);
   if (!item) { $('#detail').innerHTML = '<div class="empty">Select an item.</div>'; return; }

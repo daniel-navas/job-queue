@@ -129,11 +129,14 @@ try {
   await page.getByRole('button', { name: /^Saved / }).click();
   assert.equal(await page.getByRole('heading', { name: 'Your profile', exact: true }).count(), 0);
   await page.locator('#search').fill('Angular');
-  await page.locator('[data-profile-item]', { hasText: 'Angular' }).click();
+  const savedAngular = page.locator('[data-profile-item]', { hasText: 'Angular' });
+  assert.equal(await savedAngular.getByText('Basic', { exact: true }).count(), 1);
+  await savedAngular.click();
   assert.equal(await page.getByText('1 fact', { exact: true }).count(), 0);
   await page.getByRole('button', { name: 'Independent', exact: true }).click();
   await page.getByRole('button', { name: 'Save change', exact: true }).click();
   await page.waitForFunction(async () => (await (await fetch('/api/jobs')).json()).profileReview.allFacts.some(fact => fact.key === 'angular' && fact.value === 'independent'));
+  await page.locator('[data-profile-item]', { hasText: 'Angular' }).getByText('Independent', { exact: true }).waitFor();
   assert.equal(JSON.parse(await readFile(path.join(root, 'profile/matching.json'))).tags.angular, 'independent');
   await mkdir('.local', { recursive: true });
   await page.screenshot({ path: '.local/profile-desktop.png' });
