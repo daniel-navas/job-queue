@@ -62,23 +62,29 @@ test('salary preference scores only decisive ranges', () => {
   assert.equal(salaryPreference({currency:'COP',min:10000000,max:12000000,usd:{min:3200,max:3900}}).score,1);
   assert.equal(salaryPreference(null).score,0);
 });
-test('weighted priority includes fractional coverage and publication recency', () => {
+test('publication recency symmetrically multiplies positive and negative fit scores', () => {
   assert.equal(coverageScore([{score:1},{score:1},{score:0}]), 2 / 3);
   const now = Date.parse('2026-09-12T12:00:00Z');
-  const bands = [{maxAgeDays:1,score:1},{maxAgeDays:3,score:.8},{maxAgeDays:7,score:.5},{maxAgeDays:14,score:.2}];
-  assert.equal(publishedRecency(Date.parse('2026-09-10T12:00:00Z'), bands, now).score, .8);
-  assert.equal(publishedRecency(Date.parse('2026-08-01T12:00:00Z'), bands, now).score, 0);
-  assert.equal(weightedTotal({ roleFocus:{score:1}, requirements:{score:5/6}, publishedRecency:{score:.8} }, {roleFocus:1,requirements:2,publishedRecency:1}), 3.47);
+  const bands = [{maxAgeDays:1,multiplier:1.5},{maxAgeDays:3,multiplier:1.4},{maxAgeDays:7,multiplier:1.25},{multiplier:.5}];
+  assert.equal(publishedRecency(Date.parse('2026-09-10T12:00:00Z'), bands, now).multiplier, 1.4);
+  assert.equal(publishedRecency(Date.parse('2026-08-01T12:00:00Z'), bands, now).multiplier, .5);
+  assert.equal(publishedRecency(null, bands, now).multiplier, 1);
+  assert.equal(weightedTotal({ roleFocus:{score:4} }, {roleFocus:1}, 1.5), 6);
+  assert.equal(weightedTotal({ roleFocus:{score:-2} }, {roleFocus:1}, 1.5), -1.33);
+  assert.equal(weightedTotal({ roleFocus:{score:4} }, {roleFocus:1}, .5), 2);
+  assert.equal(weightedTotal({ roleFocus:{score:-2} }, {roleFocus:1}, .5), -4);
+  assert.equal(weightedTotal({ roleFocus:{score:0} }, {roleFocus:1}, 1.5), 0);
 });
-test('configured publication age strongly raises fresh jobs and lowers old jobs', async () => {
+test('configured publication age uses moderate multipliers from 1.5 to 0.5', async () => {
   const scoring = JSON.parse(await readFile(new URL('../config/scoring.json', import.meta.url), 'utf8'));
   const now = Date.parse('2026-09-25T12:00:00Z');
-  const contribution = publishedAt => publishedRecency(publishedAt, scoring.recencyBands, now).score * scoring.weights.publishedRecency;
+  const multiplier = publishedAt => publishedRecency(publishedAt, scoring.recencyBands, now).multiplier;
 
-  assert.equal(contribution(Date.parse('2026-09-25T00:00:00Z')), 2);
-  assert.equal(contribution(Date.parse('2026-08-25T12:00:00Z')), -1);
-  assert.equal(contribution(Date.parse('2026-07-25T11:59:59Z')), -2);
-  assert.equal(contribution(null), 0);
+  assert.equal(multiplier(Date.parse('2026-09-25T00:00:00Z')), 1.5);
+  assert.equal(multiplier(Date.parse('2026-09-21T12:00:00Z')), 1.25);
+  assert.equal(multiplier(Date.parse('2026-08-25T12:00:00Z')), .75);
+  assert.equal(multiplier(Date.parse('2026-07-25T11:59:59Z')), .5);
+  assert.equal(multiplier(null), 1);
 });
 test('rating values can be changed through structured preferences', () => {
   const preferences = {

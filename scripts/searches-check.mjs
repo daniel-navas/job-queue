@@ -20,6 +20,7 @@ try {
   await mkdir(path.join(root, 'data'));
   // Fixed scoring inputs keep UI expectations independent of owner calibration.
   const { preferences, scoring } = evaluationConfig();
+  scoring.recencyBands = [{ maxAgeDays: 1, multiplier: 1.5 }, { multiplier: 0.5 }];
   const scenarioProfile = matchingProfile();
   Object.assign(scenarioProfile.tags, {
     'c++': 'none', csharp: 'none', kotlin: 'none', scala: 'none',
@@ -32,7 +33,7 @@ try {
   await writeFile(path.join(root, 'config/unmapped-review.json'), JSON.stringify({ schemaVersion: 1, reviewThreshold: 1, decisions: [] }));
   const search = normalizeSearch({ id: 'backend', provider: 'linkedin', name: 'Backend · Colombia', query: 'backend engineer', location: 'Colombia', workplace: 'any', datePosted: 'month', enabled: true });
   await writeFile(path.join(root, 'config/searches.json'), JSON.stringify({ searches: [search] }));
-  const source = { id: '100', title: 'Backend Engineer', company: 'Example', location: 'Colombia', description: 'Backend. Remote in Colombia. 3-7 years.', status: 'new', history: [], discoveries: [{ search, firstSeen: '2026-09-14', lastSeen: '2026-09-14' }] };
+  const source = { id: '100', title: 'Backend Engineer', company: 'Example', location: 'Colombia', publishedAt: Date.now(), description: 'Backend. Remote in Colombia. 3-7 years.', status: 'new', history: [], discoveries: [{ search, firstSeen: '2026-09-14', lastSeen: '2026-09-14' }] };
   const card = emptyCard({ id: source.id, roleFocus: { value: 'backend', evidence: 'Backend.' }, workplaceMode: { value: 'remote', evidence: 'Remote in Colombia.' }, requirements: [
     requirement('professional', { kind: 'experience', minMonths: 36, maxMonths: 84, evidence: '3-7 years.' }),
   ] });
@@ -74,7 +75,7 @@ try {
   assert.equal(connection.running, false); assert.equal(connection.connected, false);
   assert.equal((await fetch(`${base}/api/linkedin/connect`, { method: 'POST', headers: { Origin: 'https://untrusted.example' } })).status, 403);
   const initial = await get();
-  assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 2);
+  assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 3);
   const jobsResponse = await (await fetch(`${base}/api/jobs`)).json();
   assert.equal(jobsResponse.development, true);
   assert.deepEqual(jobsResponse.catalogReview, { pending: 1, threshold: 1, recommended: true });
@@ -167,6 +168,7 @@ try {
   assert.equal(await page.locator('#run-status a, #run-status button').count(), 0);
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   await page.getByText(/Software engineering · 3–7 years/).waitFor();
+  assert.equal(await page.locator('#detail .published .rating').innerText(), '×1.5');
   assert.ok(await page.getByText('Complete', { exact: true }).count());
   assert.ok(await page.getByText('Pending analysis', { exact: true }).count());
   assert.ok(await page.getByText('Needs info · 7/8', { exact: true }).count());
@@ -243,7 +245,7 @@ try {
   assert.match(criteriaText, /Location: Colombia/);
   assert.match(criteriaText, /Date posted: Past month/);
   assert.doesNotMatch(criteriaText, /Work mode:|Any work mode|No other filters/);
-  assert.equal(await page.locator('.search-metrics small').first().innerText(), '1 processed · avg 2');
+  assert.equal(await page.locator('.search-metrics small').first().innerText(), '1 processed · avg 3');
   await page.locator('[data-offers="backend"]').click();
   assert.equal(await page.locator('.job').count(), 2);
   await page.getByRole('button', { name: 'Clear search filter' }).click();

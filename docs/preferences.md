@@ -16,11 +16,13 @@ without changing the implementation:
 - Confirmed company-stack familiarity contributes its backed fraction with a
   weight of 0.5. It is an optional advantage capped at +0.5; non-matches never
   subtract points and unresolved stack facts receive no credit.
-- Publication recency contributes from +2 to -2: +2 through day 1, +1.5
-  through day 3, +1 through day 7, +0.5 through day 14, 0 through day 30,
-  -1 through day 60, then -2. A missing or invalid publication date remains
-  neutral. This is a review-priority heuristic, not a claimed acceptance
-  probability.
+- Publication recency multiplies the weighted fit instead of adding points:
+  ×1.5 through day 1, ×1.4 through day 3, ×1.25 through day 7, ×1.1 through
+  day 14, ×1 through day 30, ×0.75 through day 60, then ×0.5. Positive and
+  zero fit use `fit × multiplier`; negative fit uses `fit ÷ multiplier`, so
+  freshness always raises priority and age always lowers it without crossing
+  zero. A missing, invalid, or future publication date uses neutral ×1. This
+  is a review-priority heuristic, not a claimed acceptance probability.
 - Own product is a provisional +1 signal, not proof of personal interest.
 - B2B is an owner-confirmed negative project preference (-1), for software
   primarily serving business/professional workflows. Merchant participation in
@@ -52,7 +54,7 @@ without changing the implementation:
   appeal and source-backed qualification fit. The number and specificity of
   searches remain hypotheses to evaluate, not fixed owner constraints.
 - Unsummarized offers are unrated and listed after summarized offers, with no
-  negative score. Sort by weighted score, then publication time and LinkedIn
+  negative score. Sort by recency-adjusted priority, then publication time and LinkedIn
   ID. Context/stack/project tags add no points without an explicit preference
   rule. The total is a priority score, not a normalized fit percentage and has
   no fixed upper bound.

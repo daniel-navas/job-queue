@@ -43,6 +43,22 @@ test('evaluation progress and score use renamed requirement groups', () => {
   assert.equal(evaluated.rating.fields.requirements.contribution, 1);
 });
 
+test('evaluation exposes fit and applies recency symmetrically to final priority', () => {
+  const now = Date.parse('2026-09-25T12:00:00Z');
+  const multiplierScoring = { ...scoring, recencyBands: [{ maxAgeDays: 1, multiplier: 1.5 }, { multiplier: 0.5 }] };
+  const positive = evaluateJob({ ...job({ requirements: [requirement('nestjs')], software: true }), publishedAt: now }, profile, preferences, multiplierScoring, null, now);
+  const negative = evaluateJob({ ...job(), publishedAt: now }, profile, preferences, multiplierScoring, null, now);
+
+  assert.deepEqual(
+    { fit: positive.rating.fields.publishedRecency.fitScore, multiplier: positive.rating.fields.publishedRecency.multiplier, priority: positive.rating.total },
+    { fit: 2, multiplier: 1.5, priority: 3 },
+  );
+  assert.deepEqual(
+    { fit: negative.rating.fields.publishedRecency.fitScore, multiplier: negative.rating.fields.publishedRecency.multiplier, priority: negative.rating.total },
+    { fit: -1, multiplier: 1.5, priority: -0.67 },
+  );
+});
+
 test('stack familiarity requires only basic level and remains capped', () => {
   const offer = { ...job({ stack: [requirement('docker'), requirement('terraform')] }), processingStatus: 'processed' };
   const evaluated = evaluateJob(offer, profile, preferences, scoring, null);

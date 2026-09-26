@@ -13,14 +13,14 @@ try {
   assert.ok((await page.locator('#jobs').boundingBox()).y < 160);
   assert.equal(await page.locator('#jobs .detail-id').count(),0);
   const data = await (await page.request.get('http://127.0.0.1:4317/api/jobs')).json();
-  const processed = data.jobs.find(j => j.processingStatus === 'processed' && j.status === 'new' && j.summary.fields.salary);
+  const processed = data.jobs.find(j => j.processingStatus === 'processed' && j.status === 'new' && !j.application && j.availability?.status !== 'closed' && j.summary.fields.salary);
   assert.ok(processed, 'A processed salary fixture is needed');
   await page.getByRole('searchbox').fill(processed.reference);
   assert.equal(await page.locator('.job').count(), 1);
   assert.equal(await page.locator('.list-reference').count(),1);
   assert.equal(await page.locator('.list-reference').innerText(),processed.reference);
   assert.notEqual(await page.locator('.list-reference').evaluate(element=>element.tagName),'BUTTON');
-  assert.equal(await page.locator('.state-processed').count(),1);
+  assert.equal(await page.locator('.state-complete, .state-needs-info').count(),1);
   assert.equal(await page.locator('.detail-id').innerText(),processed.reference);
   assert.equal(await page.locator('.detail-title .rating').innerText(),`${processed.rating.total > 0 ? '+' : ''}${processed.rating.total}`);
   assert.equal(await page.locator('.facts dd .rating').count(),0);
@@ -31,7 +31,7 @@ try {
   if (pending) {
     await page.getByRole('searchbox').fill(pending.reference);
     assert.equal(await page.locator('.detail-title .rating').innerText(),'—');
-    assert.equal(await page.locator('.state-pending').count(),1);
+    assert.equal(await page.locator('.state-pending-analysis').count(),1);
   }
   await page.getByRole('searchbox').fill('no-match-xyz');
   await page.getByText('You’re all caught up.').waitFor();

@@ -36,9 +36,12 @@ export function evaluateJob(job, profile, preferences, scoring, monthlySalary, n
     const score = signals.reduce((sum, value) => sum + value, 0);
     if (score !== rating.fields.project.score || project.some(tag => tag.score !== 0)) rating.fields.project = { score, reason: 'Configured project and work preferences are additive; neutral tags contribute zero.' };
     rating.fields.salary = salaryPreference(monthlySalary, preferences.salaryMonthlyUsd);
-    rating.fields.publishedRecency = publishedRecency(job.publishedAt, scoring.recencyBands, now);
-    rating.total = weightedTotal(rating.fields, scoring.weights);
+    const fitScore = weightedTotal(rating.fields, scoring.weights);
+    const recency = publishedRecency(job.publishedAt, scoring.recencyBands, now);
+    rating.total = weightedTotal(rating.fields, scoring.weights, recency.multiplier);
+    rating.fields.publishedRecency = { ...recency, fitScore, adjustedScore: rating.total };
     for (const [key, field] of Object.entries(rating.fields)) {
+      if (!Number.isFinite(field.score)) continue;
       field.weight = scoring.weights[key] ?? 0;
       field.contribution = Math.round(field.score * field.weight * 100) / 100;
     }

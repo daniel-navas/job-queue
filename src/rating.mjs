@@ -77,17 +77,19 @@ export function coverageScore(tags) {
 
 export function publishedRecency(publishedAt, bands, now = Date.now()) {
   const timestamp = Number(publishedAt);
-  if (!publishedAt || !Number.isFinite(timestamp) || timestamp > now || !bands?.length) return { score: 0, reason: 'Publication date unavailable or in the future; no recency adjustment.' };
+  if (!publishedAt || !Number.isFinite(timestamp) || timestamp > now || !bands?.length) return { multiplier: 1, reason: 'Publication date unavailable or in the future; neutral recency multiplier.' };
   const ageDays = Math.max(0, (now - timestamp) / 86400000);
   const band = bands.find(item => item.maxAgeDays === undefined || ageDays <= item.maxAgeDays);
-  const score = band?.score ?? 0;
+  const multiplier = Number.isFinite(band?.multiplier) && band.multiplier > 0 ? band.multiplier : 1;
   const age = ageDays < 1 ? 'less than one day' : `${Math.floor(ageDays)} day${Math.floor(ageDays) === 1 ? '' : 's'}`;
-  const effect = score > 0 ? 'recency bonus' : score < 0 ? 'age penalty' : 'neutral recency';
-  return { score, reason: `Published ${age} ago; ${effect} before weighting.` };
+  const effect = multiplier > 1 ? 'freshness raises priority' : multiplier < 1 ? 'age lowers priority' : 'neutral recency';
+  return { multiplier, reason: `Published ${age} ago; ${effect}.` };
 }
 
-export function weightedTotal(fields, weights) {
-  const total = Object.entries(fields).reduce((sum, [key, field]) => sum + field.score * (weights[key] ?? 0), 0);
+export function weightedTotal(fields, weights, recencyMultiplier = 1) {
+  const fit = Object.entries(fields).reduce((sum, [key, field]) => sum + (Number.isFinite(field.score) ? field.score * (weights[key] ?? 0) : 0), 0);
+  const multiplier = Number.isFinite(recencyMultiplier) && recencyMultiplier > 0 ? recencyMultiplier : 1;
+  const total = fit >= 0 ? fit * multiplier : fit / multiplier;
   return Math.round(total * 100) / 100;
 }
 

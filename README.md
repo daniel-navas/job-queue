@@ -23,6 +23,8 @@ unsaved selection, reload waits until that answer is saved.
   Progress shows 0/2, 1/2, 2/2. It does not search.
 - **Processed** means current structured facts and deterministic scoring are
   available. **Pending** means a complete source still needs AI extraction.
+- The priority score weights fit first, then applies the visible publication
+  multiplier. Freshness raises both positive and negative fit; age lowers both.
 - **Interested** saves a decision; **Dismiss** saves a reason. Neither submits
   an application. Use the LinkedIn link to apply manually.
 - **Applied** records a submission date. **Applications** groups active
