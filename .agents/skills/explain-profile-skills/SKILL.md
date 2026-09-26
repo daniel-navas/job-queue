@@ -15,19 +15,19 @@ Give the owner practical help choosing profile skill levels. This is an explanat
 
 ## Card format
 
-Write in concise conversational Spanish; retain standard English technical terms. Do not translate common technical English or spell out English words in Spanish.
+Write every explanation, implication, and example in concise conversational Spanish. Retain English only for the canonical technical name and an acronym's official expansion; never write an English sentence or clause around them.
 
 Use this compact shape:
 
 1. **Skill name**
 
-   **Qué es:** One plain-language sentence.
+   **Qué es:** Una sola frase en español sencillo.
 
-   If its name uses an acronym, expand it once and immediately state its purpose. For example: “ETL (Extract, Transform, Load): moves data between systems.” Do not translate the English expansion. Define unfamiliar jargon only when needed to understand the card, in a short parenthesis on first use.
+   If its name uses an acronym, expand it once and immediately state its purpose in Spanish. For example: “ETL (Extract, Transform, Load): mueve datos entre sistemas.” Do not translate the English expansion. Define unfamiliar jargon only when needed to understand the card, in a short parenthesis on first use.
 
-   - **Basic:** one concise implication and example.
-   - **Independent:** one concise implication and example.
-   - **Advanced:** one concise implication and example.
+   - **Basic:** una implicación y ejemplo, en una línea.
+   - **Independent:** una implicación y ejemplo, en una línea.
+   - **Advanced:** una implicación y ejemplo, en una línea.
 
 Do not include `None` unless the owner explicitly asks. Assess real understanding, judgment, and ability to check or correct the work—not merely whether an AI coding agent could produce something after being prompted. A presence-only profile fact is not a level skill; explain its Yes/No meaning instead if requested.
 
