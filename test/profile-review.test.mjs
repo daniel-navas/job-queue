@@ -61,6 +61,26 @@ test('saved profile facts are ordered by most recently updated', () => {
   assert.equal(result.allFacts[2].updatedAt, '2026-09-23T12:00:00.000Z');
 });
 
+test('equally recent saved facts are ordered from lower to higher skill level', () => {
+  const profile = {
+    schemaVersion: 2,
+    interests: [],
+    employmentPeriods: [],
+    tags: {
+      angular: 'advanced',
+      financial: 'present',
+      graphql: 'none',
+      nodejs: 'basic',
+      react: 'independent',
+    },
+    tagUpdatedAtDefault: '2026-09-26T12:00:00.000Z',
+  };
+
+  const result = profileReview([], profile);
+
+  assert.deepEqual(result.allFacts.map(fact => fact.key), ['graphql', 'financial', 'nodejs', 'react', 'angular']);
+});
+
 test('overlapping requested families form one task without duplicate facts', () => {
   const profile = { schemaVersion: 2, interests: [], employmentPeriods: [], tags: { java: 'basic' } };
   const jobs = [

@@ -15,6 +15,7 @@ const active = job => ['new', 'interesting'].includes(job.status)
   && job.processingStatus === 'processed'
   && job.summary?.facts;
 const scoreOf = job => Number.isFinite(job.rating?.total) ? job.rating.total : null;
+const profileValueRank = { none: 0, basic: 1, present: 1, independent: 2, advanced: 3 };
 const validTimestamp = value => typeof value === 'string'
   && !Number.isNaN(Date.parse(value))
   && new Date(value).toISOString() === value;
@@ -135,7 +136,9 @@ export function profileReview(jobs, profile) {
       activeJobCount: byJob?.size ?? 0,
       bestScore: scores.length ? Math.max(...scores) : null,
     };
-  }).sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '') || a.label.localeCompare(b.label));
+  }).sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '')
+    || profileValueRank[a.value] - profileValueRank[b.value]
+    || a.label.localeCompare(b.label));
 
   return { pendingCount: pendingKeys.size, activeUnmappedJobs: unmappedJobs.size, items, allFacts };
 }
