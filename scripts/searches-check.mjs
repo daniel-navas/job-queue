@@ -22,6 +22,7 @@ try {
   const { preferences, scoring } = evaluationConfig();
   scoring.recencyBands = [{ maxAgeDays: 1, multiplier: 1.5 }, { multiplier: 0.5 }];
   const scenarioProfile = matchingProfile();
+  scenarioProfile.tagUpdatedAtDefault = '2026-09-01T12:00:00.000Z';
   Object.assign(scenarioProfile.tags, {
     'c++': 'none', csharp: 'none', kotlin: 'none', scala: 'none',
   });
@@ -147,6 +148,7 @@ try {
   assert.equal(storedProfile.tags.rust, 'none');
   await page.getByRole('button', { name: /^Saved / }).click();
   assert.equal(await page.getByRole('heading', { name: 'Your profile', exact: true }).count(), 0);
+  assert.deepEqual((await page.locator('#jobs .profile-item h2').allTextContents()).slice(0, 3), ['Go', 'Rust', 'Angular']);
   await page.locator('#search').fill('Angular');
   const savedAngular = page.locator('[data-profile-item]', { hasText: 'Angular' });
   assert.equal(await savedAngular.getByText('Basic', { exact: true }).count(), 1);

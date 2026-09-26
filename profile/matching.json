@@ -1,5 +1,6 @@
 {
   "schemaVersion": 2,
+  "tagUpdatedAtDefault": "2026-09-26T05:45:41.000Z",
   "interests": ["go"],
   "tags": {
     "docker": "basic",

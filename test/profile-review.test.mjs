@@ -42,6 +42,25 @@ test('profile review counts each missing fact once per active job and orders by 
   assert.deepEqual(result.allFacts.map(fact => fact.key), ['nodejs']);
 });
 
+test('saved profile facts are ordered by most recently updated', () => {
+  const profile = {
+    schemaVersion: 2,
+    interests: [],
+    employmentPeriods: [],
+    tags: { angular: 'basic', nodejs: 'advanced', react: 'independent' },
+    tagUpdatedAtDefault: '2026-09-23T12:00:00.000Z',
+    tagUpdatedAt: {
+      nodejs: '2026-09-26T12:00:00.000Z',
+      react: '2026-09-25T12:00:00.000Z',
+    },
+  };
+
+  const result = profileReview([], profile);
+
+  assert.deepEqual(result.allFacts.map(fact => fact.key), ['nodejs', 'react', 'angular']);
+  assert.equal(result.allFacts[2].updatedAt, '2026-09-23T12:00:00.000Z');
+});
+
 test('overlapping requested families form one task without duplicate facts', () => {
   const profile = { schemaVersion: 2, interests: [], employmentPeriods: [], tags: { java: 'basic' } };
   const jobs = [
@@ -77,12 +96,22 @@ test('profile store applies a validated batch atomically and preserves unrelated
   const root = await mkdtemp(path.join(os.tmpdir(), 'jq-profile-'));
   try {
     await mkdir(path.join(root, 'profile'));
-    const original = { schemaVersion: 2, interests: ['go'], employmentPeriods: [['2020-01', '2021-01']], tags: { nodejs: 'advanced' } };
+    const original = {
+      schemaVersion: 2,
+      interests: ['go'],
+      employmentPeriods: [['2020-01', '2021-01']],
+      tags: { nodejs: 'advanced' },
+      tagUpdatedAt: { nodejs: '2026-09-01T12:00:00.000Z' },
+    };
     await writeFile(path.join(root, 'profile/matching.json'), JSON.stringify(original, null, 2) + '\n');
     const store = new ProfileStore(root);
 
     await store.update([{ key: 'data-modeling', value: 'independent' }, { key: 'financial', value: 'present' }]);
-    assert.deepEqual(await store.read(), { ...original, tags: { nodejs: 'advanced', 'data-modeling': 'independent', financial: 'present' } });
+    const updated = await store.read();
+    assert.deepEqual(updated.tags, { nodejs: 'advanced', 'data-modeling': 'independent', financial: 'present' });
+    assert.equal(updated.tagUpdatedAt.nodejs, '2026-09-01T12:00:00.000Z');
+    assert.match(updated.tagUpdatedAt['data-modeling'], /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    assert.equal(updated.tagUpdatedAt.financial, updated.tagUpdatedAt['data-modeling']);
 
     const beforeInvalid = await readFile(path.join(root, 'profile/matching.json'), 'utf8');
     await assert.rejects(store.update([{ key: 'graphql', value: 'basic' }, { key: 'financial', value: 'advanced' }]), /Invalid profile value/);

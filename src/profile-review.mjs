@@ -15,6 +15,9 @@ const active = job => ['new', 'interesting'].includes(job.status)
   && job.processingStatus === 'processed'
   && job.summary?.facts;
 const scoreOf = job => Number.isFinite(job.rating?.total) ? job.rating.total : null;
+const validTimestamp = value => typeof value === 'string'
+  && !Number.isNaN(Date.parse(value))
+  && new Date(value).toISOString() === value;
 
 function fact(key, profile, pending) {
   const definition = catalog.tags[key];
@@ -128,10 +131,11 @@ export function profileReview(jobs, profile) {
     const scores = [...(byJob?.values() || [])].map(item => scoreOf(item.job)).filter(Number.isFinite);
     return {
       ...fact(key, profile, pendingKeys.has(key)),
+      updatedAt: profile.tagUpdatedAt?.[key] ?? profile.tagUpdatedAtDefault ?? null,
       activeJobCount: byJob?.size ?? 0,
       bestScore: scores.length ? Math.max(...scores) : null,
     };
-  }).sort((a, b) => a.label.localeCompare(b.label));
+  }).sort((a, b) => (b.updatedAt ?? '').localeCompare(a.updatedAt ?? '') || a.label.localeCompare(b.label));
 
   return { pendingCount: pendingKeys.size, activeUnmappedJobs: unmappedJobs.size, items, allFacts };
 }
@@ -141,6 +145,13 @@ export function validateProfile(profile) {
   for (const [key, value] of Object.entries(profile.tags)) {
     const definition = catalog.tags[key];
     if (!definition || !allowedValues(definition).includes(value)) throw new Error(`Invalid profile value for ${key}`);
+  }
+  if (profile.tagUpdatedAtDefault !== undefined && !validTimestamp(profile.tagUpdatedAtDefault)) throw new Error('Invalid default profile update time');
+  if (profile.tagUpdatedAt !== undefined) {
+    if (!profile.tagUpdatedAt || typeof profile.tagUpdatedAt !== 'object' || Array.isArray(profile.tagUpdatedAt)) throw new Error('Invalid profile update history');
+    for (const [key, value] of Object.entries(profile.tagUpdatedAt)) {
+      if (!Object.hasOwn(profile.tags, key) || !validTimestamp(value)) throw new Error(`Invalid profile update time for ${key}`);
+    }
   }
   return profile;
 }
@@ -158,7 +169,12 @@ export class ProfileStore {
         keys.add(change.key);
       }
       const profile = structuredClone(await this.read());
-      for (const { key, value } of changes) profile.tags[key] = value;
+      profile.tagUpdatedAt ??= {};
+      const updatedAt = new Date().toISOString();
+      for (const { key, value } of changes) {
+        profile.tags[key] = value;
+        profile.tagUpdatedAt[key] = updatedAt;
+      }
       const temporary = `${this.file}.${randomUUID()}.tmp`;
       await mkdir(path.dirname(this.file), { recursive: true });
       try {
