@@ -157,8 +157,10 @@ Place the preference score beside the offer title. Keep the detail JQ reference
 low-emphasis in unused header space and copy it when clicked.
 Render the detail score directly adjacent to the title at the same typographic
 scale. Process at most two AI summaries per click to control token use; show a
-loader and how many offers will remain.
-Prioritize the currently selected pending offer in that batch.
+loader and how many offers will remain. Prioritize pending Interested offers,
+then pending New offers. Within each status, process the most recently
+published first; missing publication dates come last and stable IDs break ties.
+The currently selected offer does not affect processing priority.
 In list cards, omit initials and metadata tags, put the score beside the title,
 and show a non-copyable low-emphasis JQ reference at bottom right. In the detail
 header, keep the LinkedIn link at top-right, actions
@@ -173,7 +175,7 @@ review UI. Only offers with current extraction show a numeric score; stale
 extractions must not appear current.
 Availability is separate from owner review. `Mark as closed` removes an offer
 from the active status tabs and pending AI processing without changing its
-score, facts, `New`/`Interesting`/`Dismissed` decision, or reason. Closed offers
+score, facts, `New`/`Interested`/`Dismissed` decision, or reason. Closed offers
 remain in All opportunities with a `Closed` label and a reversible `Reopen`
 action. Manual checks store their timestamp and source; absence from bounded
 LinkedIn search results is not proof that an offer closed.

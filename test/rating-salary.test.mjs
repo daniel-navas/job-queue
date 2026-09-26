@@ -13,6 +13,18 @@ test('ratings are discrete, missing salary neutral, client is contextual only', 
   assert.equal(sezzle.fields.project.score,0);
   assert.ok(compareJobs({rating:{total:null}}, {rating:{total:-2}})>0);
 });
+test('job list orders scores first and breaks ties or missing scores by newest publication', () => {
+  const jobs = [
+    { id: 'unrated-old', rating: { total: null }, publishedAt: 10 },
+    { id: 'rated-low', rating: { total: -2 }, publishedAt: 40 },
+    { id: 'rated-new', rating: { total: 5 }, publishedAt: 30 },
+    { id: 'unrated-new', rating: { total: null }, publishedAt: 20 },
+    { id: 'rated-old', rating: { total: 5 }, publishedAt: 15 },
+  ];
+  assert.deepEqual(jobs.sort(compareJobs).map(item => item.id), [
+    'rated-new', 'rated-old', 'rated-low', 'unrated-new', 'unrated-old',
+  ]);
+});
 test('monthly amounts preserve currency, ranges and assumptions', () => {
   const hourly = monthlySalary({ value: '$50–$100/hour; currency not specified.', evidence: 'Payout: $50 - $100/hour' });
   assert.equal(hourly.currency, null); assert.equal(Math.round(hourly.min), 8667); assert.equal(Math.round(hourly.max), 17333);

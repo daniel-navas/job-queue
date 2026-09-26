@@ -216,7 +216,7 @@ try {
   assert.equal(await page.locator('.job').count(), 4);
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   await page.getByRole('button', { name: 'Interested', exact: true }).click();
-  await page.getByRole('button', { name: 'Interesting', exact: false }).click();
+  await page.locator('#tabs').getByRole('button', { name: 'Interested', exact: false }).click();
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   assert.equal(await page.getByRole('button', { name: 'Interested', exact: true }).getAttribute('aria-pressed'), 'true');
   await page.getByRole('button', { name: 'Dismiss', exact: true }).click();
@@ -226,7 +226,7 @@ try {
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   assert.equal(await page.getByRole('button', { name: 'Dismissed', exact: true }).getAttribute('aria-pressed'), 'true');
   await page.getByRole('button', { name: 'Dismissed', exact: true }).click();
-  await page.getByRole('button', { name: 'Interesting', exact: false }).click();
+  await page.locator('#tabs').getByRole('button', { name: 'Interested', exact: false }).click();
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   assert.equal(await page.getByRole('button', { name: 'Interested', exact: true }).getAttribute('aria-pressed'), 'true');
   await page.getByRole('button', { name: 'Interested', exact: true }).click();

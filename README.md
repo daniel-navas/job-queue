@@ -17,8 +17,9 @@ unsaved selection, reload waits until that answer is saved.
   connection. It does not launch Chrome or fall back to a browser. Searches and
   missing descriptions are fetched sequentially, at most five details/search.
   Only complete jobs enter the UI.
-- **Process** handles at most two pending jobs, selected pending job first.
-  Each gets an independent AI call; both run concurrently and save individually.
+- **Process** handles at most two pending jobs. Interested jobs come first; within
+  each status, newer publication dates come first. The selected card does not
+  affect processing priority. Each gets an independent AI call; both run concurrently and save individually.
   Progress shows 0/2, 1/2, 2/2. It does not search.
 - **Processed** means current structured facts and deterministic scoring are
   available. **Pending** means a complete source still needs AI extraction.

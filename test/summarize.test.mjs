@@ -61,17 +61,24 @@ test('worker preserves reviews and does not save results for changed inputs', as
   other.start(); await other.completion;
   assert.equal(other.state.processed, 0);
 });
-test('one start processes at most two pending offers', async () => {
-  const jobs = Array.from({ length: 6 }, (_, index) => ({ ...job, id: String(index + 1) }));
+test('one start prioritizes the two newest interested offers and ignores the selected job', async () => {
+  const jobs = [
+    { ...job, id: '1', status: 'new', publishedAt: Date.parse('2026-09-26T12:00:00Z') },
+    { ...job, id: '2', status: 'interesting', publishedAt: Date.parse('2026-09-24T12:00:00Z') },
+    { ...job, id: '3', status: 'interesting', publishedAt: Date.parse('2026-09-25T12:00:00Z') },
+    { ...job, id: '4', status: 'new', publishedAt: Date.parse('2026-09-23T12:00:00Z') },
+    { ...job, id: '5', status: 'new' },
+    { ...job, id: '6', status: 'new', publishedAt: Date.parse('2026-09-22T12:00:00Z') },
+  ];
   const queue = { state: { jobs: structuredClone(jobs) }, mutate: async fn => fn() };
   const sizes = [], ids = [];
   const worker = new Summarizer(queue, process.cwd(), async batch => {
     sizes.push(batch.length); ids.push(...batch.map(item=>item.id));
     return { cards: batch.map(item => ({ ...card(), id: item.id })), usage: { input_tokens: batch.length } };
   });
-  worker.start('6'); await worker.completion;
+  worker.start('1'); await worker.completion;
   assert.deepEqual(sizes,[1,1]);
-  assert.deepEqual(ids,['6','1']);
+  assert.deepEqual(ids,['3','2']);
   assert.equal(worker.state.completed,2);
   assert.equal(worker.state.remaining,4);
   assert.equal(worker.state.usage.input_tokens,2);

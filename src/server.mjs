@@ -89,8 +89,8 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && req.url === '/api/summarize') {
       let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }
-      const { id } = body ? JSON.parse(body) : {};
-      summarizer.start(id); return json(202, summarizer.state);
+      if (body) JSON.parse(body);
+      summarizer.start(); return json(202, summarizer.state);
     }
     if (req.method === 'POST' && req.url === '/api/review') {
       let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }

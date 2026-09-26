@@ -34,6 +34,9 @@ const upgradeV4Card = card => {
   return result;
 };
 export const pendingJobs = jobs => jobs.filter(job => job.description?.trim() && job.status !== 'dismissed' && job.availability?.status !== 'closed' && !usable(job));
+export const compareProcessingPriority = (a, b) => Number(b.status === 'interesting') - Number(a.status === 'interesting')
+  || (b.publishedAt ?? 0) - (a.publishedAt ?? 0)
+  || a.id.localeCompare(b.id);
 export const currentSummary = job => {
   if (!usable(job)) return null;
   const facts = job.summary.version === 3 ? upgradeV4Card(upgradeLegacyCard(job.summary.fields)) : job.summary.version === 4 ? upgradeV4Card(job.summary.fields) : job.summary.fields;
@@ -151,11 +154,9 @@ export async function runCodex(jobs, prompt, root) {
 
 export class Summarizer {
   constructor(queue, root, runner = runCodex) { this.queue = queue; this.root = root; this.runner = runner; this.state = { running: false, message: '', processed: 0, completed: 0, total: 0, remaining: 0, usage: null }; }
-  start(priorityId) {
+  start() {
     if (this.state.running) throw new Error('Summary processing is already running');
-    const pending = pendingJobs(this.queue.state.jobs);
-    const priority = pending.findIndex(job => job.id === priorityId);
-    if (priority > 0) pending.unshift(pending.splice(priority, 1)[0]);
+    const pending = pendingJobs(this.queue.state.jobs).sort(compareProcessingPriority);
     const jobs = structuredClone(pending.slice(0, 2));
     if (!jobs.length) throw new Error('No pending descriptions to process');
     this.state = { running: true, message: `Processing ${jobs.length} offers · ${pending.length - jobs.length} will remain`, processed: 0, completed: 0, total: jobs.length, remaining: pending.length, queueAfterBatch: pending.length - jobs.length, usage: null };

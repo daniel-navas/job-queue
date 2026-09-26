@@ -7,7 +7,7 @@ let discoveryFilter = null;
 let profileFilter = 'pending', profileSelected = null, profileShowAll = false;
 const profileSelections = {};
 let devEvents, devDisconnected = false, devReloadPending = false;
-const labels = { new: 'New', interesting: 'Interesting', dismissed: 'Dismissed', all: 'All jobs' };
+const labels = { new: 'New', interesting: 'Interested', dismissed: 'Dismissed', all: 'All jobs' };
 async function api(url, body) { const response = await fetch(url, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}); const result = await response.json(); if (!response.ok) throw new Error(result.error); return result; }
 function error(err) { $('#error').textContent = err.message; }
 function requestDevReload() {
@@ -279,7 +279,7 @@ $('#detail').onclick = async event => {
 $('#cancel').onclick = () => $('#reject-dialog').close();
 $('#reject-form').onsubmit = async event => { event.preventDefault(); try { await api('/api/review', { id: rejecting, status: 'dismissed', reason: $('#reason').value }); $('#reject-dialog').close(); await refresh(); } catch (err) { error(err); } };
 $('#scan').onclick = async () => { try { $('#error').textContent = ''; await api('/api/scan', {}); await refresh(); } catch (err) { error(err); } };
-$('#summarize').onclick = async () => { try { $('#error').textContent = ''; await api('/api/summarize', { id: selected }); await refresh(); } catch (err) { error(err); } };
+$('#summarize').onclick = async () => { try { $('#error').textContent = ''; await api('/api/summarize', {}); await refresh(); } catch (err) { error(err); } };
 initSearches(api, refresh, search => { discoveryFilter = search; view = 'opportunities'; active = 'all'; $('#search').value = ''; render(); });
 $('#clear-discovery').onclick = () => { discoveryFilter = null; render(); };
 refresh().catch(error);
