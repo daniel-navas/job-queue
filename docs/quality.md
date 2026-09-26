@@ -54,7 +54,9 @@ keeping distinct domain rules (such as family versus vendor knowledge) explicit.
 
 Use `npm test` for local rules and persistence. Run
 `node scripts/searches-check.mjs` for isolated UI/API scenarios with temporary
-profile, scoring and queue data. `node scripts/browser-check.mjs` is a read-only
+profile, scoring and queue data. That scenario also verifies development-mode
+browser reload and preservation of an unsaved Profile selection.
+`node scripts/browser-check.mjs` is a read-only
 smoke check against the running app; it requires a new processed salary offer,
 but must not assume a particular JQ ID or fixed personal match coverage.
 Verify desktop workflows. The small-device fallback is only a scaled desktop

@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { watch } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
@@ -20,6 +21,15 @@ const summarizer = new Summarizer(queue, root);
 const searches = new SearchStore(root);
 const profiles = new ProfileStore(root);
 const port = Number(process.env.PORT ?? 4317);
+const development = process.env.JOBQUEUE_DEV === '1';
+const devClients = new Set();
+let devReloadTimer;
+if (development) watch(path.join(root, 'public'), { recursive: true }, () => {
+  clearTimeout(devReloadTimer);
+  devReloadTimer = setTimeout(() => {
+    for (const client of devClients) client.write('event: reload\ndata: {}\n\n');
+  }, 75);
+});
 let scan = { running: false, message: 'Ready', finishedAt: null };
 let connection = { running: false };
 const server = http.createServer(async (req, res) => {
@@ -27,6 +37,13 @@ const server = http.createServer(async (req, res) => {
   try {
     if (![`127.0.0.1:${port}`, `localhost:${port}`].includes(req.headers.host)) return json(403, { error: 'Local access only' });
     if (req.method === 'POST' && req.headers.origin && ![`http://127.0.0.1:${port}`, `http://localhost:${port}`].includes(req.headers.origin)) return json(403, { error: 'Invalid origin' });
+    if (development && req.method === 'GET' && req.url === '/__dev/events') {
+      res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-store', Connection: 'keep-alive' });
+      res.write('retry: 100\n\n');
+      devClients.add(res);
+      req.on('close', () => devClients.delete(res));
+      return;
+    }
     if (req.method === 'GET' && req.url === '/api/linkedin/connection') return json(200, { ...await connectionStatus(root), ...connection });
     if (req.method === 'POST' && req.url === '/api/linkedin/connect') {
       if (connection.running || scan.running) return json(409, { error: 'LinkedIn is busy; wait for the current operation' });
@@ -68,7 +85,7 @@ const server = http.createServer(async (req, res) => {
         const inventory = inventoryUnmapped(queue.state.jobs, review);
         catalogReview = { pending: inventory.pending, threshold: inventory.threshold, recommended: inventory.recommended };
       } catch (error) { console.error(`Pending tag review unavailable: ${error.message}`); }
-      return json(200, { jobs, searches: searchState, preferences: preferencesConfig, profileReview: profileReview(jobs, profile), scan, connection, ai: { ...summarizer.state, pending: pendingJobs(queue.state.jobs).length }, ...(catalogReview ? { catalogReview } : {}) });
+      return json(200, { jobs, searches: searchState, preferences: preferencesConfig, profileReview: profileReview(jobs, profile), scan, connection, ai: { ...summarizer.state, pending: pendingJobs(queue.state.jobs).length }, ...(development ? { development: true } : {}), ...(catalogReview ? { catalogReview } : {}) });
     }
     if (req.method === 'POST' && req.url === '/api/summarize') {
       let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }

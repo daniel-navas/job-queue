@@ -6,6 +6,7 @@
   "description": "Personal job-search automation experiments.",
   "scripts": {
     "start": "node src/server.mjs",
+    "dev": "JOBQUEUE_DEV=1 node --watch --watch-preserve-output src/server.mjs",
     "poc:linkedin": "node src/linkedin/poc.mjs",
     "test": "node --test"
   },

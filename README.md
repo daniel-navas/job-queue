@@ -7,6 +7,9 @@ tracking.
 ## Use
 
 Run `npm install`, then `npm start`. Open http://127.0.0.1:4317 in Chrome.
+For active development, use `npm run dev`: backend changes restart the local
+server and frontend changes reload Chrome automatically. If Profile has an
+unsaved selection, reload waits until that answer is saved.
 
 - **Searches → Connect LinkedIn** opens Chrome for sign-in and learns LinkedIn's
   current request templates. Use Reconnect when the saved connection expires.

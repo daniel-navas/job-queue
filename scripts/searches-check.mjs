@@ -60,9 +60,12 @@ try {
     { ...mixedSource, summary: { fields: mixedCard, version: summaryVersion, inputHash: fingerprint(mixedSource) } },
   ];
   await writeFile(path.join(root, 'data/queue.json'), JSON.stringify({ jobs }));
+  const styleFile = path.join(root, 'public/style.css');
+  let styleRevision = 0;
+  const changePublicFile = async () => writeFile(styleFile, `${await readFile(styleFile, 'utf8')}\n/* live reload probe ${++styleRevision} */\n`);
   const queueBefore = await readFile(path.join(root, 'data/queue.json'), 'utf8');
   const socket = net.createServer(); socket.listen(0, '127.0.0.1'); await once(socket, 'listening'); const port = socket.address().port; await new Promise(resolve => socket.close(resolve));
-  child = spawn(process.execPath, ['src/server.mjs'], { env: { ...process.env, JOBQUEUE_ROOT: root, PORT: String(port) }, stdio: ['ignore', 'pipe', 'pipe'] });
+  child = spawn(process.execPath, ['src/server.mjs'], { env: { ...process.env, JOBQUEUE_ROOT: root, PORT: String(port), JOBQUEUE_DEV: '1' }, stdio: ['ignore', 'pipe', 'pipe'] });
   await Promise.race([once(child.stdout, 'data'), once(child, 'exit').then(() => { throw new Error('Test server exited'); })]);
   const base = `http://127.0.0.1:${port}`;
   const get = async () => (await fetch(`${base}/api/searches`)).json();
@@ -73,6 +76,7 @@ try {
   const initial = await get();
   assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 2);
   const jobsResponse = await (await fetch(`${base}/api/jobs`)).json();
+  assert.equal(jobsResponse.development, true);
   assert.deepEqual(jobsResponse.catalogReview, { pending: 1, threshold: 1, recommended: true });
   assert.equal(jobsResponse.profileReview.pendingCount, 3);
   assert.equal(jobsResponse.profileReview.items[0].label, 'Angular');
@@ -102,6 +106,12 @@ try {
   await detail.close();
   const errors = []; page.on('pageerror', error => errors.push(error.message));
   await page.goto(base); await page.locator('.job').first().waitFor();
+  await page.evaluate(() => { window.__liveReloadProbe = true; });
+  const automaticReload = page.waitForEvent('load', { timeout: 3000 });
+  await changePublicFile();
+  await automaticReload;
+  assert.equal(await page.evaluate(() => window.__liveReloadProbe), undefined);
+  await page.locator('.job').first().waitFor();
   await page.getByRole('button', { name: 'Jobs', exact: true }).waitFor();
   assert.equal(await page.getByRole('button', { name: 'Profile, 3 missing skills', exact: true }).count(), 1);
   await page.getByRole('button', { name: 'Profile, 3 missing skills', exact: true }).click();
@@ -114,8 +124,16 @@ try {
   assert.equal(await page.getByText('Choose an answer for every missing fact.', { exact: true }).count(), 0);
   assert.equal(await page.getByText('can perform bounded tasks with support.', { exact: true }).count(), 0);
   await page.getByRole('button', { name: 'Basic', exact: true }).click();
+  await page.evaluate(() => { window.__liveReloadProbe = true; });
+  let reloadedWithDraft = false;
+  page.once('load', () => { reloadedWithDraft = true; });
+  await changePublicFile();
+  await page.waitForTimeout(400);
+  assert.equal(reloadedWithDraft, false);
   await page.getByRole('button', { name: 'Save and continue', exact: true }).click();
+  await page.waitForFunction(() => window.__liveReloadProbe === undefined);
   await page.getByRole('button', { name: 'Profile, 2 missing skills', exact: true }).waitFor();
+  await page.getByRole('button', { name: 'Profile, 2 missing skills', exact: true }).click();
   await page.getByRole('button', { name: 'None', exact: true }).nth(0).click();
   await page.getByRole('button', { name: 'None', exact: true }).nth(1).click();
   await page.getByRole('button', { name: 'Save and continue', exact: true }).click();

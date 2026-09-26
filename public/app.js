@@ -6,10 +6,23 @@ let data = { jobs: [] }, active = 'new', selected, rejecting, view = 'opportunit
 let discoveryFilter = null;
 let profileFilter = 'pending', profileSelected = null, profileShowAll = false;
 const profileSelections = {};
+let devEvents, devDisconnected = false, devReloadPending = false;
 const labels = { new: 'New', interesting: 'Interesting', dismissed: 'Dismissed', all: 'All jobs' };
 async function api(url, body) { const response = await fetch(url, body ? { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) } : {}); const result = await response.json(); if (!response.ok) throw new Error(result.error); return result; }
 function error(err) { $('#error').textContent = err.message; }
-async function refresh() { data = await api('/api/jobs'); render(); }
+function requestDevReload() {
+  if (view === 'profile' && Object.keys(profileSelections).length) { devReloadPending = true; return; }
+  window.location.reload();
+}
+function continueDevReload() { if (devReloadPending && !(view === 'profile' && Object.keys(profileSelections).length)) window.location.reload(); }
+function initDevReload() {
+  if (!data.development || devEvents) return;
+  devEvents = new EventSource('/__dev/events');
+  devEvents.addEventListener('reload', requestDevReload);
+  devEvents.onopen = () => { if (devDisconnected) requestDevReload(); };
+  devEvents.onerror = () => { devDisconnected = true; };
+}
+async function refresh() { data = await api('/api/jobs'); initDevReload(); render(); }
 function render() {
   const tracking = view === 'applications';
   const profiling = view === 'profile';
@@ -204,7 +217,7 @@ $('#application-remove').onclick = async () => {
   try { await api('/api/application', { id: selected, change: { type: 'remove-event', eventId: editingEvent.id } }); $('#application-dialog').close(); await refresh(); }
   catch (err) { $('#application-error').textContent = err.message; }
 };
-$('#views').onclick = event => { const button = event.target.closest('[data-view]'); if (button) { view = button.dataset.view; selected = null; $('#search').value = ''; render(); } };
+$('#views').onclick = event => { const button = event.target.closest('[data-view]'); if (button) { view = button.dataset.view; selected = null; $('#search').value = ''; render(); continueDevReload(); } };
 $('#tabs').onclick = event => { const tab = event.target.closest('[data-tab]'); if (tab) { if (view === 'applications') applicationFilter = tab.dataset.tab; else if (view === 'profile') { profileFilter = tab.dataset.tab; profileSelected = null; } else active = tab.dataset.tab; render(); } };
 $('#search').oninput = render;
 $('#jobs').onclick = event => {
@@ -233,6 +246,7 @@ $('#detail').onclick = async event => {
         profileSelected = null;
         profileShowAll = false;
         await refresh();
+        continueDevReload();
       } catch (err) { $('#profile-error').textContent = err.message; }
     }
     return;
