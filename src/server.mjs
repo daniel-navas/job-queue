@@ -124,7 +124,7 @@ const server = http.createServer(async (req, res) => {
       return json(202, scan);
     }
     if (req.method === 'GET' && req.url === '/rating.js') { res.writeHead(200, { 'Content-Type': 'text/javascript' }); return res.end(await readFile(path.join(root, 'src/rating.mjs'))); }
-    const assets = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/searches.js': ['searches.js', 'text/javascript'], '/style.css': ['style.css', 'text/css'] };
+    const assets = { '/': ['index.html', 'text/html'], '/app.js': ['app.js', 'text/javascript'], '/job-presentation.js': ['job-presentation.js', 'text/javascript'], '/searches.js': ['searches.js', 'text/javascript'], '/style.css': ['style.css', 'text/css'] };
     if (req.method !== 'GET' || !assets[req.url]) return json(404, { error: 'Not found' });
     const [file, type] = assets[req.url];
     res.writeHead(200, { 'Content-Type': type, 'Cache-Control': 'no-store', 'Content-Security-Policy': "default-src 'self'; connect-src 'self'; style-src 'self'; script-src 'self'; base-uri 'none'; frame-ancestors 'none'" });

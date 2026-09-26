@@ -1,6 +1,7 @@
 {
   "weights": {
     "roleFocus": 1,
+    "easyApply": 0.5,
     "salary": 1,
     "companyType": 1,
     "workplace": 1,

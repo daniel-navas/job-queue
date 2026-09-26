@@ -39,6 +39,11 @@ export function normalizeCaptures(payloads, metadata = []) {
   // Legacy search-card metadata can hydrate a detail-only response. Never seed
   // descriptions here: only descriptions received in this capture are imported.
   const jobs = new Map(metadata.map(({ id, title, company, location, publishedAt, source, url }) => [id, { id, title, company, location, publishedAt, source, url }]));
+  const confirmedEasyApply = new Set(payloads.flatMap(payload => (payload.included ?? []).flatMap(item => {
+    if (!item?.$type?.endsWith('.JobSeekerApplicationDetail') || item.onsiteApply !== true) return [];
+    const id = item.entityUrn?.match(/jobSeekerApplicationDetail:(\d+)/)?.[1];
+    return id ? [id] : [];
+  })));
   for (const payload of payloads) {
     for (const item of payload.included ?? []) {
       const card = item.$type?.endsWith('.JobPostingCard');
@@ -54,6 +59,7 @@ export function normalizeCaptures(payloads, metadata = []) {
         publishedAt: item.footerItems?.find(i => i.type === 'LISTED_DATE')?.timeAt,
       };
       for (const [key, value] of Object.entries(fields)) if (value) previous[key] = value;
+      if (confirmedEasyApply.has(id) || (!card && Object.hasOwn(item, 'companyApplyUrl') && item.companyApplyUrl === null)) previous.easyApply = true;
       jobs.set(id, previous);
     }
   }

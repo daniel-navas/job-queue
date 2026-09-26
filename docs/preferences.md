@@ -16,6 +16,9 @@ without changing the implementation:
 - Confirmed company-stack familiarity contributes its backed fraction with a
   weight of 0.5. It is an optional advantage capped at +0.5; non-matches never
   subtract points and unresolved stack facts receive no credit.
+- LinkedIn-confirmed Easy Apply contributes +0.5 to fit before publication
+  recency adjusts the final priority. Missing application-method data remains
+  neutral and must not be inferred from the description.
 - Publication recency multiplies the weighted fit instead of adding points:
   ×1.5 through day 1, ×1.4 through day 3, ×1.25 through day 7, ×1.1 through
   day 14, ×1 through day 30, ×0.75 through day 60, then ×0.5. Positive and
@@ -163,8 +166,10 @@ loader and how many offers will remain. Prioritize pending Interested offers,
 then pending New offers. Within each status, process the most recently
 published first; missing publication dates come last and stable IDs break ties.
 The currently selected offer does not affect processing priority.
-In list cards, omit initials and metadata tags, put the score beside the title,
-and show a non-copyable low-emphasis JQ reference at bottom right. In the detail
+In list cards, omit initials and generic metadata tags, put the score beside the
+title, and show publication age plus a compact Easy Apply tag when LinkedIn
+confirmed it. The tag shows its +0.5 fit contribution for processed jobs. Keep
+the non-copyable low-emphasis JQ reference at bottom right. In the detail
 header, keep the LinkedIn link at top-right, actions
 and metadata together on a compact second row, and the copyable JQ reference at
 the far right of that row. The desktop header should use two rows total.

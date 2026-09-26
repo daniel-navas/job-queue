@@ -59,6 +59,17 @@ test('evaluation exposes fit and applies recency symmetrically to final priority
   );
 });
 
+test('confirmed Easy Apply adds a small configurable fit bonus', () => {
+  const offer = job({ requirements: [requirement('nestjs')], software: true });
+  const bonusScoring = { ...scoring, weights: { ...scoring.weights, easyApply: 0.5 } };
+  const ordinary = evaluateJob(offer, profile, preferences, bonusScoring, null);
+  const easy = evaluateJob({ ...offer, easyApply: true }, profile, preferences, bonusScoring, null);
+
+  assert.equal(ordinary.rating.fields.easyApply.contribution, 0);
+  assert.equal(easy.rating.fields.easyApply.contribution, 0.5);
+  assert.equal(easy.rating.total - ordinary.rating.total, 0.5);
+});
+
 test('stack familiarity requires only basic level and remains capped', () => {
   const offer = { ...job({ stack: [requirement('docker'), requirement('terraform')] }), processingStatus: 'processed' };
   const evaluated = evaluateJob(offer, profile, preferences, scoring, null);

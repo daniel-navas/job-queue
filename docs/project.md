@@ -17,7 +17,8 @@ infrastructure, or additional providers.
 3. Match every processed job to structured profile data and preferences using
    local code. Profile, preference and weight changes require no AI calls.
 4. Show compact decision cards, source quotes, weighted contributions, and a
-   priority-ordered review queue. Unknown remains visible and is not invented.
+   priority-ordered review queue. List cards show publication age and confirmed
+   LinkedIn Easy Apply status. Unknown remains visible and is not invented.
    Each relevant requirement, nice-to-have, experience criterion, and company
    stack technology is explicitly assessed as match, non-match, missing profile
    information, or unmapped. The queue shows whether that evaluation is pending,

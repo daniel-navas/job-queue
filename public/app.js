@@ -1,5 +1,6 @@
 import { compareJobs, workplaceMode, roleFocus } from '/rating.js';
 import { initSearches, provenanceHTML } from '/searches.js';
+import { listTags, publicationAgeLabel } from '/job-presentation.js';
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 let data = { jobs: [] }, active = 'new', selected, view = 'opportunities', applicationFilter = 'active', editingEvent = null;
@@ -67,7 +68,7 @@ function render() {
   $('#run-status').title = $('#run-status').textContent;
   $('#scan').title = enabled.length ? (data.scan?.running && data.scan.query ? data.scan.query : `${enabled.length} LinkedIn searches`) : 'Enable a search in Searches';
   $('#run-status').classList.toggle('failure', !!data.scan?.error);
-  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''} ${job.availability?.status === 'closed' ? 'job-closed' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="list-states">${evaluationBadge(job.evaluation)}${active === 'all' && job.application ? `<span class="application-stage">${escape(stageLabels[job.applicationView?.stage] || 'Applied')}</span>` : ''}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</span></span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Recency-adjusted priority score')}</span><span class="list-footer"><span class="muted">${escape(job.location || 'Location not provided')}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more jobs.</p></div>';
+  $('#jobs').innerHTML = jobs.map(job => `<article class="job ${job.id === selected ? 'selected' : ''} ${job.availability?.status === 'closed' ? 'job-closed' : ''}"><button class="job-open" data-open="${job.id}"><span class="job-copy"><span class="list-top"><span class="company">${escape(job.company || 'Company not provided')}</span><span class="list-states">${evaluationBadge(job.evaluation)}${active === 'all' && job.application ? `<span class="application-stage">${escape(stageLabels[job.applicationView?.stage] || 'Applied')}</span>` : ''}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</span></span><span class="list-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, job.rating.total === null ? 'No current AI summary' : 'Recency-adjusted priority score')}</span><span class="list-footer"><span class="list-metadata"><span class="muted">${escape(job.location || 'Location not provided')}</span>${publicationAgeHTML(job)}${listTagsHTML(job)}</span><span class="list-reference">${escape(job.reference)}</span></span></span></button></article>`).join('') || '<div class="empty"><h2>You’re all caught up.</h2><p>Try another tab, clear your search, or find more jobs.</p></div>';
   const job = data.jobs.find(j => j.id === selected);
   $('#detail').innerHTML = job ? `<div class="detail-head"><a class="external detail-link" href="${escape(job.url)}" target="_blank" rel="noopener noreferrer">LinkedIn ↗</a><div class="detail-title"><h2>${escape(job.title)}</h2>${ratingBadge(job.rating.total, 'Recency-adjusted priority score')}${job.application ? `<span class="application-stage">${escape(stageLabels[job.applicationView?.stage] || 'Applied')}</span>` : ''}${job.availability?.status === 'closed' ? '<span class="availability-state">Closed</span>' : ''}</div><div class="detail-meta"><span>${escape(job.company || 'Company not provided')}</span>${publishedHTML(job)}<button class="detail-id" data-copy-id="${escape(job.reference)}" title="Copy job ID">${escape(job.reference)}</button></div>${jobActions(job)}</div>${job.reason ? `<div class="feedback"><strong>Your feedback</strong><p>${escape(job.reason)}</p></div>` : ''}<hr>${summaryHTML(job)}<details class="original"><summary>Full description</summary><div class="description">${escape(job.description || 'Description not captured. Open LinkedIn for details.')}</div></details>` : '<div class="empty">Select a job to see the details.</div>';
 }
@@ -354,11 +355,19 @@ function multiplierBadge(rating) {
 }
 
 function publishedHTML(job) {
-  if (!job.publishedAt) return '';
-  const days = Math.max(0, Math.floor((Date.now() - job.publishedAt) / 86400000));
-  const relative = days === 0 ? 'today' : days === 1 ? '1 day ago' : `${days} days ago`;
+  const relative = publicationAgeLabel(job.publishedAt);
+  if (!relative) return '';
   const rating = job.rating.fields.publishedRecency;
   return `<span class="published" title="${escape(new Date(job.publishedAt).toLocaleString())}">Published ${relative}${rating ? multiplierBadge(rating) : ''}</span>`;
+}
+
+function publicationAgeHTML(job) {
+  const relative = publicationAgeLabel(job.publishedAt);
+  return relative ? `<span class="published-age" title="${escape(new Date(job.publishedAt).toLocaleString())}">${escape(relative)}</span>` : '';
+}
+
+function listTagsHTML(job) {
+  return listTags(job).map(tag => `<span class="list-tag list-tag-${escape(tag.tone)}" title="${escape(tag.title)}">${escape(tag.label)}</span>`).join('');
 }
 
 function projectHTML(value) {

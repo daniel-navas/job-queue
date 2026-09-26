@@ -21,6 +21,7 @@ try {
   // Fixed scoring inputs keep UI expectations independent of owner calibration.
   const { preferences, scoring } = evaluationConfig();
   scoring.recencyBands = [{ maxAgeDays: 1, multiplier: 1.5 }, { multiplier: 0.5 }];
+  scoring.weights.easyApply = 0.5;
   const scenarioProfile = matchingProfile();
   scenarioProfile.tagUpdatedAtDefault = '2026-09-01T12:00:00.000Z';
   Object.assign(scenarioProfile.tags, {
@@ -34,11 +35,11 @@ try {
   await writeFile(path.join(root, 'config/unmapped-review.json'), JSON.stringify({ schemaVersion: 1, reviewThreshold: 1, decisions: [] }));
   const search = normalizeSearch({ id: 'backend', provider: 'linkedin', name: 'Backend · Colombia', query: 'backend engineer', location: 'Colombia', workplace: 'any', datePosted: 'month', enabled: true });
   await writeFile(path.join(root, 'config/searches.json'), JSON.stringify({ searches: [search] }));
-  const source = { id: '100', title: 'Backend Engineer', company: 'Example', location: 'Colombia', publishedAt: Date.now(), description: 'Backend. Remote in Colombia. 3-7 years.', status: 'new', history: [], discoveries: [{ search, firstSeen: '2026-09-14', lastSeen: '2026-09-14' }] };
+  const source = { id: '100', title: 'Backend Engineer', company: 'Example', location: 'Colombia', publishedAt: Date.now(), easyApply: true, description: 'Backend. Remote in Colombia. 3-7 years.', status: 'new', history: [], discoveries: [{ search, firstSeen: '2026-09-14', lastSeen: '2026-09-14' }] };
   const card = emptyCard({ id: source.id, roleFocus: { value: 'backend', evidence: 'Backend.' }, workplaceMode: { value: 'remote', evidence: 'Remote in Colombia.' }, requirements: [
     requirement('professional', { kind: 'experience', minMonths: 36, maxMonths: 84, evidence: '3-7 years.' }),
   ] });
-  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation job', discoveries: [], description: 'Node.js. Kubernetes. Unusual platform certification. Go. React. 6-8 hours overlap with PST.' };
+  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation job', easyApply: undefined, discoveries: [], description: 'Node.js. Kubernetes. Unusual platform certification. Go. React. 6-8 hours overlap with PST.' };
   const mixedCard = emptyCard({ id: mixedSource.id,
     workplace: { value: 'Remote; 6-8 hours overlap with PST', evidence: '6-8 hours overlap with PST.' },
     timezoneOverlap: { value: '6-8 hours overlap with PST', evidence: '6-8 hours overlap with PST.' },
@@ -57,8 +58,8 @@ try {
   });
   const jobs = [
     { ...source, summary: { fields: card, version: summaryVersion, inputHash: fingerprint(source) } },
-    { ...source, id: '101', title: 'Pending job' },
-    { ...source, id: '102', title: 'Legacy job', discoveries: undefined, searchUrl: 'https://www.linkedin.com/jobs/search/?keywords=old&location=Colombia' },
+    { ...source, id: '101', title: 'Pending job', easyApply: undefined },
+    { ...source, id: '102', title: 'Legacy job', easyApply: undefined, discoveries: undefined, searchUrl: 'https://www.linkedin.com/jobs/search/?keywords=old&location=Colombia' },
     { ...mixedSource, summary: { fields: mixedCard, version: summaryVersion, inputHash: fingerprint(mixedSource) } },
   ];
   await writeFile(path.join(root, 'data/queue.json'), JSON.stringify({ jobs }));
@@ -76,7 +77,7 @@ try {
   assert.equal(connection.running, false); assert.equal(connection.connected, false);
   assert.equal((await fetch(`${base}/api/linkedin/connect`, { method: 'POST', headers: { Origin: 'https://untrusted.example' } })).status, 403);
   const initial = await get();
-  assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 3);
+  assert.equal(initial.stats[0].captured, 2); assert.equal(initial.stats[0].processed, 1); assert.equal(initial.stats[0].meanRating, 3.75);
   const jobsResponse = await (await fetch(`${base}/api/jobs`)).json();
   assert.equal(jobsResponse.development, true);
   assert.deepEqual(jobsResponse.catalogReview, { pending: 1, threshold: 1, recommended: true });
@@ -181,6 +182,9 @@ try {
   await page.getByRole('button', { name: 'Jobs', exact: true }).click();
   await page.getByText('1 tag pending review', { exact: true }).waitFor();
   assert.equal(await page.locator('#run-status a, #run-status button').count(), 0);
+  const backendCard = page.locator('#jobs .job', { hasText: 'Backend Engineer' });
+  assert.equal(await backendCard.getByText('today', { exact: true }).count(), 1);
+  assert.equal(await backendCard.locator('.list-tag').innerText(), 'Easy Apply +0.5');
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   await page.getByText(/Software engineering · 3–7 years/).waitFor();
   assert.equal(await page.locator('#detail .published .rating').innerText(), '×1.5');
@@ -259,7 +263,7 @@ try {
   assert.match(criteriaText, /Location: Colombia/);
   assert.match(criteriaText, /Date posted: Past month/);
   assert.doesNotMatch(criteriaText, /Work mode:|Any work mode|No other filters/);
-  assert.equal(await page.locator('.search-metrics small').first().innerText(), '1 processed · avg 3');
+  assert.equal(await page.locator('.search-metrics small').first().innerText(), '1 processed · avg 3.75');
   await page.locator('[data-offers="backend"]').click();
   assert.equal(await page.locator('.job').count(), 2);
   await page.getByRole('button', { name: 'Clear search filter' }).click();

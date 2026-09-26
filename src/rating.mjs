@@ -14,6 +14,9 @@ export function rateJob(job, preferences = defaults) {
   const facts = job.summary?.fields;
   if (!facts) return { total: null, fields };
   for (const key of ['salary', 'companyType', 'requirements', 'preferred', 'experience', 'language', 'workplace', 'workCountry', 'timezoneOverlap', 'visaSupport', 'relocationFunding', 'project', 'culture']) fields[key] = { score: 0, reason: 'No preference defined; neutral.' };
+  fields.easyApply = job.easyApply === true
+    ? { score: 1, reason: 'LinkedIn confirms Easy Apply.' }
+    : { score: 0, reason: 'Easy Apply is not confirmed; neutral.' };
   const type = facts.companyType?.value?.toLowerCase().trim();
   const role = roleFocus(job, preferences);
   fields.roleFocus = { score: role.score, reason: role.reason };

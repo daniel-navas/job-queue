@@ -50,6 +50,24 @@ test('normalization joins card metadata with descriptions without importing unre
   assert.equal(normalizeCaptures([{ included: [{ $type: 'x.JobPostingCard', entityUrn: 'urn:li:fsd_jobPostingCard:(456,JOBS_SEARCH)', jobPostingTitle: 'Partial' }] }]).length, 0);
 });
 
+test('normalization keeps only confirmed LinkedIn Easy Apply signals', () => {
+  const description = { text: 'Complete source description.' };
+  const [currentEasy, external, unknown] = normalizeCaptures([{ included: [
+    { $type: 'x.JobPosting', entityUrn: 'urn:li:fsd_jobPosting:123', title: 'Easy', description, companyApplyUrl: null },
+    { $type: 'x.JobPosting', entityUrn: 'urn:li:fsd_jobPosting:456', title: 'External', description, companyApplyUrl: 'https://example.test/apply' },
+    { $type: 'x.JobPosting', entityUrn: 'urn:li:fsd_jobPosting:789', title: 'Unknown', description },
+  ] }]);
+  assert.equal(currentEasy.easyApply, true);
+  assert.equal('easyApply' in external, false);
+  assert.equal('easyApply' in unknown, false);
+
+  const [legacyEasy] = normalizeCaptures([{ included: [
+    { $type: 'x.JobPosting', entityUrn: 'urn:li:fsd_jobPosting:999', title: 'Legacy easy', description },
+    { $type: 'x.JobSeekerApplicationDetail', entityUrn: 'urn:li:fsd_jobSeekerApplicationDetail:999', onsiteApply: true },
+  ] }]);
+  assert.equal(legacyEasy.easyApply, true);
+});
+
 test('repeat imports preserve review decisions and discovery time', () => {
   const old = [{ id: '123', status: 'dismissed', reason: 'Too senior', history: [{ status: 'dismissed' }], firstSeen: '2026-01-01' }];
   const result = mergeJobs(old, [{ id: '123', title: 'Updated title' }], '2026-02-01', 'search');
