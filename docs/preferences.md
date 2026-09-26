@@ -119,13 +119,13 @@ unconvertible salary stays neutral.
 
 ## Interaction
 
-Profile is the standard completion workflow. Its Needs info queue contains each
-missing canonical fact once, ordered by the number of distinct active jobs it
+Profile is the standard completion workflow. Its Missing queue contains each
+missing canonical value once, ordered by the number of distinct active jobs it
 affects, the best score among those jobs, and then label. Active means processed,
 open, not applied, and currently New or Interested. Family requirements group
-their missing members; overlapping families merge so a fact appears once.
-All facts contains confirmed answers plus facts currently requested by active
-jobs and supports searching and changing an existing value.
+their missing members; overlapping families merge so a value appears once.
+Saved contains only values already stored in the profile and supports searching
+and changing them.
 
 Routine chat responses must not append profile questions. Chat may assist with
 or audit a profile answer only when the owner explicitly requests it. Never ask

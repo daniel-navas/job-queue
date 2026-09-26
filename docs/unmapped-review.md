@@ -80,5 +80,5 @@ new or unresolved candidates, not the entire historical backlog.
 
 Routine profile completion stays separate. Once review maps a criterion to a
 canonical tag that is absent from the profile, it enters the local Profile
-Needs info queue. Unmapped criteria remain visibly separate and cannot be
+Missing queue. Unmapped criteria remain visibly separate and cannot be
 answered in Profile.

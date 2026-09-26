@@ -21,7 +21,7 @@ const activeJob = (id, requirements, score, overrides = {}) => ({
 });
 
 test('profile review counts each missing fact once per active job and orders by reach', () => {
-  const profile = { schemaVersion: 2, interests: [], employmentPeriods: [['2020-01', '2021-01']], tags: {} };
+  const profile = { schemaVersion: 2, interests: [], employmentPeriods: [['2020-01', '2021-01']], tags: { nodejs: 'advanced' } };
   const jobs = [
     activeJob('001', [requirement('data-modeling')], 4, { summary: { facts: emptyCard({ requirements: [requirement('data-modeling')], preferred: [requirement('data-modeling')] }) } }),
     activeJob('002', [requirement('data-modeling'), requirement('financial')], 2),
@@ -39,7 +39,7 @@ test('profile review counts each missing fact once per active job and orders by 
   assert.deepEqual(result.items[0].jobs.map(job => job.id), ['001', '002']);
   assert.deepEqual(result.items[0].jobs[0].groups, ['requirements', 'preferred']);
   assert.equal(result.items[2].facts[0].mode, 'presence');
-  assert.deepEqual(result.allFacts.map(fact => fact.key), ['data-modeling', 'financial', 'graphql']);
+  assert.deepEqual(result.allFacts.map(fact => fact.key), ['nodejs']);
 });
 
 test('overlapping requested families form one task without duplicate facts', () => {

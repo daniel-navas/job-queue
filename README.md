@@ -44,8 +44,9 @@ version. Pending legacy cards must be processed once with the current schema.
 
 ## Change preferences or profile
 
-- Use **Profile** in the app to answer missing facts or search and edit existing
-  answers. It writes `profile/matching.json` locally and recalculates processed
+- Use **Profile → Missing** to complete requested profile values and
+  **Profile → Saved** to search or edit stored values. It writes
+  `profile/matching.json` locally and recalculates processed
   jobs without AI or Chrome.
 - config/preferences.json: preference values.
 - config/scoring.json: weights and recency bands.

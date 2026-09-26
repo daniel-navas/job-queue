@@ -35,7 +35,7 @@ infrastructure, or additional providers.
    rediscovery. Applying records a local date and implies `Interested`;
    correcting an accidental application before later milestones restores the
    exact prior review decision. No application is submitted by the tracker.
-8. Complete missing profile facts through the local `Profile` workspace. Its
+8. Complete missing profile values through the local `Profile` workspace. Its
    pending queue is derived only from processed, open New or Interested jobs;
    dismissed, closed, and applied jobs do not create tasks. Answers update the
    global profile atomically and immediately rerank every processed job without

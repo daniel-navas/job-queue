@@ -122,7 +122,7 @@ export function profileReview(jobs, profile) {
     || (b.bestScore ?? -Infinity) - (a.bestScore ?? -Infinity)
     || a.label.localeCompare(b.label));
 
-  const allKeys = new Set([...Object.keys(profile.tags || {}), ...pendingKeys]);
+  const allKeys = new Set(Object.keys(profile.tags || {}));
   const allFacts = [...allKeys].map(key => {
     const byJob = occurrences.get(key);
     const scores = [...(byJob?.values() || [])].map(item => scoreOf(item.job)).filter(Number.isFinite);
