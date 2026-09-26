@@ -83,7 +83,8 @@ The extraction/matching boundary is recorded in decision 0002.
   skills only as none, basic, independent, or advanced; do not collect duration
   or experience recency for a skill tag. Saved skills are ordered by their local
   save or edit time, then from lower to higher level when times match. This
-  workflow metadata is not displayed.
+  workflow metadata is not displayed. Saved Profile also exposes catalog
+  families as searchable groups and identifies each individual skill's families.
 - Source quotations prove provenance, not perfect AI interpretation. Extraction
   errors must be fixed generically, not with hidden per-job score exceptions.
 - Keep the verified GitHub remote (`origin/main`) synchronized after coherent

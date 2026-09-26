@@ -81,6 +81,32 @@ test('equally recent saved facts are ordered from lower to higher skill level', 
   assert.deepEqual(result.allFacts.map(fact => fact.key), ['graphql', 'financial', 'nodejs', 'react', 'angular']);
 });
 
+test('saved profile exposes catalog families and each member family', () => {
+  const profile = {
+    schemaVersion: 2,
+    interests: [],
+    employmentPeriods: [],
+    tags: { go: 'advanced', java: 'basic', react: 'independent' },
+  };
+
+  const result = profileReview([], profile);
+
+  const compiled = result.families.find(family => family.key === 'compiled-language');
+  assert.equal(compiled.label, 'Compiled languages');
+  assert.equal(compiled.savedCount, 2);
+  assert.deepEqual(compiled.facts.filter(fact => fact.value).map(fact => [fact.key, fact.value]), [
+    ['go', 'advanced'],
+    ['java', 'basic'],
+  ]);
+  assert.deepEqual(result.allFacts.find(fact => fact.key === 'go').families.map(family => family.key), [
+    'compiled-language',
+    'server-side-language',
+  ]);
+  assert.deepEqual(result.allFacts.find(fact => fact.key === 'react').families.map(family => family.key), [
+    'modern-frontend',
+  ]);
+});
+
 test('overlapping requested families form one task without duplicate facts', () => {
   const profile = { schemaVersion: 2, interests: [], employmentPeriods: [], tags: { java: 'basic' } };
   const jobs = [
@@ -95,6 +121,10 @@ test('overlapping requested families form one task without duplicate facts', () 
   assert.equal(new Set(result.items[0].facts.map(fact => fact.key)).size, result.items[0].facts.length);
   assert.deepEqual(result.items[0].facts.find(fact => fact.key === 'java'), {
     key: 'java', label: 'Java', mode: 'level', value: 'basic', pending: false,
+    families: [
+      { key: 'compiled-language', label: 'Compiled languages' },
+      { key: 'server-side-language', label: 'Server-side language' },
+    ],
   });
   assert.equal(result.pendingCount, result.items[0].facts.filter(fact => fact.pending).length);
 });

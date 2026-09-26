@@ -55,6 +55,9 @@ version. Pending legacy cards must be processed once with the current schema.
   **Profile → Saved** to search or edit stored values. It writes
   `profile/matching.json` locally and recalculates processed
   jobs without AI or Chrome.
+- **Profile → Saved** also lists skill families. Family rows show their members;
+  individual skills identify their families and link back through the existing
+  search field.
 - config/preferences.json: preference values.
 - config/scoring.json: weights and recency bands.
 - config/tag-catalog.json: allowed tags, definitions, aliases and display labels.

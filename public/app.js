@@ -26,7 +26,7 @@ async function refresh() { data = await api('/api/jobs'); initDevReload(); rende
 function render() {
   const tracking = view === 'applications';
   const profiling = view === 'profile';
-  const review = data.profileReview || { pendingCount: 0, activeUnmappedJobs: 0, items: [], allFacts: [] };
+  const review = data.profileReview || { pendingCount: 0, activeUnmappedJobs: 0, items: [], allFacts: [], families: [] };
   for (const button of document.querySelectorAll('#views [data-view]')) button.setAttribute('aria-pressed', String(button.dataset.view === view));
   const profileButton = $('#views [data-view="profile"]');
   profileButton.innerHTML = `Profile${review.pendingCount ? '<span class="profile-alert" aria-hidden="true"></span>' : ''}`;
@@ -35,12 +35,12 @@ function render() {
   $('#run-status').hidden = tracking || profiling;
   $('#ai-status').hidden = tracking || profiling;
   $('.list-heading').hidden = profiling;
-  $('#jobs').setAttribute('aria-label', profiling ? 'Profile skills' : tracking ? 'Applications' : 'Jobs');
-  $('#detail').setAttribute('aria-label', profiling ? 'Profile skill details' : tracking ? 'Application details' : 'Job details');
+  $('#jobs').setAttribute('aria-label', profiling ? 'Profile skills and families' : tracking ? 'Applications' : 'Jobs');
+  $('#detail').setAttribute('aria-label', profiling ? 'Profile details' : tracking ? 'Application details' : 'Job details');
   $('#search').placeholder = profiling ? 'Search profile…' : tracking ? 'Search applications or ID…' : 'Search jobs or ID…';
   $('#search').setAttribute('aria-label', profiling ? 'Search profile' : tracking ? 'Search applications' : 'Search jobs');
   $('#search').hidden = profiling && !data.profileReview;
-  $('#tabs').setAttribute('aria-label', profiling ? 'Profile skills' : tracking ? 'Application status' : 'Job status');
+  $('#tabs').setAttribute('aria-label', profiling ? 'Profile skills and families' : tracking ? 'Application status' : 'Job status');
   if (profiling) { if (data.profileReview) renderProfile(review); else renderProfileUnavailable(); return; }
   if (tracking) { renderApplications(); return; }
   const reviewable = job => job.availability?.status !== 'closed' && !job.application;
@@ -94,12 +94,14 @@ function renderProfileUnavailable() {
 function renderProfile(review) {
   const pending = profileFilter === 'pending';
   $('#tabs').innerHTML = `<button data-tab="pending" class="tab ${pending ? 'active' : ''}" aria-pressed="${pending}">Missing <span>${review.pendingCount}</span></button><button data-tab="all" class="tab ${!pending ? 'active' : ''}" aria-pressed="${!pending}">Saved <span>${review.allFacts.length}</span></button>`;
-  const items = pending ? review.items : review.allFacts.map(fact => {
+  const familyItems = pending ? [] : (review.families || []);
+  const skillItems = pending ? [] : review.allFacts.filter(fact => !fact.isFamily).map(fact => {
     const source = review.items.find(item => item.facts.some(candidate => candidate.key === fact.key));
-    return { id: `all:${fact.key}`, label: fact.label, activeJobCount: source?.activeJobCount || 0, facts: [fact], jobs: source?.jobs || [] };
+    return { id: `all:${fact.key}`, label: fact.label, type: 'skill', activeJobCount: source?.activeJobCount || 0, facts: [fact], jobs: source?.jobs || [] };
   });
+  const items = pending ? review.items : [...familyItems, ...skillItems];
   const query = $('#search').value.trim().toLowerCase();
-  const filtered = items.filter(item => `${item.label} ${item.facts.map(fact => fact.label).join(' ')}`.toLowerCase().includes(query));
+  const filtered = items.filter(item => `${item.label} ${item.facts.map(fact => fact.label).join(' ')} ${item.facts.flatMap(fact => fact.families || []).map(family => family.label).join(' ')}`.toLowerCase().includes(query));
   if (!filtered.some(item => item.id === profileSelected)) profileSelected = filtered[0]?.id || null;
   $('#count').textContent = '';
   $('#clear-discovery').hidden = true;
@@ -108,19 +110,40 @@ function renderProfile(review) {
     $('#detail').innerHTML = '';
     return;
   }
-  $('#jobs').innerHTML = filtered.map(item => {
+  const itemHTML = item => {
     const missingCount = item.facts.filter(fact => fact.pending).length;
-    const meta = [pending && missingCount > 1 ? `${missingCount} missing` : '', item.activeJobCount ? `${item.activeJobCount} active ${item.activeJobCount === 1 ? 'job' : 'jobs'}` : ''].filter(Boolean);
-    const savedValue = !pending && item.facts.length === 1 ? profileValueLabel(item.facts[0]) : '';
-    return `<article class="job profile-item ${item.id === profileSelected ? 'selected' : ''}"><button class="job-open" data-profile-item="${escape(item.id)}"><span class="job-copy">${meta.length ? `<span class="list-top"><span class="profile-impact">${meta.join(' · ')}</span></span>` : ''}<span class="list-title"><h2>${escape(item.label)}</h2>${savedValue ? `<span class="profile-value">${escape(savedValue)}</span>` : ''}</span></span></button></article>`;
-  }).join('') || '<div class="empty"><h2>No matches</h2></div>';
+    const family = !pending && item.type === 'family';
+    const meta = family
+      ? [`${item.savedCount}/${item.facts.length} saved`]
+      : [pending && missingCount > 1 ? `${missingCount} missing` : '', item.activeJobCount ? `${item.activeJobCount} active ${item.activeJobCount === 1 ? 'job' : 'jobs'}` : ''].filter(Boolean);
+    const savedValue = !pending && !family && item.facts.length === 1 ? profileValueLabel(item.facts[0]) : '';
+    const familyNames = !family && item.facts.length === 1 ? (item.facts[0].families || []).map(group => group.label).join(' · ') : '';
+    return `<article class="job profile-item ${family ? 'profile-family' : 'profile-skill'} ${item.id === profileSelected ? 'selected' : ''}"><button class="job-open" data-profile-item="${escape(item.id)}" aria-pressed="${item.id === profileSelected}"><span class="job-copy">${meta.length ? `<span class="list-top"><span class="profile-impact">${meta.join(' · ')}</span></span>` : ''}<span class="list-title"><h2>${escape(item.label)}</h2>${savedValue ? `<span class="profile-value">${escape(savedValue)}</span>` : ''}</span>${familyNames ? `<small class="profile-family-names">${escape(familyNames)}</small>` : ''}</span></button></article>`;
+  };
+  if (pending) $('#jobs').innerHTML = filtered.map(itemHTML).join('') || '<div class="empty"><h2>No matches</h2></div>';
+  else {
+    const shownFamilies = filtered.filter(item => item.type === 'family');
+    const shownSkills = filtered.filter(item => item.type === 'skill');
+    $('#jobs').innerHTML = `${shownFamilies.length ? `<div class="profile-section-label">Families</div>${shownFamilies.map(itemHTML).join('')}` : ''}${shownSkills.length ? `<div class="profile-section-label">Skills</div>${shownSkills.map(itemHTML).join('')}` : ''}` || '<div class="empty"><h2>No matches</h2></div>';
+  }
   const item = items.find(candidate => candidate.id === profileSelected);
   if (!item) { $('#detail').innerHTML = '<div class="empty">Select an item.</div>'; return; }
+  if (!pending && item.type === 'family') {
+    const controls = item.value !== null ? `<section class="profile-family-level"><h3>General level</h3>${profileFactControls(item, true)}</section>` : '';
+    const memberList = item.facts.map(fact => fact.value !== null
+      ? `<button data-profile-member="all:${escape(fact.key)}"><span>${escape(fact.label)}</span><strong>${escape(profileValueLabel(fact))}</strong></button>`
+      : `<div data-profile-member><span>${escape(fact.label)}</span><small>Not saved</small></div>`).join('');
+    $('#detail').innerHTML = `<div class="profile-detail profile-family-detail"><div class="eyebrow">FAMILY</div><h2>${escape(item.label)}</h2>${item.definition ? `<p class="muted">${escape(item.definition)}</p>` : ''}${controls}<section class="profile-members"><h3>Members</h3>${memberList}</section><p id="profile-error" role="alert"></p>${item.value !== null ? '<button class="primary profile-save" data-profile-save>Save change</button>' : ''}</div>`;
+    return;
+  }
   const editableFacts = pending ? item.facts.filter(fact => fact.pending) : item.facts;
   const knownFacts = pending ? item.facts.filter(fact => !fact.pending) : [];
   const jobs = profileShowAll ? item.jobs : item.jobs.slice(0, 3);
   const jobContext = item.jobs.length ? `<section class="profile-jobs"><h3>Affected jobs</h3>${jobs.map(job => `<button data-profile-job="${escape(job.id)}"><span><strong>${escape(job.title)}</strong><small>${escape(job.company)} · ${escape(job.reference)}</small></span>${ratingBadge(job.score, 'Weighted priority score')}${job.quotes?.length ? `<q>${escape(job.quotes.join(' · '))}</q>` : ''}</button>`).join('')}${item.jobs.length > 3 && !profileShowAll ? '<button class="profile-show-all" data-profile-show-all>Show all</button>' : ''}</section>` : '';
-  $('#detail').innerHTML = `<div class="profile-detail"><h2>${escape(item.label)}</h2>${editableFacts.map(fact => profileFactControls(fact, true)).join('')}${knownFacts.length ? `<section class="profile-known-list"><h3>Already known</h3>${knownFacts.map(fact => profileFactControls(fact, false)).join('')}</section>` : ''}${jobContext}<p id="profile-error" role="alert"></p><button class="primary profile-save" data-profile-save>${pending ? 'Save and continue' : 'Save change'}</button></div>`;
+  const familyLinks = !pending && item.facts.length === 1 && item.facts[0].families?.length
+    ? `<section class="profile-family-links"><h3>Families</h3>${item.facts[0].families.map(family => `<button data-profile-family="${escape(family.key)}" data-profile-family-label="${escape(family.label)}">${escape(family.label)}</button>`).join('')}</section>`
+    : '';
+  $('#detail').innerHTML = `<div class="profile-detail"><h2>${escape(item.label)}</h2>${familyLinks}${editableFacts.map(fact => profileFactControls(fact, true)).join('')}${knownFacts.length ? `<section class="profile-known-list"><h3>Already known</h3>${knownFacts.map(fact => profileFactControls(fact, false)).join('')}</section>` : ''}${jobContext}<p id="profile-error" role="alert"></p><button class="primary profile-save" data-profile-save>${pending ? 'Save and continue' : 'Save change'}</button></div>`;
 }
 function jobActions(job) {
   const closed = job.availability?.status === 'closed';
@@ -228,6 +251,10 @@ $('#jobs').onclick = event => {
 };
 $('#detail').onclick = async event => {
   if (view === 'profile') {
+    const family = event.target.closest('[data-profile-family]');
+    if (family) { profileFilter = 'all'; profileSelected = `family:${family.dataset.profileFamily}`; $('#search').value = family.dataset.profileFamilyLabel; render(); return; }
+    const member = event.target.closest('[data-profile-member]');
+    if (member?.dataset.profileMember) { profileSelected = member.dataset.profileMember; render(); return; }
     const choice = event.target.closest('[data-profile-value]');
     if (choice) { profileSelections[choice.dataset.profileKey] = choice.dataset.profileValue; render(); return; }
     if (event.target.closest('[data-profile-show-all]')) { profileShowAll = true; render(); return; }
@@ -236,7 +263,8 @@ $('#detail').onclick = async event => {
     if (event.target.closest('[data-profile-save]')) {
       const review = data.profileReview;
       const allFact = review.allFacts.find(fact => `all:${fact.key}` === profileSelected);
-      const item = profileFilter === 'pending' ? review.items.find(candidate => candidate.id === profileSelected) : allFact && { facts: [allFact] };
+      const family = review.families?.find(candidate => candidate.id === profileSelected);
+      const item = profileFilter === 'pending' ? review.items.find(candidate => candidate.id === profileSelected) : allFact ? { facts: [allFact] } : family?.value !== null ? { facts: [family] } : null;
       const editable = profileFilter === 'pending' ? item?.facts.filter(fact => fact.pending) || [] : item?.facts || [];
       const changes = editable.map(fact => ({ key: fact.key, value: profileSelections[fact.key] ?? fact.value })).filter(change => change.value != null);
       if (changes.length !== editable.length) { $('#profile-error').textContent = 'Choose a value for every item before saving.'; return; }

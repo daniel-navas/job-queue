@@ -16,13 +16,17 @@ const active = job => ['new', 'interesting'].includes(job.status)
   && job.summary?.facts;
 const scoreOf = job => Number.isFinite(job.rating?.total) ? job.rating.total : null;
 const profileValueRank = { none: 0, basic: 1, present: 1, independent: 2, advanced: 3 };
+const familyEntries = Object.entries(catalog.tags).filter(([, definition]) => definition.members?.length);
 const validTimestamp = value => typeof value === 'string'
   && !Number.isNaN(Date.parse(value))
   && new Date(value).toISOString() === value;
 
 function fact(key, profile, pending) {
   const definition = catalog.tags[key];
-  return { key, label: definition.label, mode: definition.profileMode, value: profile.tags?.[key] ?? null, pending };
+  const families = familyEntries
+    .filter(([, family]) => family.members.includes(key))
+    .map(([familyKey, family]) => ({ key: familyKey, label: family.label }));
+  return { key, label: definition.label, mode: definition.profileMode, value: profile.tags?.[key] ?? null, pending, families };
 }
 
 function jobSummary(job, occurrence) {
@@ -41,7 +45,7 @@ export function profileReview(jobs, profile) {
   const eligible = jobs.filter(active);
   const pendingKeys = new Set();
   const occurrences = new Map();
-  const families = [];
+  const pendingFamilies = [];
   const unmappedJobs = new Set();
 
   const record = (key, job, group, quote) => {
@@ -66,7 +70,7 @@ export function profileReview(jobs, profile) {
           if (!definition) continue;
           if (definition.members?.length) {
             const missing = members(alternative).filter(key => profile.tags?.[key] === undefined);
-            if (missing.length) families.push({ key: alternative, missing });
+            if (missing.length) pendingFamilies.push({ key: alternative, missing });
             for (const key of missing) record(key, job, group, criterion.evidence);
           } else if (profile.tags?.[alternative] === undefined) record(alternative, job, group, criterion.evidence);
         }
@@ -83,7 +87,7 @@ export function profileReview(jobs, profile) {
     return value;
   };
   const union = (a, b) => { const left = find(a), right = find(b); if (left !== right) parent.set(right, left); };
-  for (const family of families) for (const key of family.missing.slice(1)) union(family.missing[0], key);
+  for (const family of pendingFamilies) for (const key of family.missing.slice(1)) union(family.missing[0], key);
 
   const components = new Map();
   for (const key of pendingKeys) {
@@ -94,7 +98,7 @@ export function profileReview(jobs, profile) {
 
   const items = [...components.values()].map(keys => {
     keys.sort();
-    const familyKeys = [...new Set(families.filter(family => family.missing.some(key => keys.includes(key))).map(family => family.key))];
+    const familyKeys = [...new Set(pendingFamilies.filter(family => family.missing.some(key => keys.includes(key))).map(family => family.key))];
     const contextKeys = familyKeys.flatMap(members).filter(key => profile.tags?.[key] !== undefined);
     const itemFacts = [...new Set([...keys, ...contextKeys])]
       .map(key => fact(key, profile, pendingKeys.has(key)))
@@ -132,6 +136,7 @@ export function profileReview(jobs, profile) {
     const scores = [...(byJob?.values() || [])].map(item => scoreOf(item.job)).filter(Number.isFinite);
     return {
       ...fact(key, profile, pendingKeys.has(key)),
+      isFamily: Boolean(catalog.tags[key]?.members?.length),
       updatedAt: profile.tagUpdatedAt?.[key] ?? profile.tagUpdatedAtDefault ?? null,
       activeJobCount: byJob?.size ?? 0,
       bestScore: scores.length ? Math.max(...scores) : null,
@@ -140,7 +145,20 @@ export function profileReview(jobs, profile) {
     || profileValueRank[a.value] - profileValueRank[b.value]
     || a.label.localeCompare(b.label));
 
-  return { pendingCount: pendingKeys.size, activeUnmappedJobs: unmappedJobs.size, items, allFacts };
+  const catalogFamilies = familyEntries.map(([key, definition]) => {
+    const familyFact = fact(key, profile, pendingKeys.has(key));
+    const familyFacts = definition.members.map(memberKey => fact(memberKey, profile, pendingKeys.has(memberKey)));
+    return {
+      ...familyFact,
+      id: `family:${key}`,
+      type: 'family',
+      definition: definition.definition ?? '',
+      savedCount: familyFacts.filter(memberFact => memberFact.value !== null).length,
+      facts: familyFacts,
+    };
+  }).sort((a, b) => a.label.localeCompare(b.label));
+
+  return { pendingCount: pendingKeys.size, activeUnmappedJobs: unmappedJobs.size, items, allFacts, families: catalogFamilies };
 }
 
 export function validateProfile(profile) {
