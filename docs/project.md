@@ -5,7 +5,7 @@ Status: Local LinkedIn MVP
 ## Purpose
 
 Replace manual vacancy searching with a compact, ranked queue for one owner.
-The owner reviews useful facts, marks interest or dismisses with a reason,
+The owner reviews useful facts, marks interest or dismisses in one click,
 applies manually, and tracks application progress. The app is exclusively
 personal and local: no deployment, marketing, accounts, multi-user
 infrastructure, or additional providers.
@@ -24,9 +24,9 @@ infrastructure, or additional providers.
    needs information, or complete.
    Offer details visually group facts into Role fit, Opportunity, and Work
    conditions, with Work conditions last; grouping never merges their scores.
-5. Preserve reviews, reasons, availability history, source records, stable IDs
-   and original CVs. Manually closed jobs leave active review tabs but remain
-   recoverable in All jobs.
+5. Preserve reviews, historical feedback, availability history, source records,
+   stable IDs and original CVs. Manually closed jobs leave active review tabs
+   but remain recoverable in All jobs.
 6. Manage LinkedIn searches locally with per-job historical criteria and
    measured capture results. Definitions and provenance identify their provider;
    review skills are provider-specific. Only LinkedIn is currently implemented.

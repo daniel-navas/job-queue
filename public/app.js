@@ -2,7 +2,7 @@ import { compareJobs, workplaceMode, roleFocus } from '/rating.js';
 import { initSearches, provenanceHTML } from '/searches.js';
 const $ = selector => document.querySelector(selector);
 const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-let data = { jobs: [] }, active = 'new', selected, rejecting, view = 'opportunities', applicationFilter = 'active', editingEvent = null;
+let data = { jobs: [] }, active = 'new', selected, view = 'opportunities', applicationFilter = 'active', editingEvent = null;
 let discoveryFilter = null;
 let profileFilter = 'pending', profileSelected = null, profileShowAll = false;
 const profileSelections = {};
@@ -256,7 +256,7 @@ $('#detail').onclick = async event => {
   const source = event.target.closest('[data-source]');
   if (source) { const quote = document.getElementById(`source-${source.dataset.source}`); quote.hidden = !quote.hidden; source.setAttribute('aria-expanded', String(!quote.hidden)); return; }
   const reject = event.target.closest('[data-reject]');
-  if (reject) { rejecting = selected; const job = data.jobs.find(j => j.id === rejecting); $('#reject-title').textContent = job.title; $('#reason').value = job.reason; $('#reject-dialog').showModal(); return; }
+  if (reject) { try { await api('/api/review', { id: reject.dataset.reject, status: 'dismissed' }); await refresh(); } catch (err) { error(err); } return; }
   if (event.target.closest('[data-app-start]')) { openApplicationDialog('submit'); return; }
   if (event.target.closest('[data-app-update]')) { openApplicationDialog('add-interview'); return; }
   if (event.target.closest('[data-app-reopen]')) { try { await api('/api/application', { id: selected, change: { type: 'reopen' } }); applicationFilter = 'active'; await refresh(); } catch (err) { error(err); } return; }
@@ -276,8 +276,6 @@ $('#detail').onclick = async event => {
   const availability = event.target.closest('[data-availability]');
   if (availability) { try { await api('/api/availability', { id: selected, status: availability.dataset.availability }); await refresh(); } catch (err) { error(err); } }
 };
-$('#cancel').onclick = () => $('#reject-dialog').close();
-$('#reject-form').onsubmit = async event => { event.preventDefault(); try { await api('/api/review', { id: rejecting, status: 'dismissed', reason: $('#reason').value }); $('#reject-dialog').close(); await refresh(); } catch (err) { error(err); } };
 $('#scan').onclick = async () => { try { $('#error').textContent = ''; await api('/api/scan', {}); await refresh(); } catch (err) { error(err); } };
 $('#summarize').onclick = async () => { try { $('#error').textContent = ''; await api('/api/summarize', {}); await refresh(); } catch (err) { error(err); } };
 initSearches(api, refresh, search => { discoveryFilter = search; view = 'opportunities'; active = 'all'; $('#search').value = ''; render(); });

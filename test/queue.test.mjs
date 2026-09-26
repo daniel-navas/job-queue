@@ -56,14 +56,14 @@ test('repeat imports preserve review decisions and discovery time', () => {
   assert.equal(result.length, 1); assert.equal(result[0].reason, 'Too senior'); assert.equal(result[0].status, 'dismissed'); assert.equal(result[0].firstSeen, '2026-01-01');
 });
 
-test('review persists across restart and requires dismissal reason', async () => {
+test('dismissal persists across restart without requiring feedback', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'jobqueue-test-'));
   try {
     const queue = new Queue(root); queue.state.jobs = [{ id: '123', status: 'new', history: [] }];
-    assert.throws(() => queue.review('123', 'dismissed', ' '));
-    await queue.review('123', 'dismissed', 'Too senior');
+    await queue.review('123', 'dismissed', ' ');
     const restored = new Queue(root); await restored.load();
-    assert.equal(restored.state.jobs[0].reason, 'Too senior');
+    assert.equal(restored.state.jobs[0].status, 'dismissed');
+    assert.equal(restored.state.jobs[0].reason, '');
     await restored.review('123', 'new', '');
     assert.equal(restored.state.jobs[0].history.length, 2);
   } finally { await rm(root, { recursive: true }); }

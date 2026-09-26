@@ -20,8 +20,8 @@ which ones deserve further action.
 
 ## Core Workflow
 
-1. Use enabled LinkedIn searches from the Searches dialog and collect
-   preferences gradually through reviews and dismissal reasons. See
+1. Use enabled LinkedIn searches from the Searches dialog and refine
+   preferences through explicit owner decisions. See
    docs/linkedin-searches.md for current strategy and provenance semantics.
 2. JobQueue runs those LinkedIn searches through saved authenticated HTTP
    requests. Chrome is only for explicit connection/renewal.

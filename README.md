@@ -25,8 +25,9 @@ unsaved selection, reload waits until that answer is saved.
   available. **Pending** means a complete source still needs AI extraction.
 - The priority score weights fit first, then applies the visible publication
   multiplier. Freshness raises both positive and negative fit; age lowers both.
-- **Interested** saves a decision; **Dismiss** saves a reason. Neither submits
-  an application. Use the LinkedIn link to apply manually.
+- **Interested** saves a decision; **Dismiss** removes the job from the active
+  review queue in one click. Dismissal is reversible from **Dismissed**. Neither
+  action submits an application. Use the LinkedIn link to apply manually.
 - **Applied** records a submission date. **Applications** groups active
   and closed processes; use **Update progress** for interview scheduling and
   outcomes. If application tracking was accidental, **Not applied** is

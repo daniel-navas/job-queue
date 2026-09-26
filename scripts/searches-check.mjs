@@ -224,8 +224,7 @@ try {
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   assert.equal(await page.getByRole('button', { name: 'Interested', exact: true }).getAttribute('aria-pressed'), 'true');
   await page.getByRole('button', { name: 'Dismiss', exact: true }).click();
-  await page.locator('#reason').fill('Not a fit');
-  await page.getByRole('button', { name: 'Dismiss job', exact: true }).click();
+  assert.equal(await page.getByRole('dialog').count(), 0);
   await page.getByRole('button', { name: 'Dismissed', exact: false }).click();
   await page.getByRole('button', { name: /Backend Engineer/ }).click();
   assert.equal(await page.getByRole('button', { name: 'Dismissed', exact: true }).getAttribute('aria-pressed'), 'true');

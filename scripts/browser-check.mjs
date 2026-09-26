@@ -36,9 +36,6 @@ try {
   await page.getByRole('searchbox').fill('no-match-xyz');
   await page.getByText('You’re all caught up.').waitFor();
   await page.getByRole('searchbox').fill(processed.reference);
-  await page.getByRole('button',{name:'Dismiss',exact:true}).click();
-  await page.getByRole('dialog').waitFor();
-  await page.getByRole('button',{name:'Cancel',exact:true}).click();
   await page.screenshot({path:'.local/frontend.png',fullPage:false});
   await page.getByRole('button',{name:'Searches',exact:true}).click();
   await page.locator('.search-row').first().waitFor();
@@ -47,5 +44,5 @@ try {
   await page.screenshot({path:'.local/searches-actual.png',fullPage:false});
   await page.keyboard.press('Escape');
   assert.deepEqual(errors,[]);
-  console.log('Browser checks passed: scores, processing states, source toggles, search, header, searches dialog, modal, no runtime errors.');
+  console.log('Browser checks passed: scores, processing states, source toggles, search, header, searches dialog, no runtime errors.');
 } finally { await browser.close(); }

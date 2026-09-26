@@ -155,7 +155,6 @@ export class Queue {
   }
   review(id, status, reason) {
     if (!['new', 'interesting', 'dismissed'].includes(status) || typeof reason !== 'string' || reason.length > 2000) throw new Error('Invalid review');
-    if (status === 'dismissed' && !reason.trim()) throw new Error('Please add a reason for dismissing this job.');
     return this.mutate(() => {
       const job = this.state.jobs.find(job => job.id === id);
       if (!job) throw new Error('Job not found');
