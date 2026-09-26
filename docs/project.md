@@ -85,7 +85,8 @@ The extraction/matching boundary is recorded in decision 0002.
   or experience recency for a skill tag. Saved skills are ordered by their local
   save or edit time, then from lower to higher level when times match. This
   workflow metadata is not displayed. Saved Profile also exposes catalog
-  families as searchable groups and identifies each individual skill's families.
+  families as searchable groups, identifies each individual skill's families,
+  and supports updating member values directly inside a family.
 - Source quotations prove provenance, not perfect AI interpretation. Extraction
   errors must be fixed generically, not with hidden per-job score exceptions.
 - Keep the verified GitHub remote (`origin/main`) synchronized after coherent

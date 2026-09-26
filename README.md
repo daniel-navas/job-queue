@@ -57,7 +57,8 @@ version. Pending legacy cards must be processed once with the current schema.
   jobs without AI or Chrome.
 - **Profile → Saved** also lists skill families. Family rows show their members;
   individual skills identify their families and link back through the existing
-  search field.
+  search field. Member values can be completed or updated directly from the
+  family detail and saved together.
 - config/preferences.json: preference values.
 - config/scoring.json: weights and recency bands.
 - config/tag-catalog.json: allowed tags, definitions, aliases and display labels.

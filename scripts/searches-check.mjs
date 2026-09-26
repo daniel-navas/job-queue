@@ -164,6 +164,34 @@ try {
   await page.locator('#search').fill('');
   assert.deepEqual((await page.locator('#jobs .profile-skill h2').allTextContents()).slice(0, 3), ['Go', 'Rust', 'Angular']);
   await page.locator('#search').fill('Angular');
+  await page.locator('[data-profile-item="family:modern-frontend"]').click();
+  const familyWrites = [];
+  page.on('request', request => {
+    if (request.url().endsWith('/api/profile') && request.method() === 'POST') familyWrites.push(request.postDataJSON());
+  });
+  const vueFamilyValue = page.locator('[data-profile-family-member="vue"]');
+  const reactFamilyValue = page.locator('[data-profile-family-member="react"]');
+  assert.equal(await vueFamilyValue.count(), 1);
+  assert.equal(await reactFamilyValue.inputValue(), 'independent');
+  await reactFamilyValue.focus();
+  await reactFamilyValue.selectOption('advanced');
+  await reactFamilyValue.selectOption('independent');
+  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('data-profile-family-member')), 'react');
+  assert.equal(await page.getByRole('button', { name: 'Save family', exact: true }).isDisabled(), true);
+  await vueFamilyValue.selectOption('basic');
+  await reactFamilyValue.selectOption('advanced');
+  await page.getByRole('button', { name: 'Save family', exact: true }).click();
+  await page.waitForFunction(async () => {
+    const facts = (await (await fetch('/api/jobs')).json()).profileReview.allFacts;
+    return facts.some(fact => fact.key === 'vue' && fact.value === 'basic')
+      && facts.some(fact => fact.key === 'react' && fact.value === 'advanced');
+  });
+  assert.deepEqual(familyWrites.at(-1), { changes: [
+    { key: 'react', value: 'advanced' },
+    { key: 'vue', value: 'basic' },
+  ] });
+  await mkdir('.local', { recursive: true });
+  await page.screenshot({ path: '.local/profile-family-edit.png' });
   const savedAngular = page.locator('[data-profile-item="all:angular"]');
   assert.equal(await savedAngular.getByText('Basic', { exact: true }).count(), 1);
   await savedAngular.click();
@@ -173,7 +201,6 @@ try {
   await page.waitForFunction(async () => (await (await fetch('/api/jobs')).json()).profileReview.allFacts.some(fact => fact.key === 'angular' && fact.value === 'independent'));
   await page.locator('[data-profile-item]', { hasText: 'Angular' }).getByText('Independent', { exact: true }).waitFor();
   assert.equal(JSON.parse(await readFile(path.join(root, 'profile/matching.json'))).tags.angular, 'independent');
-  await mkdir('.local', { recursive: true });
   await page.screenshot({ path: '.local/profile-desktop.png' });
   await page.setViewportSize({ width: 1024, height: 900 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth), 1024);

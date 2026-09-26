@@ -87,6 +87,12 @@ function profileFactControls(fact, editable) {
   const selectedValue = Object.hasOwn(profileSelections, fact.key) ? profileSelections[fact.key] : fact.value;
   return `<fieldset class="profile-fact"><legend>${escape(fact.label)}</legend><div class="profile-choices">${choices.map(([value, label]) => `<button type="button" data-profile-key="${escape(fact.key)}" data-profile-value="${value}" aria-pressed="${selectedValue === value}">${label}</button>`).join('')}</div></fieldset>`;
 }
+function profileFamilyMemberControl(fact) {
+  const choices = fact.mode === 'presence' ? presenceChoices : levelChoices;
+  const selectedValue = Object.hasOwn(profileSelections, fact.key) ? profileSelections[fact.key] : fact.value ?? '';
+  const label = fact.value !== null ? `<button data-profile-member="all:${escape(fact.key)}">${escape(fact.label)}</button>` : `<span>${escape(fact.label)}</span>`;
+  return `<div class="profile-member">${label}<select data-profile-family-member="${escape(fact.key)}" data-profile-original="${escape(fact.value ?? '')}" aria-label="Value for ${escape(fact.label)}"><option value="" disabled ${selectedValue === '' ? 'selected' : ''}>Not saved</option>${choices.map(([value, choiceLabel]) => `<option value="${value}" ${selectedValue === value ? 'selected' : ''}>${choiceLabel}</option>`).join('')}</select></div>`;
+}
 function renderProfileUnavailable() {
   $('#tabs').innerHTML = '';
   $('#jobs').innerHTML = '<div class="empty"><h2>Profile unavailable. Restart JobQueue.</h2></div>';
@@ -131,10 +137,9 @@ function renderProfile(review) {
   if (!item) { $('#detail').innerHTML = '<div class="empty">Select an item.</div>'; return; }
   if (!pending && item.type === 'family') {
     const controls = item.value !== null ? `<section class="profile-family-level"><h3>General level</h3>${profileFactControls(item, true)}</section>` : '';
-    const memberList = item.facts.map(fact => fact.value !== null
-      ? `<button data-profile-member="all:${escape(fact.key)}"><span>${escape(fact.label)}</span><strong>${escape(profileValueLabel(fact))}</strong></button>`
-      : `<div data-profile-member><span>${escape(fact.label)}</span><small>Not saved</small></div>`).join('');
-    $('#detail').innerHTML = `<div class="profile-detail profile-family-detail"><div class="eyebrow">FAMILY</div><h2>${escape(item.label)}</h2>${item.definition ? `<p class="muted">${escape(item.definition)}</p>` : ''}${controls}<section class="profile-members"><h3>Members</h3>${memberList}</section><p id="profile-error" role="alert"></p>${item.value !== null ? '<button class="primary profile-save" data-profile-save>Save change</button>' : ''}</div>`;
+    const memberList = item.facts.map(profileFamilyMemberControl).join('');
+    const changed = [item, ...item.facts].some(fact => Object.hasOwn(profileSelections, fact.key) && profileSelections[fact.key] !== fact.value);
+    $('#detail').innerHTML = `<div class="profile-detail profile-family-detail"><div class="eyebrow">FAMILY</div><h2>${escape(item.label)}</h2>${item.definition ? `<p class="muted">${escape(item.definition)}</p>` : ''}${controls}<section class="profile-members"><h3>Members</h3>${memberList}</section><p id="profile-error" role="alert"></p><button class="primary profile-save" data-profile-save ${changed ? '' : 'disabled'}>Save family</button></div>`;
     return;
   }
   const editableFacts = pending ? item.facts.filter(fact => fact.pending) : item.facts;
@@ -257,7 +262,12 @@ $('#detail').onclick = async event => {
     const member = event.target.closest('[data-profile-member]');
     if (member?.dataset.profileMember) { profileSelected = member.dataset.profileMember; render(); return; }
     const choice = event.target.closest('[data-profile-value]');
-    if (choice) { profileSelections[choice.dataset.profileKey] = choice.dataset.profileValue; render(); return; }
+    if (choice) {
+      const current = data.profileReview.allFacts.find(fact => fact.key === choice.dataset.profileKey)?.value ?? null;
+      if (choice.dataset.profileValue === current) delete profileSelections[choice.dataset.profileKey];
+      else profileSelections[choice.dataset.profileKey] = choice.dataset.profileValue;
+      render(); return;
+    }
     if (event.target.closest('[data-profile-show-all]')) { profileShowAll = true; render(); return; }
     const job = event.target.closest('[data-profile-job]');
     if (job) { view = 'opportunities'; active = 'all'; selected = job.dataset.profileJob; $('#search').value = ''; render(); return; }
@@ -265,13 +275,16 @@ $('#detail').onclick = async event => {
       const review = data.profileReview;
       const allFact = review.allFacts.find(fact => `all:${fact.key}` === profileSelected);
       const family = review.families?.find(candidate => candidate.id === profileSelected);
-      const item = profileFilter === 'pending' ? review.items.find(candidate => candidate.id === profileSelected) : allFact ? { facts: [allFact] } : family?.value !== null ? { facts: [family] } : null;
+      const item = profileFilter === 'pending' ? review.items.find(candidate => candidate.id === profileSelected) : allFact ? { facts: [allFact] } : family ? { facts: [family, ...family.facts], family: true } : null;
       const editable = profileFilter === 'pending' ? item?.facts.filter(fact => fact.pending) || [] : item?.facts || [];
-      const changes = editable.map(fact => ({ key: fact.key, value: profileSelections[fact.key] ?? fact.value })).filter(change => change.value != null);
-      if (changes.length !== editable.length) { $('#profile-error').textContent = 'Choose a value for every item before saving.'; return; }
+      const changes = item?.family
+        ? editable.filter(fact => Object.hasOwn(profileSelections, fact.key) && profileSelections[fact.key] !== fact.value).map(fact => ({ key: fact.key, value: profileSelections[fact.key] }))
+        : editable.map(fact => ({ key: fact.key, value: profileSelections[fact.key] ?? fact.value })).filter(change => change.value != null);
+      if (!item?.family && changes.length !== editable.length) { $('#profile-error').textContent = 'Choose a value for every item before saving.'; return; }
+      if (!changes.length) return;
       try {
         await api('/api/profile', { changes });
-        for (const fact of editable) delete profileSelections[fact.key];
+        for (const change of changes) delete profileSelections[change.key];
         profileSelected = null;
         profileShowAll = false;
         await refresh();
@@ -304,6 +317,17 @@ $('#detail').onclick = async event => {
   if (button) { try { await api('/api/review', { id: selected, status: button.dataset.status }); await refresh(); } catch (err) { error(err); } }
   const availability = event.target.closest('[data-availability]');
   if (availability) { try { await api('/api/availability', { id: selected, status: availability.dataset.availability }); await refresh(); } catch (err) { error(err); } }
+};
+$('#detail').onchange = event => {
+  const member = event.target.closest('[data-profile-family-member]');
+  if (member) {
+    if (member.value === member.dataset.profileOriginal) delete profileSelections[member.dataset.profileFamilyMember];
+    else profileSelections[member.dataset.profileFamilyMember] = member.value;
+    const family = data.profileReview.families?.find(candidate => candidate.id === profileSelected);
+    const changed = family && [family, ...family.facts].some(fact => Object.hasOwn(profileSelections, fact.key) && profileSelections[fact.key] !== fact.value);
+    const save = $('#detail [data-profile-save]');
+    if (save) save.disabled = !changed;
+  }
 };
 $('#scan').onclick = async () => { try { $('#error').textContent = ''; await api('/api/scan', {}); await refresh(); } catch (err) { error(err); } };
 $('#summarize').onclick = async () => { try { $('#error').textContent = ''; await api('/api/summarize', {}); await refresh(); } catch (err) { error(err); } };
