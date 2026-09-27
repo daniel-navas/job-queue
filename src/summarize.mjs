@@ -114,7 +114,15 @@ export function discardUnsupportedFacts(result, jobs) {
   return result;
 }
 
-export async function resolveCodexExecutable(env = process.env, bundled = process.platform === 'darwin' ? ['/Applications/ChatGPT.app/Contents/Resources/codex'] : []) {
+export function bundledCodexExecutables(platform = process.platform, applications = '/Applications') {
+  if (platform !== 'darwin') return [];
+  return [
+    path.join(applications, 'ChatGPT.app/Contents/Resources/codex-cli/CodexCLI.app/Contents/MacOS/codex'),
+    path.join(applications, 'ChatGPT.app/Contents/Resources/codex'),
+  ];
+}
+
+export async function resolveCodexExecutable(env = process.env, bundled = bundledCodexExecutables()) {
   if (env.CODEX_BIN) return env.CODEX_BIN;
   for (const candidate of [...(env.PATH || '').split(path.delimiter).filter(Boolean).map(directory => path.join(directory, 'codex')), ...bundled]) {
     try { await access(candidate, constants.X_OK); return candidate; }
