@@ -28,6 +28,17 @@ test('legacy recruiting intermediary values use the normalized negative preferen
   assert.equal(rating.total, -1);
 });
 
+test('outsourcing company is a normalized negative preference', async () => {
+  const preferences = JSON.parse(await readFile(new URL('../config/preferences.json', import.meta.url), 'utf8'));
+  const rating = rateJob({ summary: { fields: {
+    companyType: { value: 'outsourcing', evidence: 'Engineering services for client teams.' },
+    project: { value: 'Client platform', evidence: 'Client platform' },
+  } } }, preferences);
+
+  assert.equal(rating.fields.companyType.score, -1);
+  assert.equal(rating.total, -1);
+});
+
 test('company types expose display labels without losing their configured score', async () => {
   const preferences = JSON.parse(await readFile(new URL('../config/preferences.json', import.meta.url), 'utf8'));
   const fields = displayFields(emptyCard({

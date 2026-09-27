@@ -7,7 +7,7 @@ const defaults = {
   roleFocus: { backend: 1, fullstack: 0, frontend: -1 },
   workplace: { remote: 1, hybrid: 0, onsite: -1 },
   timezoneOverlap: { requiredScore: -1 },
-  companyType: { product: 1, outsourcing: 0, 'recruiting-intermediary': -1, unknown: 0 },
+  companyType: { product: 1, outsourcing: -1, 'recruiting-intermediary': -1, unknown: 0 },
   salaryMonthlyUsd: { preferredMin: 3000, preferredMax: 4000, acceptableMin: 2500, acceptableMax: 4500, preferredScore: 1, outsideScore: -1 }
 };
 

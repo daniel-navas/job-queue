@@ -24,7 +24,7 @@
   },
   "companyType": {
     "product": 1,
-    "outsourcing": 0,
+    "outsourcing": -1,
     "recruiting-intermediary": -1,
     "unknown": 0
   },

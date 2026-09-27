@@ -33,8 +33,8 @@ without changing the implementation:
   is a review-priority heuristic, not a claimed acceptance probability.
 - Company type uses one normalized category: product company, outsourcing
   company, recruiting intermediary, or not determined. Own product is a
-  provisional +1 signal, recruiting intermediary is -1, and outsourcing or
-  unknown remain neutral. Client identity stays contextual and never scores.
+  provisional +1 signal; recruiting intermediary and outsourcing are -1; and
+  unknown remains neutral. Client identity stays contextual and never scores.
 - B2B is an owner-confirmed negative project preference (-1), for software
   primarily serving business/professional workflows. Merchant participation in
   a consumer journey is insufficient. Consumer and mixed-audience products are

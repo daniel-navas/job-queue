@@ -233,7 +233,7 @@ try {
   await page.getByRole('button', { name: /Mixed evaluation job/ }).click();
   assert.deepEqual(await page.locator('.fact-group>h3').allTextContents(), ['Role fit', 'Opportunity', 'Work conditions']);
   assert.equal(await page.locator('#detail .company-type-tag').innerText(), 'Recruiting intermediary');
-  assert.equal(await page.locator('#detail .company-type-tag').evaluate(element => getComputedStyle(element).color), 'rgb(98, 107, 114)');
+  assert.equal(await page.locator('#detail .company-type-tag').evaluate(element => getComputedStyle(element).color), 'rgb(170, 63, 56)');
   assert.equal(await page.locator('#detail .fact-row', { hasText: 'Company type' }).locator('.rating').innerText(), '-1');
   assert.equal(await page.locator('.fact-group').last().getByText('Time overlap', { exact: true }).count(), 1);
   assert.equal(await page.locator('.fact-group').last().getByText('6-8 hours overlap with PST', { exact: true }).count(), 1);

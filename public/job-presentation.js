@@ -28,6 +28,6 @@ export function listTags(job) {
   return tags;
 }
 
-export function companyTypeTag(value) {
-  return value ? { label: String(value), tone: 'neutral' } : null;
+export function companyTypeTag(value, score = 0) {
+  return value ? { label: String(value), tone: score > 0 ? 'positive' : score < 0 ? 'negative' : 'neutral' } : null;
 }
