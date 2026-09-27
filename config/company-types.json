@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "types": {
+    "product": {
+      "label": "Product company",
+      "definition": "The hiring company owns and develops the product described in the vacancy."
+    },
+    "outsourcing": {
+      "label": "Outsourcing company",
+      "definition": "The hiring company employs engineers to deliver software for external clients."
+    },
+    "recruiting-intermediary": {
+      "label": "Recruiting intermediary",
+      "definition": "The company brokers or manages recruitment for another employer rather than owning the role's product.",
+      "aliases": ["recruiting intermediary"]
+    },
+    "unknown": {
+      "label": "Not determined",
+      "definition": "The vacancy does not establish which supported company type applies."
+    }
+  }
+}

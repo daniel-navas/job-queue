@@ -1,3 +1,5 @@
+import { companyTypeLabel, normalizeCompanyType } from './company-types.mjs';
+
 // Numeric scores come from explicit data, never an AI-generated rating.
 const defaults = {
   unknownScore: 0,
@@ -5,7 +7,7 @@ const defaults = {
   roleFocus: { backend: 1, fullstack: 0, frontend: -1 },
   workplace: { remote: 1, hybrid: 0, onsite: -1 },
   timezoneOverlap: { requiredScore: -1 },
-  companyType: { product: 1, outsourcing: 0, 'recruiting-intermediary': 0, unknown: 0 },
+  companyType: { product: 1, outsourcing: 0, 'recruiting-intermediary': -1, unknown: 0 },
   salaryMonthlyUsd: { preferredMin: 3000, preferredMax: 4000, acceptableMin: 2500, acceptableMax: 4500, preferredScore: 1, outsideScore: -1 }
 };
 
@@ -17,7 +19,7 @@ export function rateJob(job, preferences = defaults) {
   fields.easyApply = job.easyApply === true
     ? { score: 1, reason: 'LinkedIn confirms Easy Apply.' }
     : { score: 0, reason: 'Easy Apply is not confirmed; neutral.' };
-  const type = facts.companyType?.value?.toLowerCase().trim();
+  const typeKey = normalizeCompanyType(facts.companyType?.value);
   const role = roleFocus(job, preferences);
   fields.roleFocus = { score: role.score, reason: role.reason };
   const mode = workplaceMode(job, preferences);
@@ -34,9 +36,8 @@ export function rateJob(job, preferences = defaults) {
     score: 1,
     reason: `Employer-confirmed visa sponsorship for work in ${workCountry}.`,
   };
-  const typeKey = type?.replace(/\s+/g, '-') || 'unknown';
   const companyScore = preferences.companyType?.[typeKey] ?? preferences.unknownScore ?? 0;
-  if (companyScore) fields.companyType = { score: companyScore, reason: `Company type ${typeKey}: configured preference ${companyScore}.` };
+  if (companyScore) fields.companyType = { score: companyScore, reason: `${companyTypeLabel(typeKey)}: configured preference ${companyScore}.` };
   if (job.summary.facts ? !job.summary.facts.software : !facts.project) fields.project = { score: preferences.missingProjectScore ?? -1, reason: 'The source does not establish what the software does.' };
   return { total: Object.values(fields).reduce((sum, field) => sum + field.score, 0), fields };
 }

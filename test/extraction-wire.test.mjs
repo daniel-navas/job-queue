@@ -67,6 +67,8 @@ const schema = JSON.parse(await readFile(args[args.indexOf('--output-schema') + 
 assert(schema.$defs.criterion.anyOf.every(rule => rule.required.includes('t') && !rule.required.includes('minMonths')));
 let input = ''; for await (const chunk of process.stdin) input += chunk;
 assert(input.includes('Keep every requirement.'));
+assert(input.includes('COMPANY TYPE CATALOG'));
+assert(input.includes('- recruiting-intermediary: The company brokers or manages recruitment for another employer rather than owning the role\\'s product.'));
 assert(input.includes('WIRE FORMAT ONLY'));
 assert(input.includes('Java. Remote. Business customers. Complete source tail.'));
 await writeFile(args[args.indexOf('--output-last-message') + 1], ${JSON.stringify(JSON.stringify(wire({})))});

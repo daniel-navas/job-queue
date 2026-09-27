@@ -31,7 +31,10 @@ without changing the implementation:
   freshness always raises priority and age always lowers it without crossing
   zero. A missing, invalid, or future publication date uses neutral ×1. This
   is a review-priority heuristic, not a claimed acceptance probability.
-- Own product is a provisional +1 signal, not proof of personal interest.
+- Company type uses one normalized category: product company, outsourcing
+  company, recruiting intermediary, or not determined. Own product is a
+  provisional +1 signal, recruiting intermediary is -1, and outsourcing or
+  unknown remain neutral. Client identity stays contextual and never scores.
 - B2B is an owner-confirmed negative project preference (-1), for software
   primarily serving business/professional workflows. Merchant participation in
   a consumer journey is insufficient. Consumer and mixed-audience products are
@@ -44,7 +47,6 @@ without changing the implementation:
 - Sezzle JQ-008 is personally appealing to the owner, but that observation does
   not score because no deterministic reusable rule has been established. Do not
   translate per-offer subjective appeal into a numeric exception.
-- Client identity is context under company type, never a scoring criterion.
 - A processed offer without a supported explanation of what the software does:
   -1, even when specific work responsibilities are stated. No per-offer overrides.
 - Unknown salary and fields without a defined preference: 0.

@@ -29,8 +29,8 @@ assigned product area when stated; use mixed-audience if both separate business
 and consumer products are stated without a clear assignment. Internal tools
 do not become B2B just because employees use them. Domain tags may coexist.
 
-companyType: product, outsourcing, recruiting-intermediary, unknown. Distinguish
-hiring firm from client; client is contextual. roleFocus: backend, fullstack,
+companyType: choose exactly one key using the appended company type catalog.
+Distinguish hiring firm from client; client is contextual. roleFocus: backend, fullstack,
 frontend, unknown; use title and actual duties. workplaceMode: remote, hybrid,
 onsite, unknown; conflicting modes remain unknown. Preserve geography
 restrictions in workplace. salary: original amount/currency/period/gross-net,

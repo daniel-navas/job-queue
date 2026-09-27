@@ -1,5 +1,6 @@
 // Extraction contract. No candidate data or preference scores belong here.
 import { catalog, requirementLabel, selectableKeys } from './tag-catalog.mjs';
+import { companyTypeKeys, companyTypeLabel } from './company-types.mjs';
 const string = { type: 'string', minLength: 1, maxLength: 400 };
 const evidence = { type: 'string', minLength: 1, maxLength: 500 };
 const nullable = value => ({ anyOf: [{ type: 'null' }, value] });
@@ -19,7 +20,7 @@ export const requirementSchema = { anyOf: ['tag', 'experience', 'unknown'].map(k
 })) };
 export const properties = {
   id: string,
-  salary: fact(), companyType: fact(['product', 'outsourcing', 'recruiting-intermediary', 'unknown']),
+  salary: fact(), companyType: fact(companyTypeKeys),
   client: fact(), language: fact(), workplace: fact(), culture: fact(),
   roleFocus: fact(['backend', 'fullstack', 'frontend', 'unknown']),
   workplaceMode: fact(['remote', 'hybrid', 'onsite', 'unknown']),
@@ -57,6 +58,7 @@ export function validateShape(value, rule, location = 'cards') {
 export function displayFields(card) {
   const list = values => values.length ? { value: values.map(requirementLabel).join(', '), evidence: [...new Set(values.map(v => v.evidence))].join('\n') } : null;
   return { ...card,
+    companyType: card.companyType ? { ...card.companyType, value: companyTypeLabel(card.companyType.value) } : null,
     requirements: list(card.requirements.filter(v => v.kind !== 'experience')),
     preferred: list(card.preferred),
     experience: list(card.requirements.filter(v => v.kind === 'experience')),

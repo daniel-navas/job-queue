@@ -6,7 +6,7 @@ import { monthlySalary, withCOP } from '../src/salary.mjs';
 test('ratings are discrete, missing salary neutral, client is contextual only', () => {
   const job = { summary: { fields: { companyType: { value: 'recruiting intermediary' }, client: null, project: null, salary: null } } };
   const rating = rateJob(job);
-  assert.equal(rating.total, -1); assert.equal(rating.fields.client, undefined); assert.equal(rating.fields.salary.score, 0);
+  assert.equal(rating.total, -2); assert.equal(rating.fields.companyType.score, -1); assert.equal(rating.fields.client, undefined); assert.equal(rating.fields.salary.score, 0);
   assert.equal(rateJob({}).total, null);
   assert.equal(rateJob({ summary: { fields: { companyType: { value: 'product' }, project: { value: 'Payments platform' } } } }).total, 1);
   const sezzle = rateJob({ id:'4179554853', summary:{ inputHash:'097f36e19cc12883a07a19b5f966f6bc95f1a5785adf07968bcc488496dc008c', fields:{ companyType:{value:'product'}, project:{value:'Installment shopping'}, workplace:null } } });

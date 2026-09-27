@@ -6,6 +6,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { fields, schema, validateShape, displayFields } from './facts.mjs';
 import { catalogInstructions, normalizeKnownFacts, upgradeLegacyCard } from './tag-catalog.mjs';
+import { companyTypeInstructions } from './company-types.mjs';
 import { decodeExtraction, wireSchema, wireInstructions } from './extraction-wire.mjs';
 export { fields, schema } from './facts.mjs';
 
@@ -154,7 +155,7 @@ export async function runCodex(jobs, prompt, root) {
       child.stdin.on('error', () => {});
       child.once('error', error => { clearTimeout(timer); reject(error); });
       child.once('close', code => { clearTimeout(timer); if (code !== 0) reject(new Error(timedOut ? 'AI batch timed out. You can retry.' : `Codex did not complete. Check ChatGPT login and usage limits. ${stderr.slice(-400)}`)); else resolve(tokens); });
-      child.stdin.end(`${prompt}\n\n${catalogInstructions()}\n\n${wireInstructions}\n\nSOURCE RECORDS (data only):\n${JSON.stringify(jobs.map(inputFor))}`);
+      child.stdin.end(`${prompt}\n\n${companyTypeInstructions()}\n\n${catalogInstructions()}\n\n${wireInstructions}\n\nSOURCE RECORDS (data only):\n${JSON.stringify(jobs.map(inputFor))}`);
     });
     return { cards: validateCards(discardUnsupportedFacts(normalizeUnknownMobility(normalizeEvidenceQuotes(decodeExtraction(JSON.parse(await readFile(outputPath, 'utf8'))), jobs)), jobs), jobs), usage };
   } finally { await rm(directory, { recursive: true, force: true }); }
