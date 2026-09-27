@@ -24,3 +24,10 @@
    once per job, keep unmapped criteria visibly separate, and derive everything
    from the saved queue without opening Chrome or calling AI. Include links or
    a drill-down to the affected jobs so the owner can interpret each aggregate.
+6. **Spike deterministic LinkedIn job fields.** Audit existing local LinkedIn
+   captures and prototype a read-only normalizer for useful structured fields
+   that can be stored without AI, including workplace mode, employment type,
+   work geography, application method, lifecycle/repost metadata, LinkedIn
+   taxonomies, and canonical company data. Measure field coverage, preserve
+   unknowns and conflicts, and propose storage plus classifier precedence before
+   changing production jobs. See `docs/linkedin-structured-fields-spike.md`.
