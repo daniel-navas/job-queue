@@ -175,6 +175,7 @@ try {
   assert.equal(await page.locator('#detail [data-profile-family-member] select').count(), 0);
   assert.equal(await reactFamilyValue.locator('.profile-choices').count(), 1);
   assert.equal(await reactFamilyValue.getByRole('button', { name: 'Independent', exact: true }).getAttribute('aria-pressed'), 'true');
+  assert.equal(await page.getByRole('button', { name: 'Save family', exact: true }).evaluate(button => getComputedStyle(button).cursor), 'default');
   await page.locator('#search').fill('');
   await reactFamilyValue.getByRole('button', { name: 'React', exact: true }).click();
   assert.equal(await page.locator('#detail h2').textContent(), 'React');
