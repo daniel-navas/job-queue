@@ -20,7 +20,9 @@ try {
   await mkdir(path.join(root, 'data'));
   // Fixed scoring inputs keep UI expectations independent of owner calibration.
   const { preferences, scoring } = evaluationConfig();
+  preferences.companyType['recruiting-intermediary'] = -1;
   scoring.recencyBands = [{ maxAgeDays: 1, multiplier: 1.5 }, { multiplier: 0.5 }];
+  scoring.weights.companyType = 1;
   scoring.weights.easyApply = 0.5;
   const scenarioProfile = matchingProfile();
   scenarioProfile.tagUpdatedAtDefault = '2026-09-01T12:00:00.000Z';
@@ -39,8 +41,9 @@ try {
   const card = emptyCard({ id: source.id, roleFocus: { value: 'backend', evidence: 'Backend.' }, workplaceMode: { value: 'remote', evidence: 'Remote in Colombia.' }, requirements: [
     requirement('professional', { kind: 'experience', minMonths: 36, maxMonths: 84, evidence: '3-7 years.' }),
   ] });
-  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation job', easyApply: undefined, discoveries: [], description: 'Node.js. Kubernetes. Unusual platform certification. Go. React. 6-8 hours overlap with PST.' };
+  const mixedSource = { ...source, id: '103', title: 'Mixed evaluation job', easyApply: undefined, discoveries: [], description: 'Recruiting intermediary. Node.js. Kubernetes. Unusual platform certification. Go. React. 6-8 hours overlap with PST.' };
   const mixedCard = emptyCard({ id: mixedSource.id,
+    companyType: { value: 'recruiting-intermediary', evidence: 'Recruiting intermediary.' },
     workplace: { value: 'Remote; 6-8 hours overlap with PST', evidence: '6-8 hours overlap with PST.' },
     timezoneOverlap: { value: '6-8 hours overlap with PST', evidence: '6-8 hours overlap with PST.' },
     requirements: [
@@ -229,6 +232,9 @@ try {
   assert.ok(await page.getByText('Needs info · 7/8', { exact: true }).count());
   await page.getByRole('button', { name: /Mixed evaluation job/ }).click();
   assert.deepEqual(await page.locator('.fact-group>h3').allTextContents(), ['Role fit', 'Opportunity', 'Work conditions']);
+  assert.equal(await page.locator('#detail .company-type-tag').innerText(), 'Recruiting intermediary');
+  assert.equal(await page.locator('#detail .company-type-tag').evaluate(element => getComputedStyle(element).color), 'rgb(98, 107, 114)');
+  assert.equal(await page.locator('#detail .fact-row', { hasText: 'Company type' }).locator('.rating').innerText(), '-1');
   assert.equal(await page.locator('.fact-group').last().getByText('Time overlap', { exact: true }).count(), 1);
   assert.equal(await page.locator('.fact-group').last().getByText('6-8 hours overlap with PST', { exact: true }).count(), 1);
   assert.equal((await page.locator('.fact-group').last().innerText()).match(/6-8 hours overlap with PST/g)?.length, 1);

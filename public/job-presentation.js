@@ -27,3 +27,7 @@ export function listTags(job) {
   }
   return tags;
 }
+
+export function companyTypeTag(value) {
+  return value ? { label: String(value), tone: 'neutral' } : null;
+}
