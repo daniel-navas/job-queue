@@ -172,14 +172,22 @@ try {
   const vueFamilyValue = page.locator('[data-profile-family-member="vue"]');
   const reactFamilyValue = page.locator('[data-profile-family-member="react"]');
   assert.equal(await vueFamilyValue.count(), 1);
-  assert.equal(await reactFamilyValue.inputValue(), 'independent');
-  await reactFamilyValue.focus();
-  await reactFamilyValue.selectOption('advanced');
-  await reactFamilyValue.selectOption('independent');
-  assert.equal(await page.evaluate(() => document.activeElement?.getAttribute('data-profile-family-member')), 'react');
+  assert.equal(await page.locator('#detail [data-profile-family-member] select').count(), 0);
+  assert.equal(await reactFamilyValue.locator('.profile-choices').count(), 1);
+  assert.equal(await reactFamilyValue.getByRole('button', { name: 'Independent', exact: true }).getAttribute('aria-pressed'), 'true');
+  await page.locator('#search').fill('');
+  await reactFamilyValue.getByRole('button', { name: 'React', exact: true }).click();
+  assert.equal(await page.locator('#detail h2').textContent(), 'React');
+  await page.locator('[data-profile-item="family:modern-frontend"]').click();
+  await reactFamilyValue.getByRole('button', { name: 'Advanced', exact: true }).click();
+  assert.deepEqual(await page.evaluate(() => ({
+    key: document.activeElement?.getAttribute('data-profile-key'),
+    value: document.activeElement?.getAttribute('data-profile-value'),
+  })), { key: 'react', value: 'advanced' });
+  await reactFamilyValue.getByRole('button', { name: 'Independent', exact: true }).click();
   assert.equal(await page.getByRole('button', { name: 'Save family', exact: true }).isDisabled(), true);
-  await vueFamilyValue.selectOption('basic');
-  await reactFamilyValue.selectOption('advanced');
+  await vueFamilyValue.getByRole('button', { name: 'Basic', exact: true }).click();
+  await reactFamilyValue.getByRole('button', { name: 'Advanced', exact: true }).click();
   await page.getByRole('button', { name: 'Save family', exact: true }).click();
   await page.waitForFunction(async () => {
     const facts = (await (await fetch('/api/jobs')).json()).profileReview.allFacts;

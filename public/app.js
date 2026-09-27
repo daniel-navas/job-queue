@@ -81,17 +81,18 @@ const levelChoices = [
 ];
 const presenceChoices = [['none', 'No'], ['present', 'Yes']];
 const profileValueLabel = fact => fact.mode === 'presence' ? (fact.value === 'present' ? 'Yes' : 'No') : fact.value[0].toUpperCase() + fact.value.slice(1);
-function profileFactControls(fact, editable) {
-  if (!editable) return `<div class="profile-known"><span>${escape(fact.label)}</span><strong>${escape(fact.value)}</strong></div>`;
+function profileChoiceButtons(fact) {
   const choices = fact.mode === 'presence' ? presenceChoices : levelChoices;
   const selectedValue = Object.hasOwn(profileSelections, fact.key) ? profileSelections[fact.key] : fact.value;
-  return `<fieldset class="profile-fact"><legend>${escape(fact.label)}</legend><div class="profile-choices">${choices.map(([value, label]) => `<button type="button" data-profile-key="${escape(fact.key)}" data-profile-value="${value}" aria-pressed="${selectedValue === value}">${label}</button>`).join('')}</div></fieldset>`;
+  return `<div class="profile-choices">${choices.map(([value, label]) => `<button type="button" data-profile-key="${escape(fact.key)}" data-profile-value="${value}" aria-pressed="${selectedValue === value}">${label}</button>`).join('')}</div>`;
+}
+function profileFactControls(fact, editable) {
+  if (!editable) return `<div class="profile-known"><span>${escape(fact.label)}</span><strong>${escape(fact.value)}</strong></div>`;
+  return `<fieldset class="profile-fact"><legend>${escape(fact.label)}</legend>${profileChoiceButtons(fact)}</fieldset>`;
 }
 function profileFamilyMemberControl(fact) {
-  const choices = fact.mode === 'presence' ? presenceChoices : levelChoices;
-  const selectedValue = Object.hasOwn(profileSelections, fact.key) ? profileSelections[fact.key] : fact.value ?? '';
   const label = fact.value !== null ? `<button data-profile-member="all:${escape(fact.key)}">${escape(fact.label)}</button>` : `<span>${escape(fact.label)}</span>`;
-  return `<div class="profile-member">${label}<select data-profile-family-member="${escape(fact.key)}" data-profile-original="${escape(fact.value ?? '')}" aria-label="Value for ${escape(fact.label)}"><option value="" disabled ${selectedValue === '' ? 'selected' : ''}>Not saved</option>${choices.map(([value, choiceLabel]) => `<option value="${value}" ${selectedValue === value ? 'selected' : ''}>${choiceLabel}</option>`).join('')}</select></div>`;
+  return `<fieldset class="profile-fact profile-member" data-profile-family-member="${escape(fact.key)}"><legend>${label}</legend>${profileChoiceButtons(fact)}</fieldset>`;
 }
 function renderProfileUnavailable() {
   $('#tabs').innerHTML = '';
@@ -263,10 +264,13 @@ $('#detail').onclick = async event => {
     if (member?.dataset.profileMember) { profileSelected = member.dataset.profileMember; render(); return; }
     const choice = event.target.closest('[data-profile-value]');
     if (choice) {
-      const current = data.profileReview.allFacts.find(fact => fact.key === choice.dataset.profileKey)?.value ?? null;
-      if (choice.dataset.profileValue === current) delete profileSelections[choice.dataset.profileKey];
-      else profileSelections[choice.dataset.profileKey] = choice.dataset.profileValue;
-      render(); return;
+      const { profileKey, profileValue } = choice.dataset;
+      const current = data.profileReview.allFacts.find(fact => fact.key === profileKey)?.value ?? null;
+      if (profileValue === current) delete profileSelections[profileKey];
+      else profileSelections[profileKey] = profileValue;
+      render();
+      [...document.querySelectorAll('#detail [data-profile-key]')].find(button => button.dataset.profileKey === profileKey && button.dataset.profileValue === profileValue)?.focus();
+      return;
     }
     if (event.target.closest('[data-profile-show-all]')) { profileShowAll = true; render(); return; }
     const job = event.target.closest('[data-profile-job]');
@@ -317,17 +321,6 @@ $('#detail').onclick = async event => {
   if (button) { try { await api('/api/review', { id: selected, status: button.dataset.status }); await refresh(); } catch (err) { error(err); } }
   const availability = event.target.closest('[data-availability]');
   if (availability) { try { await api('/api/availability', { id: selected, status: availability.dataset.availability }); await refresh(); } catch (err) { error(err); } }
-};
-$('#detail').onchange = event => {
-  const member = event.target.closest('[data-profile-family-member]');
-  if (member) {
-    if (member.value === member.dataset.profileOriginal) delete profileSelections[member.dataset.profileFamilyMember];
-    else profileSelections[member.dataset.profileFamilyMember] = member.value;
-    const family = data.profileReview.families?.find(candidate => candidate.id === profileSelected);
-    const changed = family && [family, ...family.facts].some(fact => Object.hasOwn(profileSelections, fact.key) && profileSelections[fact.key] !== fact.value);
-    const save = $('#detail [data-profile-save]');
-    if (save) save.disabled = !changed;
-  }
 };
 $('#scan').onclick = async () => { try { $('#error').textContent = ''; await api('/api/scan', {}); await refresh(); } catch (err) { error(err); } };
 $('#summarize').onclick = async () => { try { $('#error').textContent = ''; await api('/api/summarize', {}); await refresh(); } catch (err) { error(err); } };
