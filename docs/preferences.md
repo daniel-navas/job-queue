@@ -19,6 +19,11 @@ without changing the implementation:
 - LinkedIn-confirmed Easy Apply contributes +0.5 to fit before publication
   recency adjusts the final priority. Missing application-method data remains
   neutral and must not be inferred from the description.
+- Employer-confirmed visa sponsorship contributes +3 to fit when the extracted
+  work country is explicitly outside Colombia. Colombia, a missing or invalid
+  work country, an unknown policy, or an explicit refusal remains neutral. The
+  bonus is applied before publication recency and never inferred from generic
+  relocation wording.
 - Publication recency multiplies the weighted fit instead of adding points:
   ×1.5 through day 1, ×1.4 through day 3, ×1.25 through day 7, ×1.1 through
   day 14, ×1 through day 30, ×0.75 through day 60, then ×0.5. Positive and
@@ -96,8 +101,9 @@ Version 6 extraction records workCountry (one source-backed ISO country),
 visaSupport and relocationFunding separately. A country in the configured
 relocation set makes all explicit work modes neutral (0), independently of
 visa eligibility. This is a work-mode preference, not an eligibility score.
-Visa support and moving expenses appear with their own evidence when known;
-visa support remains visible as unknown for a stated European work country.
+Visa support and moving expenses appear with their own evidence when known.
+Confirmed support adds +3 for any explicitly non-Colombian work country; unknown
+or refused support remains neutral rather than becoming an eligibility judgment.
 The query never supplies offer facts. Older cards keep null mobility facts
 without reprocessing, so geography-specific scoring requires new source-backed
 extraction. Existing salary bands remain unchanged.
@@ -167,8 +173,9 @@ then pending New offers. Within each status, process the most recently
 published first; missing publication dates come last and stable IDs break ties.
 The currently selected offer does not affect processing priority.
 In list cards, omit initials and generic metadata tags, put the score beside the
-title, and show publication age plus a compact Easy Apply tag when LinkedIn
-confirmed it. The tag shows its +0.5 fit contribution for processed jobs. Keep
+title, and show publication age plus compact tags for LinkedIn-confirmed Easy
+Apply and employer-confirmed visa sponsorship outside Colombia. The tags show
+their +0.5 and +3 fit contributions for processed jobs. Keep
 the non-copyable low-emphasis JQ reference at bottom right. In the detail
 header, keep the LinkedIn link at top-right, actions
 and metadata together on a compact second row, and the copyable JQ reference at

@@ -70,6 +70,50 @@ test('confirmed Easy Apply adds a small configurable fit bonus', () => {
   assert.equal(easy.rating.total - ordinary.rating.total, 0.5);
 });
 
+test('confirmed visa sponsorship adds three fit points only for work outside Colombia', () => {
+  const sponsorshipScoring = { ...scoring, weights: { ...scoring.weights, visaSupport: 3 } };
+  const supported = { value: 'supported', evidence: 'We sponsor work visas.' };
+  const spain = job({
+    software: { value: 'Payments platform', evidence: 'Payments platform' },
+    workCountry: { value: 'ES', evidence: 'Madrid, Spain' },
+    visaSupport: supported,
+  });
+  const colombia = job({
+    software: { value: 'Payments platform', evidence: 'Payments platform' },
+    workCountry: { value: 'CO', evidence: 'Bogota, Colombia' },
+    visaSupport: supported,
+  });
+  const unsupported = job({
+    software: { value: 'Payments platform', evidence: 'Payments platform' },
+    workCountry: { value: 'DE', evidence: 'Berlin, Germany' },
+    visaSupport: { value: 'not-supported', evidence: 'No visa sponsorship.' },
+  });
+  const malformedCountry = job({
+    software: { value: 'Payments platform', evidence: 'Payments platform' },
+    workCountry: { value: 'unknown', evidence: 'Location not specified' },
+    visaSupport: supported,
+  });
+  const paddedColombia = job({
+    software: { value: 'Payments platform', evidence: 'Payments platform' },
+    workCountry: { value: 'CO ', evidence: 'Bogota, Colombia' },
+    visaSupport: supported,
+  });
+
+  const ordinary = evaluateJob(job({ software: { value: 'Payments platform', evidence: 'Payments platform' } }), profile, preferences, sponsorshipScoring, null);
+  const abroad = evaluateJob(spain, profile, preferences, sponsorshipScoring, null);
+  const local = evaluateJob(colombia, profile, preferences, sponsorshipScoring, null);
+  const refused = evaluateJob(unsupported, profile, preferences, sponsorshipScoring, null);
+  const malformed = evaluateJob(malformedCountry, profile, preferences, sponsorshipScoring, null);
+  const paddedLocal = evaluateJob(paddedColombia, profile, preferences, sponsorshipScoring, null);
+
+  assert.equal(abroad.rating.fields.visaSupport.contribution, 3);
+  assert.equal(abroad.rating.total - ordinary.rating.total, 3);
+  assert.equal(local.rating.fields.visaSupport.contribution, 0);
+  assert.equal(refused.rating.fields.visaSupport.contribution, 0);
+  assert.equal(malformed.rating.fields.visaSupport.contribution, 0);
+  assert.equal(paddedLocal.rating.fields.visaSupport.contribution, 0);
+});
+
 test('stack familiarity requires only basic level and remains capped', () => {
   const offer = { ...job({ stack: [requirement('docker'), requirement('terraform')] }), processingStatus: 'processed' };
   const evaluated = evaluateJob(offer, profile, preferences, scoring, null);

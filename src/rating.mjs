@@ -26,6 +26,14 @@ export function rateJob(job, preferences = defaults) {
     score: preferences.timezoneOverlap?.requiredScore ?? -1,
     reason: `${facts.timezoneOverlap.value}: configured work-condition score ${preferences.timezoneOverlap?.requiredScore ?? -1}.`,
   };
+  const rawWorkCountry = facts.workCountry?.value;
+  const workCountry = typeof rawWorkCountry === 'string' && /^[A-Z]{2}$/i.test(rawWorkCountry.trim())
+    ? rawWorkCountry.trim().toUpperCase()
+    : null;
+  if (facts.visaSupport?.value === 'supported' && workCountry && workCountry !== 'CO') fields.visaSupport = {
+    score: 1,
+    reason: `Employer-confirmed visa sponsorship for work in ${workCountry}.`,
+  };
   const typeKey = type?.replace(/\s+/g, '-') || 'unknown';
   const companyScore = preferences.companyType?.[typeKey] ?? preferences.unknownScore ?? 0;
   if (companyScore) fields.companyType = { score: companyScore, reason: `Company type ${typeKey}: configured preference ${companyScore}.` };

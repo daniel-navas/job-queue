@@ -17,5 +17,13 @@ export function listTags(job) {
       title: 'Easy Apply fit bonus before publication recency',
     });
   }
+  const visaContribution = job.rating?.fields?.visaSupport?.contribution;
+  if (job.summary?.facts?.visaSupport?.value === 'supported' && Number.isFinite(visaContribution) && visaContribution > 0) {
+    tags.push({
+      label: `Visa sponsorship +${Number(visaContribution.toFixed(2))}`,
+      tone: 'positive',
+      title: 'Confirmed visa sponsorship bonus before publication recency',
+    });
+  }
   return tags;
 }

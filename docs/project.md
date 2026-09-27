@@ -17,8 +17,9 @@ infrastructure, or additional providers.
 3. Match every processed job to structured profile data and preferences using
    local code. Profile, preference and weight changes require no AI calls.
 4. Show compact decision cards, source quotes, weighted contributions, and a
-   priority-ordered review queue. List cards show publication age and confirmed
-   LinkedIn Easy Apply status. Unknown remains visible and is not invented.
+   priority-ordered review queue. List cards show publication age, confirmed
+   LinkedIn Easy Apply status, and confirmed visa sponsorship for jobs outside
+   Colombia. Unknown remains visible and is not invented.
    Each relevant requirement, nice-to-have, experience criterion, and company
    stack technology is explicitly assessed as match, non-match, missing profile
    information, or unmapped. The queue shows whether that evaluation is pending,
@@ -43,8 +44,9 @@ infrastructure, or additional providers.
    AI, Chrome, or access to the original CV.
 
 The owner-facing vocabulary is intentionally small: `Jobs` are vacancies under
-review, `Applications` are tracked processes after applying, `Role` is the job
-title, and `Offer` is reserved for an employment offer received from a company.
+review, the left-hand card pane is the `Jobs list`, `Applications` are tracked
+processes after applying, `Role` is the job title, and `Offer` is reserved for
+an employment offer received from a company.
 Do not use Opportunity, Posting, or Listing as competing UI names.
 
 Owner-facing explanations must start with the practical behavior. Never use an
