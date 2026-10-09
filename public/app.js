@@ -86,13 +86,19 @@ function profileChoiceButtons(fact) {
   const selectedValue = Object.hasOwn(profileSelections, fact.key) ? profileSelections[fact.key] : fact.value;
   return `<div class="profile-choices">${choices.map(([value, label]) => `<button type="button" data-profile-key="${escape(fact.key)}" data-profile-value="${value}" aria-pressed="${selectedValue === value}">${label}</button>`).join('')}</div>`;
 }
+function profileExplanationHTML(fact) {
+  const card = data.profileReview?.explanations?.cards?.[fact.key];
+  if (!card) return fact.pending ? '<p class="muted profile-explanation-missing">Explanation not generated yet.</p>' : '';
+  const levels = fact.mode === 'presence' ? [['yes', 'Yes'], ['no', 'No']] : levelChoices.filter(([value]) => value !== 'none');
+  return `<div class="profile-explanation"><p>${escape(card.whatIs)}</p><ul>${levels.map(([key, label]) => `<li><strong>${label}:</strong> ${escape(card[key])}</li>`).join('')}</ul></div>`;
+}
 function profileFactControls(fact, editable) {
   if (!editable) return `<div class="profile-known"><span>${escape(fact.label)}</span><strong>${escape(fact.value)}</strong></div>`;
-  return `<fieldset class="profile-fact"><legend>${escape(fact.label)}</legend>${profileChoiceButtons(fact)}</fieldset>`;
+  return `<fieldset class="profile-fact"><legend>${escape(fact.label)}</legend>${profileExplanationHTML(fact)}${profileChoiceButtons(fact)}</fieldset>`;
 }
 function profileFamilyMemberControl(fact) {
   const label = fact.value !== null ? `<button data-profile-member="all:${escape(fact.key)}">${escape(fact.label)}</button>` : `<span>${escape(fact.label)}</span>`;
-  return `<fieldset class="profile-fact profile-member" data-profile-family-member="${escape(fact.key)}"><legend>${label}</legend>${profileChoiceButtons(fact)}</fieldset>`;
+  return `<fieldset class="profile-fact profile-member" data-profile-family-member="${escape(fact.key)}"><legend>${label}</legend>${profileExplanationHTML(fact)}${profileChoiceButtons(fact)}</fieldset>`;
 }
 function renderProfileUnavailable() {
   $('#tabs').innerHTML = '';
@@ -100,8 +106,9 @@ function renderProfileUnavailable() {
   $('#detail').innerHTML = '';
 }
 function renderProfile(review) {
+  const explanations = review.explanations;
   const pending = profileFilter === 'pending';
-  $('#tabs').innerHTML = `<button data-tab="pending" class="tab ${pending ? 'active' : ''}" aria-pressed="${pending}">Missing <span>${review.pendingCount}</span></button><button data-tab="all" class="tab ${!pending ? 'active' : ''}" aria-pressed="${!pending}">Saved <span>${review.allFacts.length}</span></button>`;
+  $('#tabs').innerHTML = `<button data-tab="pending" class="tab ${pending ? 'active' : ''}" aria-pressed="${pending}">Missing <span>${review.pendingCount}</span></button><button data-tab="all" class="tab ${!pending ? 'active' : ''}" aria-pressed="${!pending}">Saved <span>${review.allFacts.length}</span></button>${explanations ? `<button data-profile-generate ${explanations.running || explanations.unavailable || !explanations.missing ? 'disabled' : ''}>Generate explanations${explanations.missing ? ` · ${explanations.missing}` : ''}</button><span class="profile-explanation-status ${explanations.error ? 'error' : ''}">${escape(explanations.message)}</span>` : ''}`;
   const familyItems = pending ? [] : (review.families || []);
   const skillItems = pending ? [] : review.allFacts.filter(fact => !fact.isFamily).map(fact => {
     const source = review.items.find(item => item.facts.some(candidate => candidate.key === fact.key));
@@ -248,7 +255,7 @@ $('#application-remove').onclick = async () => {
   catch (err) { $('#application-error').textContent = err.message; }
 };
 $('#views').onclick = event => { const button = event.target.closest('[data-view]'); if (button) { view = button.dataset.view; selected = null; $('#search').value = ''; render(); continueDevReload(); } };
-$('#tabs').onclick = event => { const tab = event.target.closest('[data-tab]'); if (tab) { if (view === 'applications') applicationFilter = tab.dataset.tab; else if (view === 'profile') { profileFilter = tab.dataset.tab; profileSelected = null; } else active = tab.dataset.tab; render(); } };
+$('#tabs').onclick = async event => { if (event.target.closest('[data-profile-generate]')) { try { $('#error').textContent = ''; await api('/api/profile/explanations', {}); await refresh(); } catch (err) { error(err); } return; } const tab = event.target.closest('[data-tab]'); if (tab) { if (view === 'applications') applicationFilter = tab.dataset.tab; else if (view === 'profile') { profileFilter = tab.dataset.tab; profileSelected = null; } else active = tab.dataset.tab; render(); } };
 $('#search').oninput = render;
 $('#jobs').onclick = event => {
   const profileItem = event.target.closest('[data-profile-item]');
@@ -327,7 +334,7 @@ $('#summarize').onclick = async () => { try { $('#error').textContent = ''; awai
 initSearches(api, refresh, search => { discoveryFilter = search; view = 'opportunities'; active = 'all'; $('#search').value = ''; render(); });
 $('#clear-discovery').onclick = () => { discoveryFilter = null; render(); };
 refresh().catch(error);
-setInterval(() => { if (data.scan?.running || data.ai?.running || data.connection?.running) refresh().catch(error); }, 3000);
+setInterval(() => { if (data.scan?.running || data.ai?.running || data.connection?.running || data.profileReview?.explanations?.running) refresh().catch(error); }, 3000);
 
 function summaryHTML(job) {
   if (!job.summary) return provenanceHTML(job) + `<p class="muted">${job.description ? 'Summary pending. Use Process pending to prepare decision cards.' : 'Description not captured yet.'}</p>`;

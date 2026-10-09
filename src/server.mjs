@@ -13,6 +13,7 @@ import { monthlySalary, withCOP, exchangeRates } from './salary.mjs';
 import { inventoryUnmapped, loadUnmappedReview } from './unmapped-review.mjs';
 import { applicationView } from './application-tracker.mjs';
 import { profileReview, ProfileStore } from './profile-review.mjs';
+import { ProfileExplanations, explanationFacts } from './profile-explanations.mjs';
 
 const root = process.env.JOBQUEUE_ROOT || fileURLToPath(new URL('../', import.meta.url));
 const queue = new Queue(root);
@@ -20,6 +21,8 @@ await queue.load();
 const summarizer = new Summarizer(queue, root);
 const searches = new SearchStore(root);
 const profiles = new ProfileStore(root);
+const explanations = new ProfileExplanations(root);
+await explanations.load();
 const port = Number(process.env.PORT ?? 4317);
 const development = process.env.JOBQUEUE_DEV === '1';
 const devClients = new Set();
@@ -63,6 +66,12 @@ const server = http.createServer(async (req, res) => {
       const { search, version } = JSON.parse(body);
       return json(200, await searches.update(search, version));
     }
+    if (req.method === 'POST' && req.url === '/api/profile/explanations') {
+      const profile = await profiles.read();
+      const jobs = queue.state.jobs.map(job => ({ ...job, processingStatus: processingStatus(job), summary: currentSummary(job) }));
+      explanations.start(explanationFacts(profileReview(jobs, profile)));
+      return json(202, explanations.state);
+    }
     if (req.method === 'POST' && req.url === '/api/profile') {
       let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }
       const { changes } = JSON.parse(body);
@@ -85,7 +94,9 @@ const server = http.createServer(async (req, res) => {
         const inventory = inventoryUnmapped(queue.state.jobs, review);
         catalogReview = { pending: inventory.pending, threshold: inventory.threshold, recommended: inventory.recommended };
       } catch (error) { console.error(`Pending tag review unavailable: ${error.message}`); }
-      return json(200, { jobs, searches: searchState, preferences: preferencesConfig, profileReview: profileReview(jobs, profile), scan, connection, ai: { ...summarizer.state, pending: pendingJobs(queue.state.jobs).length }, ...(development ? { development: true } : {}), ...(catalogReview ? { catalogReview } : {}) });
+      const review = profileReview(jobs, profile);
+      review.explanations = explanations.view(review);
+      return json(200, { jobs, searches: searchState, preferences: preferencesConfig, profileReview: review, scan, connection, ai: { ...summarizer.state, pending: pendingJobs(queue.state.jobs).length }, ...(development ? { development: true } : {}), ...(catalogReview ? { catalogReview } : {}) });
     }
     if (req.method === 'POST' && req.url === '/api/summarize') {
       let body = ''; for await (const chunk of req) { body += chunk; if (body.length > 10000) return json(413, { error: 'Request too large' }); }

@@ -89,6 +89,12 @@ The extraction/matching boundary is recorded in decision 0002.
   workflow metadata is not displayed. Saved Profile also exposes catalog
   families as searchable groups, identifies each individual skill's families,
   and supports updating member values directly inside a family.
+- Profile skill guidance is owner-triggered and cached per canonical skill.
+  Generate only missing explanations for the current Missing queue, using
+  GPT-6 Luna medium through the existing subscription. Show concise Spanish
+  definitions and practical level examples beside the choices; retain guidance
+  after saving. Never infer or save the owner's level from a generated card.
+  See `docs/profile-explanations.md` for processing and persistence behavior.
 - Source quotations prove provenance, not perfect AI interpretation. Extraction
   errors must be fixed generically, not with hidden per-job score exceptions.
 - Keep the verified GitHub remote (`origin/main`) synchronized after coherent

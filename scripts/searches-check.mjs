@@ -12,6 +12,8 @@ import { fingerprint, summaryVersion } from '../src/summarize.mjs';
 import { emptyCard, requirement, matchingProfile, evaluationConfig } from '../test-support/fixtures.mjs';
 import { readJobDescription } from '../src/linkedin/description.mjs';
 import { readStoredJobs } from '../src/queue.mjs';
+import { catalog } from '../src/tag-catalog.mjs';
+import { ProfileExplanations } from '../src/profile-explanations.mjs';
 
 const root = await mkdtemp(path.join(os.tmpdir(), 'jq-search-browser-'));
 let child, browser;
@@ -37,6 +39,10 @@ try {
   await writeFile(path.join(root, 'config/unmapped-review.json'), JSON.stringify({ schemaVersion: 1, reviewThreshold: 1, decisions: [] }));
   const search = normalizeSearch({ id: 'backend', provider: 'linkedin', name: 'Backend · Colombia', query: 'backend engineer', location: 'Colombia', workplace: 'any', datePosted: 'month', enabled: true });
   await writeFile(path.join(root, 'config/searches.json'), JSON.stringify({ searches: [search] }));
+  const explanationStore = new ProfileExplanations(root, async facts => ({ cards: facts.map(fact => ({ key: fact.key, whatIs: 'Una explicación de prueba <segura>.', basic: 'Trabajo con guía.', independent: 'Trabajo por mi cuenta.', advanced: 'Diseño y resuelvo problemas.', yes: null, no: null })) }));
+  await explanationStore.load();
+  explanationStore.start(['angular', 'go', 'rust'].map(key => ({ key, label: catalog.tags[key].label, mode: 'level', definition: catalog.tags[key].definition })));
+  await explanationStore.completion;
   const source = { id: '100', title: 'Backend Engineer', company: 'Example', location: 'Colombia', publishedAt: Date.now(), easyApply: true, description: 'Backend. Remote in Colombia. 3-7 years.', status: 'new', history: [], discoveries: [{ search, firstSeen: '2026-09-14', lastSeen: '2026-09-14' }] };
   const card = emptyCard({ id: source.id, roleFocus: { value: 'backend', evidence: 'Backend.' }, workplaceMode: { value: 'remote', evidence: 'Remote in Colombia.' }, requirements: [
     requirement('professional', { kind: 'experience', minMonths: 36, maxMonths: 84, evidence: '3-7 years.' }),
@@ -127,6 +133,13 @@ try {
   assert.equal(await page.getByText('3 facts need info', { exact: true }).count(), 0);
   assert.equal(await page.locator('[data-profile-item]', { hasText: 'Angular' }).count(), 1);
   assert.equal(await page.locator('[data-profile-item]', { hasText: 'Compiled languages' }).count(), 1);
+  assert.equal(await page.locator('[data-profile-generate]').isDisabled(), true);
+  assert.equal(await page.locator('#detail .profile-explanation').count(), 1);
+  assert.match(await page.locator('#detail .profile-explanation').innerText(), /Una explicación de prueba <segura>/);
+  assert.equal(await page.locator('#detail segura').count(), 0);
+  await page.locator('[data-profile-item]', { hasText: 'Compiled languages' }).click();
+  assert.equal(await page.locator('#detail .profile-explanation').count(), 2);
+  await page.locator('[data-profile-item]', { hasText: 'Angular' }).click();
   const pendingFamily = page.locator('[data-profile-item]', { hasText: 'Compiled languages' });
   assert.doesNotMatch(await pendingFamily.innerText(), /undefined|saved/);
   assert.match(await pendingFamily.innerText(), /missing/);
@@ -157,6 +170,7 @@ try {
   assert.equal(await page.getByRole('heading', { name: 'Your profile', exact: true }).count(), 0);
   assert.equal(await page.locator('#jobs .profile-family').count(), 6);
   await page.locator('[data-profile-item="all:go"]').click();
+  assert.equal(await page.locator('#detail .profile-explanation').count(), 1);
   const compiledFamilyLink = page.locator('#detail [data-profile-family="compiled-language"]');
   assert.equal(await compiledFamilyLink.count(), 1);
   assert.equal(await page.locator('#detail [data-profile-family="server-side-language"]').count(), 1);

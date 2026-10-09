@@ -35,3 +35,11 @@ header{justify-content:flex-start;gap:18px}header>strong,header>.actions{flex:no
 
 /* Related facts share one visual block while retaining independent scores. */
 .facts{display:grid;gap:0}.fact-group{padding:13px 0;border-bottom:1px solid #e8ece9}.fact-group:last-child{border-bottom:0}.fact-group>h3{margin:0 0 5px;color:#566760;font-size:11px;letter-spacing:.35px;text-transform:uppercase}.fact-group>dl{margin:0}.fact-row{display:grid;grid-template-columns:165px 1fr;gap:16px;padding:7px 0}.fact-row dt{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;font-size:12px;color:#748078}.fact-row dd{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:8px;margin:0;font-size:13px;line-height:1.6}
+
+.profile-explanation { font-size: 13px; line-height: 1.5; color: #68766c; margin: 8px 0 12px; }
+.profile-explanation p { margin: 0 0 6px; }
+.profile-explanation ul { margin: 0; padding-left: 18px; }
+.profile-explanation li + li { margin-top: 4px; }
+.profile-explanation-missing { font-size: 12px; }
+.profile-explanation-status { font-size: 12px; align-self: center; color: #68766c; }
+.profile-explanation-status.error { color: #b94b45; }
