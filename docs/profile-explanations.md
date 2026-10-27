@@ -20,12 +20,13 @@ working directory, ignored user configuration and task-specific
 Only canonical skill keys, names, modes and catalog definitions are sent to
 OpenAI. No browser opens. The job classifier remains independently configured.
 
-Cards contain concise conversational Spanish: one definition and one practical
+In-app cards contain concise conversational English: one definition and one practical
 ability/example for Basic, Independent and Advanced. Presence facts instead
 explain Yes/No. The owner must assess their understanding and ability to check
 and correct work, rather than what an AI coding agent can produce. The generator
-prompt is in `src/profile-explanations.mjs`; the equivalent chat workflow is
-`.agents/skills/explain-profile-skills/SKILL.md`.
+prompt is in `src/profile-explanations.mjs`; the separate Spanish chat workflow is
+`.agents/skills/explain-profile-skills/SKILL.md`. Chat language preferences do not
+set the language of generated app content.
 
 The ignored local `.local/profile-explanations.json` cache is written atomically
 with private file permissions. Input hashes include the explanation contract,
@@ -67,3 +68,12 @@ verification rendered the cards without runtime errors; the owner's 133 saved
 profile values were unchanged. Content review found useful distinctions and
 examples, with residual technical jargon and mixed first/second-person voice;
 this remains a calibration sample rather than a claim of universal quality.
+
+On October 26, 2026, all 71 locally cached cards were reviewed and rewritten in
+English through eight bounded Luna-medium calls. A private pre-change backup and
+translation report remain under `.local/profile-language-repair-2026-10-26/`.
+The 52 current cards retain their availability; the 19 already-stale cards remain
+stale, so translating does not resurrect retired skills or obsolete definitions.
+The generator now explicitly uses English regardless of input/chat language.
+A regression verifies that cards from the former Spanish contract are not served.
+The Spanish chat-card skill remains separate from the English app-content rule.

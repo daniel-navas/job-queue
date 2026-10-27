@@ -5,8 +5,8 @@ import os from 'node:os';
 import path from 'node:path';
 const load = () => import('../src/profile-explanations.mjs');
 const facts = [{ key: 'angular', label: 'Angular', mode: 'level' }, { key: 'financial', label: 'Financial software experience', mode: 'presence' }];
-const card = key => ({ key, whatIs: 'Explicación breve.', basic: 'Sigues un ejemplo.', independent: 'Resuelves una tarea.', advanced: 'Diseñas y corriges problemas.', yes: null, no: null });
-const presence = { key: facts[1].key, whatIs: 'Experiencia en software financiero.', basic: null, independent: null, advanced: null, yes: 'Has trabajado en ese sector.', no: 'No has trabajado en ese sector.' };
+const card = key => ({ key, whatIs: 'A short explanation.', basic: 'You follow an example.', independent: 'You solve a task.', advanced: 'You design and troubleshoot.', yes: null, no: null });
+const presence = { key: facts[1].key, whatIs: 'Experience with financial software.', basic: null, independent: null, advanced: null, yes: 'You have worked in that industry.', no: 'You have not worked in that industry.' };
 async function setup(t, runner) {
   const { ProfileExplanations } = await load();
   const root = await mkdtemp(path.join(os.tmpdir(), 'jq-explanations-test-'));
@@ -18,12 +18,12 @@ test('cached explanations survive restart, deduplicate facts and invalidate chan
   await store.load();
   store.start([...facts, facts[0]]); await store.completion;
   assert.equal(store.state.generated, 2);
-  assert.equal(store.get(facts[0]).independent, 'Resuelves una tarea.');
+  assert.equal(store.get(facts[0]).independent, 'You solve a task.');
   const restarted = await setup(t, () => { throw new Error('Unexpected provider call'); });
   restarted.file = store.file;
   await restarted.load();
   assert.deepEqual(restarted.missing(facts), []);
-  assert.equal(restarted.get(facts[1]).yes, 'Has trabajado en ese sector.');
+  assert.equal(restarted.get(facts[1]).yes, 'You have worked in that industry.');
   assert.equal(restarted.get({ ...facts[0], definition: 'A changed meaning' }), null);
   assert.throws(() => restarted.start(facts), /No explanations/);
 });
@@ -66,4 +66,13 @@ test('an unreadable optional cache blocks generation without overwriting it or b
   assert.equal(view.running, false);
   assert.throws(() => store.start([facts[0]]), /cache unavailable/i);
   assert.equal(await readFile(store.file, 'utf8'), '{broken');
+});
+test('the English contract never serves cards cached under the former Spanish contract', async t => {
+  const store = await setup(t, () => { throw new Error('Unexpected provider call'); });
+  store.cache.cards.angular = {
+    inputHash: 'f3692a15f894c34b5461c7018b85e12a93d6268a04dec79902d82bfb65053438',
+    card: { key: 'angular', whatIs: 'Explicación breve.', basic: 'Sigues un ejemplo.', independent: 'Resuelves una tarea.', advanced: 'Diseñas y corriges problemas.', yes: null, no: null },
+  };
+  assert.equal(store.get(facts[0]), null);
+  assert.deepEqual(store.missing([facts[0]]), [facts[0]]);
 });

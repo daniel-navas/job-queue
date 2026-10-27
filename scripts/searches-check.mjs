@@ -39,7 +39,7 @@ try {
   await writeFile(path.join(root, 'config/unmapped-review.json'), JSON.stringify({ schemaVersion: 1, reviewThreshold: 1, decisions: [] }));
   const search = normalizeSearch({ id: 'backend', provider: 'linkedin', name: 'Backend · Colombia', query: 'backend engineer', location: 'Colombia', workplace: 'any', datePosted: 'month', enabled: true });
   await writeFile(path.join(root, 'config/searches.json'), JSON.stringify({ searches: [search] }));
-  const explanationStore = new ProfileExplanations(root, async facts => ({ cards: facts.map(fact => ({ key: fact.key, whatIs: 'Una explicación de prueba <segura>.', basic: 'Trabajo con guía.', independent: 'Trabajo por mi cuenta.', advanced: 'Diseño y resuelvo problemas.', yes: null, no: null })) }));
+  const explanationStore = new ProfileExplanations(root, async facts => ({ cards: facts.map(fact => ({ key: fact.key, whatIs: 'A test explanation <safe>.', basic: 'I work with guidance.', independent: 'I work independently.', advanced: 'I design and troubleshoot.', yes: null, no: null })) }));
   await explanationStore.load();
   explanationStore.start(['angular', 'go', 'rust'].map(key => ({ key, label: catalog.tags[key].label, mode: 'level', definition: catalog.tags[key].definition })));
   await explanationStore.completion;
@@ -135,8 +135,8 @@ try {
   assert.equal(await page.locator('[data-profile-item]', { hasText: 'Compiled languages' }).count(), 1);
   assert.equal(await page.locator('[data-profile-generate]').isDisabled(), true);
   assert.equal(await page.locator('#detail .profile-explanation').count(), 1);
-  assert.match(await page.locator('#detail .profile-explanation').innerText(), /Una explicación de prueba <segura>/);
-  assert.equal(await page.locator('#detail segura').count(), 0);
+  assert.match(await page.locator('#detail .profile-explanation').innerText(), /A test explanation <safe>/);
+  assert.equal(await page.locator('#detail safe').count(), 0);
   await page.locator('[data-profile-item]', { hasText: 'Compiled languages' }).click();
   assert.equal(await page.locator('#detail .profile-explanation').count(), 2);
   await page.locator('[data-profile-item]', { hasText: 'Angular' }).click();

@@ -91,7 +91,7 @@ The extraction/matching boundary is recorded in decision 0002.
   and supports updating member values directly inside a family.
 - Profile skill guidance is owner-triggered and cached per canonical skill.
   Generate only missing explanations for the current Missing queue, using
-  GPT-6 Luna medium through the existing subscription. Show concise Spanish
+  GPT-6 Luna medium through the existing subscription. Show concise English
   definitions and practical level examples beside the choices; retain guidance
   after saving. Never infer or save the owner's level from a generated card.
   See `docs/profile-explanations.md` for processing and persistence behavior.
